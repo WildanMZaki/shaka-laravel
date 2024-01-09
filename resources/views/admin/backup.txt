@@ -1,0 +1,51 @@
+// Ini cadangan ajax awal yang digunakan untuk active atau inactive product pada products.blade.php 
+
+// $.ajax({
+                    //     headers: {
+                    //         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    //             "content"
+                    //         ),
+                    //     },
+                    //     url: ,
+                    //     method: "PATCH",
+                    //     data: {
+                    //         id: id,
+                    //     },
+                    //     beforeSend: function () {
+                    //         wize.show_loading();
+                    //     },
+                    //     success: (data) => {
+                    //         Swal.fire({
+                    //             icon: "success",
+                    //             text: data.message ?? "Berhasil",
+                    //             customClass: {
+                    //                 confirmButton: "btn btn-success",
+                    //             },
+                    //         });
+                    //     },
+                    //     error: function (data) {
+                    //         if (data.responseJSON.message) {
+                    //             Swal.fire({
+                    //                 icon: "error",
+                    //                 text: data.responseJSON.message,
+                    //                 showClass: {
+                    //                     popup: "animate__animated animate__shakeX",
+                    //                 },
+                    //                 customClass: {
+                    //                     confirmButton: "btn btn-primary",
+                    //                 },
+                    //             });
+                    //         } else {
+                    //             Swal.fire({
+                    //                 icon: "error",
+                    //                 text: "Something went wrong!",
+                    //                 showClass: {
+                    //                     popup: "animate__animated animate__shakeX",
+                    //                 },
+                    //                 customClass: {
+                    //                     confirmButton: "btn btn-primary",
+                    //                 },
+                    //             });
+                    //         }
+                    //     },
+                    // });
