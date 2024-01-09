@@ -31,7 +31,7 @@ class AccessesSeeder extends Seeder
             'name' => 'Team Leader',
         ]);
         DB::table($this->table)->insert([
-            'id' => 3,
+            'id' => 4,
             'name' => 'Sales',
         ]);
     }
