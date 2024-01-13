@@ -56,8 +56,8 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
 
         Route::prefix('restocks')->group(function () {
             Route::get('/', [RestockController::class, 'index'])->name('products.restocks.list');
-            Route::get('/{id}', [RestockController::class, 'detail'])->name('products.restocks.detail');
             Route::get('/new', [RestockController::class, 'restock'])->name('products.restocks.form');
+            Route::get('/{id}', [RestockController::class, 'detail'])->name('products.restocks.detail');
             Route::post('/', [RestockController::class, 'store'])->name('products.restock');
             Route::get('/change/{id}', [RestockController::class, 'edit'])->name('products.restocks.edit');
             Route::put('/', [RestockController::class, 'update'])->name('products.restocks.update');
