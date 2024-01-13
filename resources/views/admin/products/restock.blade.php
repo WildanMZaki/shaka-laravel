@@ -1,15 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Products')
+@section('title', 'Restock Barang')
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('assets') }}/vendor/libs/select2/select2.css" />
     <link rel="stylesheet" href="{{ asset('assets') }}/vendor/libs/flatpickr/flatpickr.css" />
-    <style>
-        /* .select2.select2-container.select2-container--default + input[type="text"] {
-            display: none;
-        } */
-    </style>
 @endpush
 
 @section('content')
@@ -18,53 +13,43 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-start align-items-center">
-                        <a href="{{ route('products') }}" class="fw-bold me-2">
+                        <a href="{{ route('products.restocks.list') }}" class="fw-bold me-2">
                             <i class="ti ti-arrow-left fs-3 m-0 p-0"></i>
                         </a>
-                        <h3 class="m-0 p-0">Tambah atau Restock Produk</h3>
+                        <h3 class="m-0 p-0">Restock Produk</h3>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('product.store') }}" id="add-or-restock-product" method="POST">
+                        <form action="{{ route('products.restock') }}" id="restock-product" method="POST">
                             @csrf
                             @php
-                                $isOptionEmpty = empty($merkOptions);
+                                $isOptionEmpty = count($merkOptions) == 0; 
                             @endphp
-                            <div class="row">
+                            <div class="row">                                
                                 <div class="col-lg-6 col-xl-6">
-                                    <label for="type" class="form-label">Tipe Belanja <span class="text-danger">*</span></label>
-                                    <select class="select-type apply-select2 storeInput" name="type" id="type" data-hide-search="1">
-                                        @if ($isOptionEmpty)
-                                            <option selected value="Produk Baru" data-target="#new-product-option">Tambah Barang Baru</option>                                            
-                                            <option value="Restock" data-target="#restock-option" disabled>Restock Barang</option>
-                                        @else
-                                            <option selected value="Restock" data-target="#restock-option">Restock Barang</option>
-                                            <option value="Produk Baru" data-target="#new-product-option">Tambah Barang Baru</option>                                                                                        
+                                    <label for="select-merk" class="form-label">Pilih Merk <span class="text-danger">*</span></label>
+                                    <select class="select-merk apply-select2 storeInput" name="merk_id" id="merk_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
+                                        @if (!isset($product))
+                                            <option value=""></option>
                                         @endif
+                                        @foreach ($merkOptions as $merkOption)
+                                            <option value="{{ $merkOption->id }}">{{ $merkOption->merk }}</option>
+                                        @endforeach
                                     </select>
-                                    <span class="invalid-feedback" id="type-invalid-msg"></span>
-                                    <small>Pastikan Tipe Belanja Sesuai</small>
+                                    <span class="invalid-feedback" id="merk_id-invalid-msg"></span>
+                                    @if ($isOptionEmpty)
+                                        <small class="text-danger">*** Ups.. sepertinya belum ada produk yang pernah ditambahkan</small>
+                                    @endif                            
                                 </div>
-                                <div class="col-lg-6 col-xl-6">
-                                    <div id="restock-option" class="shopping-options mt-3 mt-lg-0 mt-xl-0 {{ $isOptionEmpty ? 'd-none': '' }}">
-                                        <label for="select-merk" class="form-label">Pilih Merk <span class="text-danger">*</span></label>
-                                        <select class="select-merk apply-select2 storeInput" name="merk_id" id="merk_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
-                                            @if (!isset($restock))
-                                                <option value=""></option>
-                                            @endif
-                                            @foreach ($merkOptions as $merkOption)
-                                                <option value="{{ $merkOption->id }}">{{ $merkOption->merk }}</option>
-                                            @endforeach
-                                        </select>
-                                        <span class="invalid-feedback" id="merk_id-invalid-msg"></span>
-                                        @if ($isOptionEmpty)
-                                            <small class="text-danger">*** Ups.. sepertinya belum ada produk yang pernah ditambahkan. Silahkan pilih tipe belanja 'Tambah Barang Baru'</small>
-                                        @endif
-                                    </div>
-                                    <div id="new-product-option" class="shopping-options {{ !$isOptionEmpty ? 'd-none': '' }} mt-3 mt-lg-0 mt-xl-0">
-                                        <label for="merk" class="form-label">Masukkan Merk Produk Baru <span class="text-danger">*</span></label>
-                                        <input type="text" name="merk" id="merk" class="form-control storeInput" placeholder="Masukkan merk produk">
-                                        <span class="invalid-feedback" id="merk-invalid-msg"></span>
-                                    </div>
+
+                                <div class="col-lg-3 col-xl-3 mt-3 mt-lg-0 mt-xl-0">
+                                    <label class="form-label" for="transaction_date">Tanggal Transaksi <span class="text-danger">*</span></label>
+                                    <input type="date" name="transaction_date" id="transaction_date" class="form-control storeInput">
+                                    <span class="invalid-feedback" id="transaction_date-invalid-msg"></span>
+                                </div>
+                                <div class="col-lg-3 col-xl-3 mt-3 mt-lg-0 mt-xl-0">
+                                    <label class="form-label" for="expiration_date">Tanggal Kadaluwarsa <span class="text-danger">*</span></label>
+                                    <input type="date" name="expiration_date" id="expiration_date" class="form-control storeInput">
+                                    <span class="invalid-feedback" id="expiration_date-invalid-msg"></span>
                                 </div>
                             </div>
 
@@ -101,18 +86,12 @@
                                 <div class="col-lg-3 col-xl-3 mt-3 mt-lg-0 mt-xl-0">
                                     <label class="form-label" for="price">Harga Satuan</label>
                                     <input type="text" name="price" id="price" class="form-control disabled" disabled placeholder="Rp 0">
-                                </div>
-                                <div class="col-lg-3 col-xl-3 mt-3 mt-lg-0 mt-xl-0">
-                                    <label class="form-label" for="transaction_date">Tanggal Transaksi <span class="text-danger">*</span></label>
-                                    <input type="date" name="transaction_date" id="transaction_date" class="form-control storeInput">
-                                    <span class="invalid-feedback" id="transaction_date-invalid-msg"></span>
-
-                                </div>
-                                <div class="col-lg-3 col-xl-3 mt-3 mt-lg-0 mt-xl-0">
-                                    <label class="form-label" for="expiration_date">Tanggal Kadaluwarsa <span class="text-danger">*</span></label>
-                                    <input type="date" name="expiration_date" id="expiration_date" class="form-control storeInput">
-                                    <span class="invalid-feedback" id="expiration_date-invalid-msg"></span>
-                                </div>
+                                </div>       
+                                <div class="col-lg-6 col-xl-6 mt-3 mt-lg-0 mt-xl-0">
+                                    <label class="form-label" for="description">Keterangan <i>(Opsional)</i></label>
+                                    <input type="text" class="form-control storeInput" id="description" name="description" placeholder="Tambahkan keterangan (Opsional)">
+                                    <span class="invalid-feedback" id="description-invalid-msg"></span>
+                                </div>                         
                             </div>
 
                             <div class="row">
@@ -154,12 +133,6 @@
             }
         }
         $(document).ready(() => {
-            $('#type').change(function() {
-                const value = $(this).val();
-                $('.shopping-options').addClass('d-none');
-                const showOption = $(this).find(`option[value="${value}"]`).data().target;
-                $(showOption).removeClass('d-none');
-            });
             $('#unit').change(function() {
                 const qty = parseInt($('#qty').val());
                 const satuan = Number($(this).val());
@@ -191,23 +164,10 @@
             enableTime: false,
             dateFormat: "j M Y",
             defaultDate: new Date(),
-            // minDate: new Date(),
-            // maxDate: new Date().setMonth(new Date().getMonth() + 1),
-            // onChange: function(selectedDates, dateStr, instance) {
-            //     // Update minDate of expiration_date when transaction_date changes
-            //     const newMinDate = new Date(dateStr).setDate(new Date().getDate() + 1);
-                
-            //     console.log(dateStr);
-            //     console.log(newMinDate);
-
-            //     $expirationDate.config.minDate = newMinDate;
-            //     // $('#expiration_date').flatpickr().set('minDate', dateStr);
-            //     // $expirationDate.config.minDate
-            // }
         });
 
         // Initialize expiration_date datepicker
-        const $expirationDate = $('#expiration_date').flatpickr({
+        $('#expiration_date').flatpickr({
             enableTime: false,
             dateFormat: "j M Y",
             defaultDate: new Date().setMonth(new Date().getMonth() + 2),
@@ -216,19 +176,19 @@
     <script>
         const wize = new Wize();
 
-        $(document).on('submit', '#add-or-restock-product', function (e) {
+        $(document).on('submit', '#restock-product', function (e) {
             e.preventDefault();
             const url = $(this).attr('action');
             const data = {
                 type: $('#type').val(),
                 merk_id: $('#merk_id').val(),
-                merk: $('#merk').val(),
                 qty: $('#qty').val(),
                 unit: $('#unit').val(),
                 price_total: validInt($('#price_total').val()),
                 price: validInt($('#price').val()),
                 transaction_date: $('#transaction_date').val(),
                 expiration_date: $('#expiration_date').val(),
+                description: $('#description').val(),
             };
 
             wize.ajax({

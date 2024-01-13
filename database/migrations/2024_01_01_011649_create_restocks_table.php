@@ -17,10 +17,10 @@ return new class extends Migration
             $table->unsignedInteger('qty')->comment('In Botol');
             $table->dateTime('restock_date');
             $table->dateTime('expiration_date');
-            $table->enum('type', ['Produk Baru', 'Restock'])->default('Restock');
             $table->unsignedBigInteger('price');
             $table->unsignedBigInteger('price_total');
             $table->unsignedBigInteger('price_sale');
+            $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

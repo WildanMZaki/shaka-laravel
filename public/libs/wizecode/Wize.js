@@ -53,6 +53,7 @@ const mustBeAtLeast = (element, min, cbFn = null) => {
     if (isNaN(numericValue) || numericValue < min) {
         element.value = min;
     }
+    // element.value = numericValue;
 
     if (cbFn !== null) {
         cbFn(element.value);

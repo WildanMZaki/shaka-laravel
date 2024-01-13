@@ -47,7 +47,6 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     Route::prefix('admin')->group(function () {
         Route::prefix('products')->group(function () {
             Route::get('/', [ProductController::class, 'index'])->name('products');
-            Route::get('restock', [ProductController::class, 'restock'])->name('product.restock');
             Route::post('/', [ProductController::class, 'store'])->name('product.store');
             Route::patch('/', [ProductController::class, 'active_control'])->name('product.active_control');
             Route::put('/', [ProductController::class, 'update'])->name('product.update');
@@ -57,11 +56,18 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
 
         Route::prefix('restocks')->group(function () {
             Route::get('/', [RestockController::class, 'index'])->name('products.restocks.list');
+            Route::get('/{id}', [RestockController::class, 'detail'])->name('products.restocks.detail');
+            Route::get('/new', [RestockController::class, 'restock'])->name('products.restocks.form');
+            Route::post('/', [RestockController::class, 'store'])->name('products.restock');
+            Route::get('/change/{id}', [RestockController::class, 'edit'])->name('products.restocks.edit');
+            Route::put('/', [RestockController::class, 'update'])->name('products.restocks.update');
             Route::delete('/', [RestockController::class, 'delete'])->name('products.restocks.delete');
         });
 
         Route::prefix('employees')->group(function () {
             Route::get('/', [EmployeeController::class, 'index'])->name('employees');
+            Route::patch('/', [EmployeeController::class, 'active_control'])->name('employee.active_control');
+            Route::post('/', [EmployeeController::class, 'store'])->name('employee.store');
             Route::get('/positions', [PositionController::class, 'index'])->name('employees.positions');
         });
     });

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Products')
+@section('title', 'List Karyawan')
 
 @push('css')
     <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.css" rel="stylesheet">
@@ -16,11 +16,11 @@
                         <table class="table" id="wize-table">
                             <thead>
                                 <tr>
-                                    <td id="select-all-container"></td>
-                                    <th>Merk</th>
-                                    <th>Stok</th>
-                                    <th>Harga Jual</th>
-                                    <th>Terjual</th>
+                                    <td></td>
+                                    <th>Nama</th>
+                                    <th>Nomor Whatsapp</th>
+                                    <th>Email</th>
+                                    <th>Jabatan</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -31,6 +31,77 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal-add" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="">Tambah Karyawan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="form-add" action="{!! route('employee.store') !!}" method="post">
+                    <input type="hidden" value="" name="id" class="store">
+                    <div class="modal-body">
+                        <div class="row g-1">
+                            <div class="col-lg-6 col-12 mb-3">
+                                <label class="form-label">Nama <span class="text-danger">*</span></label>
+                                <input type="text" name="name" class="form-control store" placeholder="Masukkan nama karyawan" />
+                                <span class="invalid-feedback" id="name-invalid-msg"></span>
+                            </div>
+                            <div class="col-lg-6 col-12 mb-3">
+                                <label class="form-label">NIK <span class="text-danger">*</span></label>
+                                <input type="text" name="nik" class="form-control store" placeholder="Masukkan nik karyawan" oninput="mustDigit(this)" />
+                                <span class="invalid-feedback" id="nik-invalid-msg"></span>
+                            </div>
+                        </div>
+                        <div class="row g-1">
+                            <div class="col-lg-6 col-12 mb-3">
+                                <label class="form-label">Nomor Whatsapp <span class="text-danger">*</span></label>
+                                <input type="text" name="phone" class="form-control store" placeholder="Masukkan nomor whatsapp" oninput="mustDigit(this)" />
+                                <span class="invalid-feedback" id="phone-invalid-msg"></span>
+                            </div>
+                            <div class="col-lg-6 col-12 mb-3">
+                                <label class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" name="email" class="form-control store" placeholder="Masukkan email" />
+                                <span class="invalid-feedback" id="email-invalid-msg"></span>
+                            </div>
+                        </div>
+                        <div class="row g-1">
+                            <div class="col-lg-4 col-12 mb-3">
+                                <label class="form-label">Jabatan <span class="text-danger">*</span></label>
+                                <select name="position" id="position" class="form-select store">
+                                    @foreach ($positions as $position)
+                                        <option value="{{ $position->id }}">{{ $position->name }}</option>
+                                    @endforeach
+                                </select>
+                                <span class="invalid-feedback" id="position-invalid-msg"></span>
+                            </div>
+                            <div class="col-lg-4 col-12 mb-3">
+                                <label class="form-label">Pilih Team Leader (Untuk Sales)<span class="text-danger">*</span></label>
+                                <select name="tl_id" id="tl_id" class="form-select apply-select2 store" {{ count($team_leaders) ? '' : "disabled"}}>
+                                    @foreach ($team_leaders as $team_leader)
+                                        <option value="{{ $team_leader->id }}">{{ $team_leader->name }}</option>
+                                    @endforeach
+                                </select>
+                                <span class="invalid-feedback" id="tl_id-invalid-msg"></span>
+                            </div>
+                            <div class="col-lg-4 col-12 mb-3">
+                                <label for="Foto" class="form-label">Tambah Foto (Opsional)</label>
+                                <input type="file" name="photo" id="photo" class="form-control store">
+                                <span class="invalid-feedback" id="photo-invalid-msg"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -85,25 +156,25 @@
 @push('js')
     <script src="{{ asset('libs') }}/wizecode/Wize.js"></script>
     <script src="{{ asset('libs') }}/wizecode/WizeTable.js"></script>
+    <script src="{{ asset('libs') }}/wizecode/select2-caller.js"></script>
     <script>
         const wize = new Wize();
         const wizeTable = new WizeTable();
         let table;
         $(document).ready(() => {
             wizeTable.init({
-                title: 'Daftar Barang',
-                url_delete: '{!! route("products.delete") !!}',
+                title: 'Daftar Karyawan',
+                url_delete: '{!! route("employees") !!}',
                 columns: [
-                    'merk', 'stock', 'sell_price', 'sold', 'status', 'actions'
+                    'name', 'phone', 'email', 'position', 'status', 'actions'
                 ],
                 defaultButton: {
                     custom: null,
-                    icon: "ti ti-shopping-cart-plus",
+                    icon: "ti ti-user-plus",
                     color: "btn-primary",
-                    text: "Restock Barang",
+                    text: "Tambah Karyawan",
                     action: () => {
-                        wize.show_loading();
-                        window.location.href = '{{ route("product.restock") }}';
+                        $('#modal-add').modal('show');
                     },
                 }
             })
@@ -153,7 +224,7 @@
             const title = $(this).attr('title') ?? $(this).data('bsOriginalTitle');
             const id = $(this).data('id');
             Swal.fire({
-                text: `${title} produk`,
+                text: `${title} karyawan`,
                 icon: "question",
                 showCancelButton: true,
                 confirmButtonText: "Ya",
@@ -166,7 +237,7 @@
             }).then((result) => {
                 if (result.value) {
                     wize.ajax({
-                        url: '{!! route("product.active_control") !!}',
+                        url: '{!! route("employee.active_control") !!}',
                         method: 'PATCH',
                         data: {
                             id: id,

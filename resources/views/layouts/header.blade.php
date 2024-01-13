@@ -30,8 +30,8 @@
                         </div>
                         </div>
                         <div class="flex-grow-1">
-                        <h6 class="mb-0">John Doe</h6>
-                        <small class="text-muted">Admin</small>
+                        <h6 class="mb-0">{{ $auth->name }}</h6>
+                        <small class="text-muted">{{ $auth->access->name }}</small>
                         </div>
                     </div>
                     </a>

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_employee')->default(true);
+            $table->boolean('active')->default(true)->comment('1=active, 0=inactive');
             $table->rememberToken();
             $table->timestamps();
         });

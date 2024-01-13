@@ -60,4 +60,11 @@ trait Formatter
     {
         return date('d M Y', strtotime($dateTime));
     }
+
+    public static function ceilToHundreds($value)
+    {
+        $value = abs($value);
+        $roundedValue = ceil($value / 100) * 100;
+        return $roundedValue;
+    }
 }

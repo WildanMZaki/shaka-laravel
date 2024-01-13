@@ -28,6 +28,7 @@ class UsersTableSeeder extends Seeder
             'phone' => '089619925691',
             'email' => 'wildanmzaki7@gmail.com',
             'email_verified_at' => now(),
+            'is_employee' => false,
             'password' => bcrypt($devPass),
         ]);
         DB::table($this->table)->insert([

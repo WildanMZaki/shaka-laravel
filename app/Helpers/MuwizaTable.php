@@ -10,8 +10,12 @@ class MuwizaTable extends Muwiza
     private $processedData = [];
     private $resultData = [];
     private $extractData = ['id'];
+    private $withId = true;
     private $order = [];
     private static $defaultPlaceholder = '{data}';
+    private $usedBtns = [];
+    private $definedBtns = [];
+    private $btnsKeys = [];
 
     private $testResult = [];
 
@@ -55,6 +59,69 @@ class MuwizaTable extends Muwiza
             'textColor' => 'text-danger',
             'tooltip' => 'Nonaktifkan'
         ],
+        'success' => [
+            'selector' => 'is-btn-success',
+            'data' => [],
+            'classColor' => 'btn-label-success',
+            'textColor' => 'text-success',
+            'tooltip' => 'Success Action'
+        ],
+        'primary' => [
+            'selector' => 'is-btn-primary',
+            'data' => [],
+            'classColor' => 'btn-label-primary',
+            'textColor' => 'text-primary',
+            'tooltip' => 'Primary Action'
+        ],
+        'secondary' => [
+            'selector' => 'is-btn-secondary',
+            'data' => [],
+            'classColor' => 'btn-label-secondary',
+            'textColor' => 'text-secondary',
+            'tooltip' => 'Secondary Action'
+        ],
+        'warning' => [
+            'selector' => 'is-btn-warning',
+            'data' => [],
+            'classColor' => 'btn-label-warning',
+            'textColor' => 'text-warning',
+            'tooltip' => 'Warning Action'
+        ],
+        'danger' => [
+            'selector' => 'is-btn-danger',
+            'data' => [],
+            'classColor' => 'btn-label-danger',
+            'textColor' => 'text-danger',
+            'tooltip' => 'Danger Action'
+        ],
+        'info' => [
+            'selector' => 'is-btn-info',
+            'data' => [],
+            'classColor' => 'btn-label-info',
+            'textColor' => 'text-info',
+            'tooltip' => 'Info Action'
+        ],
+        'dark' => [
+            'selector' => 'is-btn-dark',
+            'data' => [],
+            'classColor' => 'btn-label-dark',
+            'textColor' => 'text-dark',
+            'tooltip' => 'Dark Btn'
+        ],
+        'light' => [
+            'selector' => 'is-btn-light',
+            'data' => [],
+            'classColor' => 'btn-label-light',
+            'textColor' => 'text-light',
+            'tooltip' => 'Light Btn'
+        ],
+        'white' => [
+            'selector' => 'is-btn-white',
+            'data' => [],
+            'classColor' => 'btn-label-white',
+            'textColor' => 'text-white',
+            'tooltip' => 'White Btn'
+        ],
     ];
 
     public static function generate($rowsData, ?callable $basicProcess = null)
@@ -79,6 +146,7 @@ class MuwizaTable extends Muwiza
 
     public function withoutId()
     {
+        $this->withId = false;
         $i = array_search('id', $this->extractData);
 
         // Hapus elemen dengan indeks yang ditemukan
@@ -277,18 +345,59 @@ class MuwizaTable extends Muwiza
         return implode('', array_map([self::class, 'formatDefaultActionBtn'], $btns));
     }
 
-    public function actions(string|callable $actionColumn = 'actions', ?callable $callback = null)
+    // public function actions(string|callable $actionColumn = 'actions', ?callable $callback = null)
+    // {
+    //     foreach ($this->rowsData as $i => $row) {
+    //         $trueActionColumn = is_string($actionColumn) ? $actionColumn : 'actions';
+    //         $btns = $trueActionColumn === 'actions' && $callback !== null ? $callback($row) : $actionColumn($row);
+
+    //         // $btns = $trueActionColumn === 'actions' ? $callback($row) : $actionColumn($row);
+
+    //         $this->processedData[$i][$trueActionColumn] = $this::generateActions($btns);
+    //     }
+
+    //     return $this;
+    // }
+
+    public function actions(string|array $actionOrBtns = 'actions', array|callable $btnsOrCallback = null, ?callable $closure = null)
     {
+        if (is_array($actionOrBtns)) {
+            $this->definedBtns = $actionOrBtns;
+            $colName = 'actions';
+        } else {
+            $colName = $actionOrBtns;
+        }
+
+        if (is_array($btnsOrCallback)) {
+            $this->definedBtns = $btnsOrCallback;
+        }
+        $this->getBtns();
         foreach ($this->rowsData as $i => $row) {
-            $trueActionColumn = is_string($actionColumn) ? $actionColumn : 'actions';
-            $btns = $trueActionColumn === 'actions' && $callback !== null ? $callback($row) : $actionColumn($row);
-
-            // $btns = $trueActionColumn === 'actions' ? $callback($row) : $actionColumn($row);
-
-            $this->processedData[$i][$trueActionColumn] = $this::generateActions($btns);
+            if ($this->withId) {
+                foreach ($this->btnsKeys as $btnKey) {
+                    $this->usedBtns[$btnKey]['data']['id'] = $row->id;
+                }
+            }
+            $fix_buttons = $closure != null ? $closure($this->usedBtns, $row) : $btnsOrCallback($this->usedBtns, $row);
+            $this->processedData[$i][$colName] = $this::generateActions(array_values($fix_buttons));
         }
 
         return $this;
+    }
+
+    private function getBtns()
+    {
+        foreach ($this->definedBtns as $btn) {
+            if (is_array($btn)) {
+                $btnKey = array_keys($btn)[0];
+                $this->btnsKeys[] = $btnKey;
+                $type = $btn[$btnKey];
+                $this->usedBtns[$btnKey] = $this::$btnsDefault[$type];
+            } else {
+                $this->usedBtns[$btn] = $this::$btnsDefault[$btn];
+                $this->btnsKeys[] = $btn;
+            }
+        }
     }
 
     public function result()
