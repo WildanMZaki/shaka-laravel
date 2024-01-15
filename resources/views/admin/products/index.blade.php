@@ -42,7 +42,7 @@
                     <h5 class="modal-title" id="">Tambah Barang</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="form-add" action="{!! route('product.store') !!}" method="post">
+                <form id="form-add" action="{!! route('product.store') !!}" method="post" e>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col mb-3">
@@ -129,7 +129,7 @@
         let table;
         $(document).ready(() => {
             wizeTable.init({
-                title: 'Daftar Barang',
+                title: 'Daftar Karyawan',
                 url_delete: '{!! route("products.delete") !!}',
                 columns: [
                     'merk', 'stock', 'sell_price', 'sold', 'status', 'actions'
@@ -146,6 +146,11 @@
             })
             wize.activate_tooltips();
         });
+
+        $('#modal-add').on('shown.bs.modal', function () {
+            console.log(this);
+            $(this).find('input[name="merk"].add').focus();
+        })
 
         $('#form-add').on('submit', function(e) {
             e.preventDefault();

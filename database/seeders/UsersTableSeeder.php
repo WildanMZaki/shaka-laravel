@@ -24,20 +24,20 @@ class UsersTableSeeder extends Seeder
         DB::table($this->table)->insert([
             'name' => 'Developer',
             'access_id' => 1,
-            'username' => 'dev',
+            // 'username' => 'dev',
             'phone' => '089619925691',
             'email' => 'wildanmzaki7@gmail.com',
-            'email_verified_at' => now(),
+            // 'email_verified_at' => now(),
             'is_employee' => false,
             'password' => bcrypt($devPass),
         ]);
         DB::table($this->table)->insert([
             'name' => 'Administrator',
             'access_id' => 2,
-            'username' => 'admin',
-            'phone' => '081234567890',
+            // 'username' => 'admin',
+            'phone' => '123',
             'email' => 'admin@admin.com',
-            'email_verified_at' => now(),
+            // 'email_verified_at' => now(),
             'password' => bcrypt($adminPass),
         ]);
     }

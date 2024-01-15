@@ -30,15 +30,15 @@
                 <div class="form-floating form-floating-outline mb-3">
                   <input 
                     type="text"
-                    class="form-control @error('username') is-invalid @enderror" 
-                    name="username" value="{{ old('username') }}" required autocomplete="username"
+                    class="form-control @error('phone') is-invalid @enderror" 
+                    name="phone" value="{{ old('phone') }}" required autocomplete="phone"
                     autofocus />
-                    @error('username')
+                    @error('phone')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror
-                  <label for="username">Username</label>
+                  <label for="phone">Nomor Whatsapp</label>
                 </div>
                 <div class="mb-3">
                   <div class="form-password-toggle">

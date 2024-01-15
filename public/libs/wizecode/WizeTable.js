@@ -24,9 +24,11 @@ class WizeTable {
             text: "Tambah",
             action: () => {},
         },
+        addon_delete = null,
+        defaultDelete = true,
     }) => {
         // Yang jelas di bawah ini untuk mencegah terjadinya auto sort ketika tabel diinisialisasi
-        $(selector).data("order", "");
+        // $(selector).data("order", "");
         this.url = url;
         this.columns = columns;
         this.message_delete = message_delete;
@@ -34,6 +36,8 @@ class WizeTable {
         this.withDelete = url_delete !== false;
         this.defaultButton = defaultButton;
         this.btns = btns;
+        this.addon_delete = addon_delete;
+        this.defaultDelete = defaultDelete;
 
         if (this.withDelete) {
             if (columns.length) this.columns.unshift("checkbox");
@@ -60,7 +64,7 @@ class WizeTable {
                         },
                     },
                 ],
-                order: [[1, "asc"]],
+                order: [],
             });
             this.wizeTable.column(0).header().innerHTML = `
                 <div class="form-check">
@@ -198,6 +202,12 @@ class WizeTable {
                             });
                         },
                         success: (data) => {
+                            if (this.addon_delete != null) {
+                                this.addon_delete(data);
+                                if (!this.defaultDelete) {
+                                    return;
+                                }
+                            }
                             this.reload();
                             Swal.fire({
                                 icon: "success",

@@ -19,7 +19,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'username',
+        'nik',
+        'is_employee',
+        'access_id',
+        'active',
+        'phone',
         'email',
         'password',
     ];
@@ -46,6 +50,16 @@ class User extends Authenticatable
 
     public function access()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Access::class);
+    }
+
+    public function salesTeams()
+    {
+        return $this->hasMany(SalesTeam::class, 'leader_id');
+    }
+
+    public function teamLeaders()
+    {
+        return $this->hasMany(SalesTeam::class, 'sales_id');
     }
 }

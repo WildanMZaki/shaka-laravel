@@ -29,4 +29,31 @@ $(document).ready(() => {
 
         $select.select2(config);
     });
+
+    // Input File and it preview:
+    $(".wize-upload-image").on("change", function (e) {
+        const targetImg = $(this).data("wzTarget");
+        if (!targetImg) {
+            alert("data-wz-target diperlukan");
+        }
+        // Get the selected file
+        var file = e.target.files[0];
+
+        if (file) {
+            // Create a FileReader object to read the file
+            var reader = new FileReader();
+
+            // Set a callback function to execute when the file is read
+            reader.onload = function (e) {
+                // Set the source of the image to the data URL
+                $(targetImg).attr("src", e.target.result);
+            };
+
+            // Read the file as a data URL
+            reader.readAsDataURL(file);
+        } else {
+            // If no file is selected, clear the image source
+            $(targetImg).attr("src", "");
+        }
+    });
 });

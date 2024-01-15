@@ -69,6 +69,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::patch('/', [EmployeeController::class, 'active_control'])->name('employee.active_control');
             Route::post('/', [EmployeeController::class, 'store'])->name('employee.store');
             Route::get('/positions', [PositionController::class, 'index'])->name('employees.positions');
+            Route::delete('/', [EmployeeController::class, 'delete'])->name('employees.delete');
         });
     });
 });

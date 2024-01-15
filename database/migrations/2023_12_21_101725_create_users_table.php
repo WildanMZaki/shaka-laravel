@@ -19,10 +19,10 @@ return new class extends Migration
                 ->on('accesses')
                 ->onDelete('cascade');
             $table->string('name');
-            $table->string('username')->unique();
+            $table->string('nik')->nullable();
+            $table->string('photo')->nullable();
             $table->string('email')->unique();
             $table->string('phone', 16)->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('is_employee')->default(true);
             $table->boolean('active')->default(true)->comment('1=active, 0=inactive');

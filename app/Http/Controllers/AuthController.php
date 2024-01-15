@@ -17,14 +17,14 @@ class AuthController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'username' => ['required'],
+            'phone' => ['required'],
             'password' => ['required']
         ]);
 
-        $user = User::where('username', $request->username)->first();
+        $user = User::where('phone', $request->phone)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->withErrors([
-                'msg' => 'Username atau password salah'
+                'msg' => 'Nomor ponsel atau password salah'
             ]);
         }
 

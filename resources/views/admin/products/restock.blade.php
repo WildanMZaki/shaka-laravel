@@ -115,7 +115,7 @@
 @endpush
 
 @push('js')
-    <script src="{{ asset('libs') }}/wizecode/select2-caller.js"></script>
+    <script src="{{ asset('libs') }}/wizecode/applier.js"></script>
     <script src="{{ asset('libs') }}/wizecode/Wize.js"></script>
     <script>
         // CallBack Functions: 

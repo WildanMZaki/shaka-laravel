@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\MuwizaTable;
 use App\Models\Access;
+use App\Models\SalesTeam;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -18,8 +19,8 @@ class EmployeeController extends Controller
             return response()->json($rows);
         }
         $data['rows'] = $table->resultHTML();
-        $data['positions'] = Access::whereIn('id', [3, 4])->get();
-        $data['team_leaders'] = User::where('id', 3)->get();
+        $data['team_leaders'] = User::where('access_id', 3)->get();
+        $data['positions'] = Access::whereIn('id', [3, 4])->orderBy('id', (count($data['team_leaders']) ? 'desc' : 'asc'))->get();
         return view('admin.employees.index', $data);
     }
 
@@ -41,6 +42,70 @@ class EmployeeController extends Controller
                 $btns[$used]['classIcon'] = $row->active ? 'ti ti-user-off' : 'ti ti-user-check';
                 return $btns;
             });
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => ['required'],
+            'phone' => ['required', 'unique:users,phone'],
+            'password' => ['required'],
+            'email' => ['required'],
+            'nik' => ['required'],
+            'photo' => 'image|mimes:jpeg,png,jpg|max:5120',
+            'position' => ['required', 'in:3,4'],
+        ], [
+            'name.required' => 'Nama karyawan harus diisi',
+            'phone.required' => 'Nomor ponsel harus diisi',
+            'phone.unique' => 'Nomor ponsel telah digunakan ',
+            'password.required' => 'Password harus diisi',
+            'email.required' => 'Email harus diisi',
+            'position.required' => 'Jabatan harus dipilih',
+            'position.in' => 'Jabatan tidak valid',
+            'nik.required' => 'NIK harus diisi',
+            'photo.image' => 'Foto harus gambar',
+            'photo.mimes' => 'Ekstensi foto harus antara jpeg, png, atau jpg',
+            'photo.max' => 'Ukuran file foto maksimal: 5 Mb',
+        ]);
+
+        if ($request->position == 4) {
+            if (!$request->tl_id) {
+                return response()->json([
+                    'message' => 'Team Leader harus dipilih',
+                    'errors' => [
+                        'tl_id' => ['Team Leader harus dipilih'],
+                    ],
+                ], 422);
+            } else {
+                $salesTeam = new SalesTeam();
+                $salesTeam->leader_id = $request->tl_id;
+            }
+        }
+
+        $path = null;
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('public/employees');
+        }
+
+        $employee = new User();
+        $employee->name = $request->name;
+        $employee->password = bcrypt($request->password);
+        $employee->nik = $request->nik;
+        $employee->photo = $path;
+        $employee->phone = $request->phone;
+        $employee->email = $request->email;
+        $employee->access_id = $request->position;
+        $employee->save();
+
+        if ($employee->access_id == 4) {
+            $salesTeam->sales_id = $employee->id;
+            $salesTeam->save();
+        }
+
+        return response()->json([
+            'message' => 'Karyawan ditambahkan',
+            'leaders' => User::where('active', 1)->where('access_id', 3)->get(['id', 'name']),
+        ]);
     }
 
     public function active_control(Request $request)
@@ -99,22 +164,19 @@ class EmployeeController extends Controller
         ], 400);
 
         foreach ($request->id as $id) {
-            $product = User::find($id);
-            // $is_allowed = Owner::is_allowed($table->user_id, auth()->user()->id);
-            // if ($is_allowed) {
-            //     if ($table) $table->delete();
-            // }
-            if ($product) {
-                $product->delete();
+            $employee = User::whereIn('access_id', [3, 4])->find($id);
+            if ($employee) {
+                $employee->delete();
             } else {
                 return response()->json([
-                    'message' => 'Barang tidak ditemukan'
+                    'message' => 'Karyawan tidak ditemukan'
                 ], 400);
             }
         }
 
         return response()->json([
-            'message' => 'Barang berhasil dihapus',
+            'message' => 'Karyawan berhasil dihapus',
+            'leaders' => User::where('active', 1)->where('access_id', 3)->get(['id', 'name']),
         ]);
     }
 }

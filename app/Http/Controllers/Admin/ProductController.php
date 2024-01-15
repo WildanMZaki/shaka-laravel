@@ -156,10 +156,6 @@ class ProductController extends Controller
 
         foreach ($request->id as $id) {
             $product = Product::find($id);
-            // $is_allowed = Owner::is_allowed($table->user_id, auth()->user()->id);
-            // if ($is_allowed) {
-            //     if ($table) $table->delete();
-            // }
             if ($product) {
                 $product->delete();
             } else {

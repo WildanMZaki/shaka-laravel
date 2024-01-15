@@ -43,45 +43,64 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="form-add" action="{!! route('employee.store') !!}" method="post">
-                    <input type="hidden" value="" name="id" class="store">
                     <div class="modal-body">
-                        <div class="row g-1">
-                            <div class="col-lg-6 col-12 mb-3">
-                                <label class="form-label">Nama <span class="text-danger">*</span></label>
-                                <input type="text" name="name" class="form-control store" placeholder="Masukkan nama karyawan" />
-                                <span class="invalid-feedback" id="name-invalid-msg"></span>
+                        <div class="row">
+                            <div class="col-lg-3 d-flex d-lg-block justify-content-center">
+                                <img src="{{ asset('assets/img/avatars').'/'.rand(1,7).'.png' }}" alt="Avatar" id="preview-foto-karyawan" class="img-fluid">
                             </div>
-                            <div class="col-lg-6 col-12 mb-3">
-                                <label class="form-label">NIK <span class="text-danger">*</span></label>
-                                <input type="text" name="nik" class="form-control store" placeholder="Masukkan nik karyawan" oninput="mustDigit(this)" />
-                                <span class="invalid-feedback" id="nik-invalid-msg"></span>
+                            <div class="col-lg-9 col-12 mb-3">
+                                <div class="row mt-2">
+                                    <div class="col">
+                                        <label class="form-label">Nama <span class="text-danger">*</span></label>
+                                        <input type="text" name="name" class="form-control store" placeholder="Masukkan nama karyawan" />
+                                        <span class="invalid-feedback" id="name-invalid-msg"></span>
+                                    </div>
+                                </div>
+                                <div class="row g-1 my-lg-3 mt-2 mt-lg-0">
+                                    <div class="col-lg-6">
+                                        <label for="Foto" class="form-label">Tambah Foto (Opsional)</label>
+                                        <input type="file" name="photo" id="photo" class="form-control store wize-upload-image" data-wz-target="#preview-foto-karyawan">
+                                        <span class="invalid-feedback" id="photo-invalid-msg"></span>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <label class="form-label">NIK <span class="text-danger">*</span></label>
+                                        <input type="text" name="nik" class="form-control store" placeholder="Masukkan nik karyawan" oninput="mustDigit(this)" />
+                                        <span class="invalid-feedback" id="nik-invalid-msg"></span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="row g-1">
-                            <div class="col-lg-6 col-12 mb-3">
+                            <div class="col-lg-4 col-12 mb-3">
                                 <label class="form-label">Nomor Whatsapp <span class="text-danger">*</span></label>
                                 <input type="text" name="phone" class="form-control store" placeholder="Masukkan nomor whatsapp" oninput="mustDigit(this)" />
                                 <span class="invalid-feedback" id="phone-invalid-msg"></span>
                             </div>
-                            <div class="col-lg-6 col-12 mb-3">
+                            <div class="col-lg-4 col-12 mb-3">
+                                <label class="form-label">Password <span class="text-danger">*</span></label>
+                                <input type="text" name="password" class="form-control store" placeholder="Masukkan password untuk karyawan" />
+                                <span class="invalid-feedback" id="password-invalid-msg"></span>
+                            </div>
+                            <div class="col-lg-4 col-12 mb-3">
                                 <label class="form-label">Email <span class="text-danger">*</span></label>
                                 <input type="email" name="email" class="form-control store" placeholder="Masukkan email" />
                                 <span class="invalid-feedback" id="email-invalid-msg"></span>
                             </div>
                         </div>
                         <div class="row g-1">
-                            <div class="col-lg-4 col-12 mb-3">
+                            <div class="col-lg-6 col-12 mb-3">
                                 <label class="form-label">Jabatan <span class="text-danger">*</span></label>
                                 <select name="position" id="position" class="form-select store">
                                     @foreach ($positions as $position)
-                                        <option value="{{ $position->id }}">{{ $position->name }}</option>
+                                        <option value="{{ $position->id }}" {{ $position->id == 4 && !count($team_leaders) ? "disabled" : "" }}>{{ $position->name }}</option>
                                     @endforeach
                                 </select>
                                 <span class="invalid-feedback" id="position-invalid-msg"></span>
                             </div>
-                            <div class="col-lg-4 col-12 mb-3">
+                            <div class="col-lg-6 col-12 mb-3">
                                 <label class="form-label">Pilih Team Leader (Untuk Sales)<span class="text-danger">*</span></label>
-                                <select name="tl_id" id="tl_id" class="form-select apply-select2 store" {{ count($team_leaders) ? '' : "disabled"}}>
+                                <select name="tl_id" id="tl_id" class="form-select store" {{ count($team_leaders) ? '' : "disabled"}}>
+                                    <option value="">-- Pilih Team Leader --</option>
                                     @foreach ($team_leaders as $team_leader)
                                         <option value="{{ $team_leader->id }}">{{ $team_leader->name }}</option>
                                     @endforeach
@@ -89,9 +108,7 @@
                                 <span class="invalid-feedback" id="tl_id-invalid-msg"></span>
                             </div>
                             <div class="col-lg-4 col-12 mb-3">
-                                <label for="Foto" class="form-label">Tambah Foto (Opsional)</label>
-                                <input type="file" name="photo" id="photo" class="form-control store">
-                                <span class="invalid-feedback" id="photo-invalid-msg"></span>
+                                
                             </div>
                         </div>
                     </div>
@@ -147,6 +164,7 @@
 @endsection
 
 @push('jsvendor')
+    <script src="{{ asset('assets') }}/vendor/libs/select2/select2.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.js"></script>
@@ -156,7 +174,7 @@
 @push('js')
     <script src="{{ asset('libs') }}/wizecode/Wize.js"></script>
     <script src="{{ asset('libs') }}/wizecode/WizeTable.js"></script>
-    <script src="{{ asset('libs') }}/wizecode/select2-caller.js"></script>
+    <script src="{{ asset('libs') }}/wizecode/applier.js"></script>
     <script>
         const wize = new Wize();
         const wizeTable = new WizeTable();
@@ -164,7 +182,7 @@
         $(document).ready(() => {
             wizeTable.init({
                 title: 'Daftar Karyawan',
-                url_delete: '{!! route("employees") !!}',
+                url_delete: '{!! route("employees.delete") !!}',
                 columns: [
                     'name', 'phone', 'email', 'position', 'status', 'actions'
                 ],
@@ -176,7 +194,24 @@
                     action: () => {
                         $('#modal-add').modal('show');
                     },
-                }
+                },
+                addon_delete: (data) => {
+                    $('#tl_id').html('<option value="">-- Pilih Team Leader --</option>');
+                    if (data.leaders.length > 0) {
+                        $('#position option[value="4"]').removeAttr("disabled");
+                        $('#position').val(4);
+                        $('#tl_id').removeAttr('disabled');
+                        data.leaders.forEach(leader => {
+                            $('#tl_id').append(`
+                                <option value="${leader.id}">${leader.name}</option>
+                            `);
+                        });
+                    } else {
+                        $('#position').val(3);
+                        $('#position option[value="4"]').attr("disabled", 'disabled');
+                        $('#tl_id').attr('disabled', 'disabled');
+                    }
+                },
             })
             wize.activate_tooltips();
         });
@@ -198,25 +233,44 @@
         })
 
 
-        $('#form-update').on('submit', function(e) {
+        $('#form-add').on('submit', function(e) {
             e.preventDefault();
             const url = $(this).attr('action');
-            const data = {
-                id: $('input[name="id"].update').val(),
-                merk: $('input[name="merk"].update').val(),
-                sell_price: validInt($('input[name="sell_price"].update').val()),
-            };
+            const data = new FormData(this);
 
             wize.ajax({
                 url,
                 data,
-                method: "PUT",
-                inputSelector: 'input[name="{key}"].update',
-                modalSelector: '#modal-edit',
+                method: "POST",
+                inputSelector: '.store[name="{key}"]',
+                modalSelector: '#modal-add',
                 addon_success: (data) => {
                     wizeTable.reload();
+                    $(this).get(0).reset();
+                    $('#tl_id').html('<option value="">-- Pilih Team Leader --</option>');
+                    if (data.leaders.length > 0) {
+                        $('#position option[value="4"]').removeAttr("disabled");
+                        $('#position').val(4);
+                        $('#tl_id').removeAttr('disabled');
+                        data.leaders.forEach(leader => {
+                            $('#tl_id').append(`
+                                <option value="${leader.id}">${leader.name}</option>
+                            `);
+                        })
+                    } else {
+                        $('#position option[value="4"]').attr("disabled", 'disabled');
+                        $('#tl_id').attr('disabled', 'disabled');
+                    }
                 },
             });
+        });
+
+        $(document).on('change', '#position', function () {
+            if ($(this).val() == 4) {
+                $('#tl_id').removeAttr('disabled');
+            } else {
+                $('#tl_id').attr('disabled', 'disabled');
+            }
         })
 
 
