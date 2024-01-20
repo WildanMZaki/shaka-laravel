@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             SubMenuAccesesSeeder::class,
             UnitsSeeder::class,
             SettingsSeeder::class,
+            NotifMessageSeeder::class,
         ]);
     }
 }

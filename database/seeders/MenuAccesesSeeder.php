@@ -22,6 +22,8 @@ class MenuAccesesSeeder extends Seeder
          * 3. Features (separator)
          * 4. Data Barang
          * 5. Karyawan
+         * 6. Absensi
+         * 7. Kasbon
          * 
          * Access: 1. Developer, 2. Administrator
          */
@@ -29,8 +31,8 @@ class MenuAccesesSeeder extends Seeder
             'dev' => 1,
             'admin' => 2,
         ];
-        $menuIds = [1, 2, 3, 4, 5];
-        $menuForAdmins = [1, 3, 4, 5];
+        $menuIds = [1, 2, 3, 4, 5, 6, 7];
+        $menuForAdmins = [1, 3, 4, 5, 6, 7];
 
         // Aturan: 1. Developer Harus Bisa Akses Semua Menu
         //         2. Batasi Menu Untuk Admin

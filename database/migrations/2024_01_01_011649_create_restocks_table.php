@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->unsignedInteger('qty')->comment('In Botol');
-            $table->dateTime('restock_date');
-            $table->dateTime('expiration_date');
+            $table->date('restock_date');
+            $table->date('expiration_date');
             $table->unsignedBigInteger('price');
             $table->unsignedBigInteger('price_total');
             $table->unsignedBigInteger('price_sale');

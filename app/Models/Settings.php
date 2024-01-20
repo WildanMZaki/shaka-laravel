@@ -15,6 +15,7 @@ class Settings extends Model
     {
         $defaultSettings = [
             'Default Harga Jual' => 10000,
+            'Limit Kasbon' => 400000,
         ];
         return self::where('rule', $rule)->value('value') ?? $defaultSettings[$rule] ?? null;
     }

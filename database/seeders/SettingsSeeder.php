@@ -16,5 +16,10 @@ class SettingsSeeder extends Seeder
             'rule' => 'Default Harga Jual',
             'value' => 10000,
         ]);
+
+        \App\Models\Settings::create([
+            'rule' => 'Limit Kasbon',
+            'value' => 400000,
+        ]);
     }
 }

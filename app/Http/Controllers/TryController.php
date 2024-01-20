@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
 use App\Models\Menu;
+use App\Models\Notification;
 use App\Models\Product;
 use App\Models\Restock;
 use App\Models\Settings;
@@ -17,7 +18,7 @@ class TryController extends Controller
 
         // $result = $this->seeMuizaTable();
         // $tbl = new MuwizaTable();
-        $result = $this->seeMuizaTable();
+        $result = $this->seeTestNotif(2);
 
         // echo $result;
         return response()->json($result);
@@ -157,5 +158,15 @@ class TryController extends Controller
             $subMenus[] = $menu->subMenus;
         }
         return $subMenus;
+    }
+
+    private function seeTestNotif($user_id)
+    {
+        return Notification::sendTo($user_id, [
+            'Testing', 'Selamat {time}, wahay sia {name}, other data: {plc1}, {plc2}'
+        ], [
+            'plc1' => 'IAMPLC1',
+            'plc2' => 'IAMPLCTWO',
+        ]);
     }
 }

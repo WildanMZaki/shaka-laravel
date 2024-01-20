@@ -150,8 +150,8 @@ class RestockController extends Controller
         $restock = new Restock();
         $restock->product_id = $productId;
         $restock->qty = $request->qty * $request->unit;
-        $restock->restock_date = date('Y-m-d H:i:s', $restockDate);
-        $restock->expiration_date = date('Y-m-d H:i:s', $expDate);
+        $restock->restock_date = date('Y-m-d', $restockDate);
+        $restock->expiration_date = date('Y-m-d', $expDate);
         $restock->price = $request->price;
         $restock->price_total = $request->price_total;
         $restock->price_sale = $product->sell_price;
@@ -270,8 +270,8 @@ class RestockController extends Controller
         // Next bisa juga tambah rule, kapan / berapa jangka minimal tanggal kadaluarsa
         $restock->product_id = $productId;
         $restock->qty = $request->qty * $request->unit;
-        $restock->restock_date = date('Y-m-d H:i:s', $restockDate);
-        $restock->expiration_date = date('Y-m-d H:i:s', $expDate);
+        $restock->restock_date = date('Y-m-d', $restockDate);
+        $restock->expiration_date = date('Y-m-d', $expDate);
         $restock->price = $request->price;
         $restock->price_total = $request->price_total;
         $restock->price_sale = $product->sell_price;

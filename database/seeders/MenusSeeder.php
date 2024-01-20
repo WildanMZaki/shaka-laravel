@@ -62,6 +62,24 @@ class MenusSeeder extends Seeder
                 'type' => 'menu',
                 'active' => 1,
             ],
+            [
+                'id' => 6,
+                'order' => 5,
+                'name' => 'Absensi',
+                'route' => 'presences',
+                'icon' => 'mdi mdi-contacts',
+                'type' => 'menu',
+                'active' => 1,
+            ],
+            [
+                'id' => 7,
+                'order' => 6,
+                'name' => 'Kasbon',
+                'route' => 'kasbons',
+                'icon' => 'ti ti-wallet',
+                'type' => 'menu',
+                'active' => 1,
+            ],
         ];
 
         DB::table($this->table)->insert($menus);

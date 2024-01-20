@@ -50,7 +50,7 @@ class EmployeeController extends Controller
             'name' => ['required'],
             'phone' => ['required', 'unique:users,phone'],
             'password' => ['required'],
-            'email' => ['required'],
+            'email' => ['required', 'unique:users,email'],
             'nik' => ['required'],
             'photo' => 'image|mimes:jpeg,png,jpg|max:5120',
             'position' => ['required', 'in:3,4'],
@@ -60,6 +60,7 @@ class EmployeeController extends Controller
             'phone.unique' => 'Nomor ponsel telah digunakan ',
             'password.required' => 'Password harus diisi',
             'email.required' => 'Email harus diisi',
+            'email.unique' => 'Email telah digunakan',
             'position.required' => 'Jabatan harus dipilih',
             'position.in' => 'Jabatan tidak valid',
             'nik.required' => 'NIK harus diisi',
@@ -83,15 +84,16 @@ class EmployeeController extends Controller
         }
 
         $path = null;
+        $dir = 'employees';
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('public/employees');
+            $path = $request->file('photo')->store("public/$dir");
         }
 
         $employee = new User();
         $employee->name = $request->name;
         $employee->password = bcrypt($request->password);
         $employee->nik = $request->nik;
-        $employee->photo = $path;
+        $employee->photo = $path ? ($dir . '/' . basename($path)) : null;
         $employee->phone = $request->phone;
         $employee->email = $request->email;
         $employee->access_id = $request->position;

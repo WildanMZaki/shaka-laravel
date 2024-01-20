@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\KasbonController;
 use App\Http\Controllers\Admin\PositionController;
+use App\Http\Controllers\Admin\PresenceController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RestockController;
 use App\Http\Controllers\AuthController;
@@ -70,6 +72,14 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::post('/', [EmployeeController::class, 'store'])->name('employee.store');
             Route::get('/positions', [PositionController::class, 'index'])->name('employees.positions');
             Route::delete('/', [EmployeeController::class, 'delete'])->name('employees.delete');
+        });
+
+        Route::prefix('presences')->group(function () {
+            Route::get('/', [PresenceController::class, 'index'])->name('presences');
+        });
+
+        Route::prefix('kasbons')->group(function () {
+            Route::get('/', [KasbonController::class, 'index'])->name('kasbons');
         });
     });
 });

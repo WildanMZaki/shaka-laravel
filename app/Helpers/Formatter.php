@@ -2,8 +2,49 @@
 
 namespace App\Helpers;
 
+use DateTime;
+
 trait Formatter
 {
+    /** 
+     * @param string date YYYY-mm-dd HH:ii:ss
+     * @return string Hari ini, HH:ii - Kemarin - HH:ii, Minggu, 15 Agu 2004
+     */
+    public static function passDate(string $timestamp): string
+    {
+        // Convert the input string to a DateTime object
+        $inputedDate = new DateTime($timestamp);
+        $now = new DateTime();
+
+        // Check if the date is today
+        if ($inputedDate->format('Y-m-d') === $now->format('Y-m-d')) {
+            return 'Hari ini, ' . $inputedDate->format('H:i');
+        }
+
+        // Check if the inputedDate is yesterday
+        $yesterday = clone $now;
+        $yesterday->modify('-1 day');
+        if ($inputedDate->format('Y-m-d') === $yesterday->format('Y-m-d')) {
+            return 'Kemarin, ' . $inputedDate->format('H:i');
+        }
+
+        $indonesianDayNames = [
+            'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu',
+        ];
+
+        $indonesianMonthNames = [
+            'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+            'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+        ];
+
+        // Return something like Minggu, 15 Agu 2005
+        $formattedDate = $indonesianDayNames[$inputedDate->format('w')] . ', ';
+        $formattedDate .= $inputedDate->format('j ');
+        $formattedDate .= $indonesianMonthNames[$inputedDate->format('n') - 1];
+        $formattedDate .= $inputedDate->format(' Y');
+        return $formattedDate;
+    }
+
     /**
      * Digunakan untuk memformat opsi dari array of item menjadi format yang cocok untuk input select dengan select2
      */
@@ -66,5 +107,20 @@ trait Formatter
         $value = abs($value);
         $roundedValue = ceil($value / 100) * 100;
         return $roundedValue;
+    }
+
+    public static function greetingTime($time)
+    {
+        $hour = (int) date('H', strtotime($time));
+
+        if ($hour >= 5 && $hour < 11) {
+            return "pagi";
+        } elseif ($hour >= 11 && $hour < 15) {
+            return "siang";
+        } elseif ($hour >= 15 && $hour < 19) {
+            return "sore";
+        } else {
+            return "malam";
+        }
     }
 }
