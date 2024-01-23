@@ -54,14 +54,30 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Access::class);
     }
 
-    public function salesTeams()
+    public function teamLeader()
     {
-        return $this->hasMany(SalesTeam::class, 'leader_id');
+        return $this->hasOne(SalesTeam::class, 'leader_id');
     }
 
-    public function teamLeaders()
+    // public function sales($id)
+    // {
+    //     $teams = SalesTeam::where('leader_id', $id)->get('sales_id');
+    //     $salesIds = [];
+    //     foreach ($teams as $sales) {
+    //         $salesIds[] = $sales->sales_id;
+    //     }
+    //     $sales = User::whereIn('id', $salesIds)->get();
+    //     return $sales;
+    // }
+
+    public function leader()
     {
-        return $this->hasMany(SalesTeam::class, 'sales_id');
+        return $this->belongsToMany(User::class, 'sales_teams', 'sales_id', 'leader_id')->limit(1);
+    }
+
+    public function sales()
+    {
+        return $this->belongsToMany(User::class, 'sales_teams', 'leader_id', 'sales_id');
     }
 
     public function getJWTIdentifier()
@@ -72,5 +88,10 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function presences()
+    {
+        return $this->hasMany(Presence::class);
     }
 }

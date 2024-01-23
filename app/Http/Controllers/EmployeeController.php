@@ -6,6 +6,7 @@ use App\Helpers\MuwizaTable;
 use App\Models\Access;
 use App\Models\SalesTeam;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -35,8 +36,6 @@ class EmployeeController extends Controller
                 return  $row->active ? '<span class="badge bg-label-success">Aktif</span>' : '<span class="badge bg-label-danger">Nonaktif</span>';
             })
             ->actions(['detail', 'edit', 'activate', 'inactivate'], function ($btns, $row) {
-                // $btns['edit']['data']['merk'] = $row->merk;
-                // $btns['edit']['data']['sell_price'] = $row->sell_price;
                 unset($btns[$row->active ? 'activate' : 'inactivate']);
                 $used = $row->active ? 'inactivate' : 'activate';
                 $btns[$used]['classIcon'] = $row->active ? 'ti ti-user-off' : 'ti ti-user-check';
@@ -107,6 +106,31 @@ class EmployeeController extends Controller
         return response()->json([
             'message' => 'Karyawan ditambahkan',
             'leaders' => User::where('active', 1)->where('access_id', 3)->get(['id', 'name']),
+        ]);
+    }
+
+    public function detail(Request $request, $id)
+    {
+        if (!$request->ajax()) {
+            return response()->json([
+                'message' => 'Invalid Request!',
+            ], 400);
+        }
+        try {
+            $employee = User::findOrFail($id);
+        } catch (ModelNotFoundException $th) {
+            return response()->json([
+                'message' => 'Karyawan tidak ditemukan',
+            ], 400);
+        }
+        return response()->json([
+            'name' => $employee->name,
+            'phone' => $employee->phone,
+            'nik' => $employee->nik,
+            'photo' => $employee->photo,
+            'email' => $employee->email,
+            'position' => $employee->access->name,
+            'leader' => $employee->access_id == 4 ? $employee->leader[0]->name : '-',
         ]);
     }
 

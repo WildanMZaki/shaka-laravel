@@ -96,6 +96,7 @@
 
     <!-- Page JS -->
     <script>
+      const STORAGE = '{{ asset("storage") }}' + '/';
       $('.logout-btn').click(() => {
         Swal.fire({
             text: 'Anda yakin ingin log out?',

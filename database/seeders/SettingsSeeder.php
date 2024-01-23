@@ -15,11 +15,19 @@ class SettingsSeeder extends Seeder
         \App\Models\Settings::create([
             'rule' => 'Default Harga Jual',
             'value' => 10000,
+            'type' => 'int',
         ]);
 
         \App\Models\Settings::create([
             'rule' => 'Limit Kasbon',
             'value' => 400000,
+            'type' => 'int',
+        ]);
+
+        \App\Models\Settings::create([
+            'rule' => 'Auto Konfirmasi Absensi',
+            'value' => 0,
+            'type' => 'bool',
         ]);
     }
 }

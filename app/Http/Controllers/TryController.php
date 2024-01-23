@@ -6,9 +6,11 @@ use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
 use App\Models\Menu;
 use App\Models\Notification;
+use App\Models\Presence;
 use App\Models\Product;
 use App\Models\Restock;
 use App\Models\Settings;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TryController extends Controller
@@ -18,7 +20,7 @@ class TryController extends Controller
 
         // $result = $this->seeMuizaTable();
         // $tbl = new MuwizaTable();
-        $result = $this->seeTestNotif(2);
+        $result = $this->seePresences();
 
         // echo $result;
         return response()->json($result);
@@ -168,5 +170,31 @@ class TryController extends Controller
             'plc1' => 'IAMPLC1',
             'plc2' => 'IAMPLCTWO',
         ]);
+    }
+
+    private function seeUserDetail()
+    {
+        $user = User::find(4);
+        return $user->leader;
+    }
+
+    private function seePresences()
+    {
+        // $presences = Presence::with(['user.access', 'user' => function ($query) {
+        //     $query->select('id', 'name', 'access_id');
+        // }])
+        //     ->where('flag', 'hadir')
+        //     ->whereDate('date', now())
+        //     ->get();
+        // return $presences;
+
+        $unpresence = User::whereDoesntHave('presences', function ($query) {
+            $query->whereDate('date', now());
+            $query->orderBy('entry_at', 'asc');
+        })
+            ->where('access_id', '>', 2)
+            ->get();
+
+        return $unpresence;
     }
 }

@@ -10,14 +10,4 @@ class SalesTeam extends Pivot
 {
     use HasFactory;
     protected $table = 'sales_teams';
-
-    public function sales()
-    {
-        return $this->belongsTo(User::class, 'sales_id');
-    }
-
-    public function teamLeader()
-    {
-        return $this->belongsTo(User::class, 'leader_id');
-    }
 }

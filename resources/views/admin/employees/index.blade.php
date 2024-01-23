@@ -35,6 +35,62 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modal-detail" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detail Karyawan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-3 d-flex d-lg-block justify-content-center">
+                            <img src="{{ asset('assets/img/avatars').'/'.rand(1,7).'.png' }}" alt="Avatar" class="img-fluid detail">
+                        </div>
+                        <div class="col-lg-9 col-12 mb-3">
+                            <div class="row mt-2">
+                                <div class="col">
+                                    <label class="form-label">Nama</label>
+                                    <input type="text" name="name" class="form-control detail" placeholder="Nama" readonly/>
+                                </div>
+                            </div>
+                            <div class="row g-1 my-lg-3 mt-2 mt-lg-0">                                
+                                <div class="col-lg-6">
+                                    <label class="form-label">NIK</label>
+                                    <input type="text" name="nik" class="form-control detail" placeholder="NIK" readonly/>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label class="form-label">Jabatan</label>
+                                    <input type="text" name="position" class="form-control detail" placeholder="Jabatan" readonly/>                            
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-1">
+                        <div class="col-lg-4 mb-3">
+                            <label class="form-label">Nomor Whatsapp</label>
+                            <input type="text" name="phone" class="form-control detail" placeholder="Nomor Whatsapp" readonly/>
+                        </div>                        
+                        <div class="col-lg-4 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control detail" placeholder="Email" readonly/>
+                        </div>
+                        <div class="col-lg-4 mb-3">
+                            <label class="form-label">Team Leader</label>
+                            <input type="text" name="leader" class="form-control detail" placeholder="Team Leader" readonly/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="modal-add" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
@@ -107,9 +163,6 @@
                                 </select>
                                 <span class="invalid-feedback" id="tl_id-invalid-msg"></span>
                             </div>
-                            <div class="col-lg-4 col-12 mb-3">
-                                
-                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -178,6 +231,7 @@
     <script>
         const wize = new Wize();
         const wizeTable = new WizeTable();
+        const detailImgDefault = $('img.detail').attr('src');
         let table;
         $(document).ready(() => {
             wizeTable.init({
@@ -216,6 +270,27 @@
             wize.activate_tooltips();
         });
 
+        $(document).on('click', '.btn-detail', function() {
+            const id = $(this).data('id');
+            console.log(id);
+            const url = '{{ route("employee.detail", "") }}';
+            wize.ajax({
+                url: url + '/' + id,
+                method: 'GET',
+                successDefault: false,
+                addon_success: (employee) => {
+                    $('img.detail').attr('src', (employee.photo ? STORAGE + employee.photo : detailImgDefault));
+                    Swal.close();
+                    $('.detail[name="name"]').val(employee.name);
+                    $('.detail[name="nik"]').val(employee.nik);
+                    $('.detail[name="phone"]').val(employee.phone);
+                    $('.detail[name="email"]').val(employee.email);
+                    $('.detail[name="position"]').val(employee.position);
+                    $('.detail[name="leader"]').val(employee.leader);
+                    $('#modal-detail').modal('show');
+                },
+            });
+        });
         $(document).on('click', '.btn-edit', function() {
             const id = $(this).data('id');
             const merk = $(this).data('merk');

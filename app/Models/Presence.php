@@ -12,4 +12,9 @@ class Presence extends Model
     protected $fillable = [
         'user_id', 'date', 'entry_at', 'photo', 'status', 'flag', 'note',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

@@ -19,6 +19,13 @@ const thousandsId = (number) => {
     return hasilFormatted;
 };
 
+function ucfirst(str) {
+    if (typeof str !== "string" || str.length === 0) {
+        return str;
+    }
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 const validInt = (stringInt) => {
     const fullInt = stringInt.replace(/[^0-9]/g, "");
 
@@ -266,5 +273,9 @@ class Wize {
             console.error(err);
             alert("Terjadi Error");
         }
+    };
+
+    maginificatePopup = () => {
+        $(".apply-magnific").magnificPopup({ type: "image" });
     };
 }

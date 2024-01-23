@@ -6,6 +6,14 @@ use DateTime;
 
 trait Formatter
 {
+    public static $idDays = [
+        'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu',
+    ];
+    public static $idMonths = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+        'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+    ];
+
     /** 
      * @param string date YYYY-mm-dd HH:ii:ss
      * @return string Hari ini, HH:ii - Kemarin - HH:ii, Minggu, 15 Agu 2004
@@ -28,20 +36,19 @@ trait Formatter
             return 'Kemarin, ' . $inputedDate->format('H:i');
         }
 
-        $indonesianDayNames = [
-            'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu',
-        ];
-
-        $indonesianMonthNames = [
-            'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-            'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
-        ];
-
         // Return something like Minggu, 15 Agu 2005
-        $formattedDate = $indonesianDayNames[$inputedDate->format('w')] . ', ';
+        $formattedDate = self::$idDays[$inputedDate->format('w')] . ', ';
         $formattedDate .= $inputedDate->format('j ');
-        $formattedDate .= $indonesianMonthNames[$inputedDate->format('n') - 1];
+        $formattedDate .= self::$idMonths[$inputedDate->format('n') - 1];
         $formattedDate .= $inputedDate->format(' Y');
+        return $formattedDate;
+    }
+
+    public static function today()
+    {
+        $today = now();
+        $formattedDate = self::$idDays[$today->dayOfWeek] . ', '
+            . $today->day . ' ' . self::$idMonths[$today->month - 1] . ' ' . $today->year;
         return $formattedDate;
     }
 

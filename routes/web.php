@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\PresenceController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RestockController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashController;
 use App\Http\Controllers\EmployeeController;
@@ -71,15 +72,26 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::patch('/', [EmployeeController::class, 'active_control'])->name('employee.active_control');
             Route::post('/', [EmployeeController::class, 'store'])->name('employee.store');
             Route::get('/positions', [PositionController::class, 'index'])->name('employees.positions');
+            Route::get('/{id}', [EmployeeController::class, 'detail'])->name('employee.detail');
             Route::delete('/', [EmployeeController::class, 'delete'])->name('employees.delete');
         });
 
         Route::prefix('presences')->group(function () {
             Route::get('/', [PresenceController::class, 'index'])->name('presences');
+            Route::patch('/', [PresenceController::class, 'change'])->name('presences.change');
+            Route::put('/all', [PresenceController::class, 'confirm_all'])->name('presences.confirm_all');
+            Route::prefix('permits')->group(function () {
+                Route::patch('/', [PresenceController::class, 'permit_change'])->name('presences.permits.change');
+                Route::put('/all', [PresenceController::class, 'allow_all'])->name('presences.permits.allow_all');
+            });
         });
 
         Route::prefix('kasbons')->group(function () {
             Route::get('/', [KasbonController::class, 'index'])->name('kasbons');
+        });
+
+        Route::prefix('settings')->group(function () {
+            Route::put('/change', [SettingController::class, 'change'])->name('settings.change');
         });
     });
 });

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('rule');
             $table->text('value');
+            $table->enum('type', ['int', 'bool', 'str', 'json']);
             $table->timestamps();
         });
     }

@@ -9,14 +9,33 @@ class Settings extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['rule', 'value'];
+    protected $fillable = ['rule', 'value', 'type'];
 
-    public static function of(string $rule): int
+    public static function of(string $rule)
     {
         $defaultSettings = [
             'Default Harga Jual' => 10000,
             'Limit Kasbon' => 400000,
+            'Auto Konfirmasi Absensi' => 0,
         ];
-        return self::where('rule', $rule)->value('value') ?? $defaultSettings[$rule] ?? null;
+        $value = self::where('rule', $rule)->value('value') ?? $defaultSettings[$rule] ?? null;
+        $type = self::where('rule', $rule)->value('type');
+
+        switch ($type) {
+            case 'int':
+                $result = intval($value);
+                break;
+            case 'bool':
+                $result = $value == 1;
+                break;
+            case 'json':
+                $result = json_decode($value);
+                break;
+
+            default:
+                $result = $value;
+                break;
+        }
+        return $result;
     }
 }

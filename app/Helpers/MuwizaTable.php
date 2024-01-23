@@ -345,20 +345,6 @@ class MuwizaTable extends Muwiza
         return implode('', array_map([self::class, 'formatDefaultActionBtn'], $btns));
     }
 
-    // public function actions(string|callable $actionColumn = 'actions', ?callable $callback = null)
-    // {
-    //     foreach ($this->rowsData as $i => $row) {
-    //         $trueActionColumn = is_string($actionColumn) ? $actionColumn : 'actions';
-    //         $btns = $trueActionColumn === 'actions' && $callback !== null ? $callback($row) : $actionColumn($row);
-
-    //         // $btns = $trueActionColumn === 'actions' ? $callback($row) : $actionColumn($row);
-
-    //         $this->processedData[$i][$trueActionColumn] = $this::generateActions($btns);
-    //     }
-
-    //     return $this;
-    // }
-
     public function actions(string|array $actionOrBtns = 'actions', array|callable $btnsOrCallback = null, ?callable $closure = null)
     {
         if (is_array($actionOrBtns)) {
