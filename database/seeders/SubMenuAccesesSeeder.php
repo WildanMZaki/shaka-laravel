@@ -60,14 +60,14 @@ class SubMenuAccesesSeeder extends Seeder
                 'access_id' => 2,
                 'sub_menu_id' => 6,
             ],
-            [
-                'access_id' => 1,
-                'sub_menu_id' => 7,
-            ],
-            [
-                'access_id' => 2,
-                'sub_menu_id' => 7,
-            ],
+            // [
+            //     'access_id' => 1,
+            //     'sub_menu_id' => 7,
+            // ],
+            // [
+            //     'access_id' => 2,
+            //     'sub_menu_id' => 7,
+            // ],
         ];
 
         $id = 1;

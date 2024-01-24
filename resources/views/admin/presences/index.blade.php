@@ -34,7 +34,6 @@
                                 <input class="form-check-input" type="checkbox" role="switch" data-rule="Auto Konfirmasi Absensi" id="auto-confirm" {{ $autoConfirm ? 'checked' : '' }}>
                                 <label class="form-check-label" for="auto-confirm">Konfirmasi Otomatis</label>
                             </div>
-
                         </div>
                     </div>
                 </div>

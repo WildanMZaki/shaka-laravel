@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\KasbonController;
+use App\Http\Controllers\Api\PresenceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,10 @@ Route::post('login', [AuthController::class, 'login']);
 Route::middleware('jwt')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
+    Route::prefix('presences')->group(function () {
+        Route::get('/', [PresenceController::class, 'check']);
+        Route::post('/', [PresenceController::class, 'store']);
+    });
     Route::prefix('kasbon')->group(function () {
         Route::get('/', [KasbonController::class, 'index']);
         Route::post('/', [KasbonController::class, 'apply']);

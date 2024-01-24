@@ -8,6 +8,20 @@ use Illuminate\Http\Request;
 
 class PresenceController extends Controller
 {
+    public function check(Request $request)
+    {
+        $user_id = $request->attributes->get('user_id');
+
+        $presence = Presence::whereDate('date', now())
+            ->where('user_id', $user_id)
+            ->first();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $presence,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

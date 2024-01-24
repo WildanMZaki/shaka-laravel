@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Presence;
 use App\Models\Settings;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
@@ -17,11 +16,13 @@ class PresenceController extends Controller
         $data['autoConfirm'] = Settings::of('Auto Konfirmasi Absensi');
         $data['presences'] = Presence::where('flag', 'hadir')
             ->whereDate('date', now())
+            ->orderByRaw("FIELD(status, 'pending', 'rejected', 'approved')")
             ->orderBy('entry_at', 'asc')
             ->get();
 
         $data['permits'] = Presence::whereIn('flag', ['izin', 'sakit'])
             ->whereDate('date', now())
+            ->orderByRaw("FIELD(status, 'pending', 'rejected', 'approved')")
             ->orderBy('entry_at', 'asc')
             ->get();
         $data['unpresences'] = User::whereDoesntHave('presences', function ($query) {

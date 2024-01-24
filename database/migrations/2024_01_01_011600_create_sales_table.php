@@ -16,6 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedInteger('qty')->comment('In Botol');
+            $table->unsignedInteger('modal');
+            $table->unsignedInteger('total');
             $table->timestamps();
             $table->softDeletes();
         });

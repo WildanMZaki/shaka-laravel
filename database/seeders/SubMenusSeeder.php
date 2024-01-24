@@ -65,13 +65,6 @@ class SubMenusSeeder extends Seeder
                 'route' => 'employees',
                 'active' => 1,
             ],
-            [
-                'order' => 2,
-                'menu_id' => 5,
-                'name' => 'Jabatan',
-                'route' => 'employees.positions',
-                'active' => 1,
-            ], // 7
         ];
 
         $id = 1;
