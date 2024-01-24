@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\KasbonController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\PresenceController;
@@ -8,7 +9,6 @@ use App\Http\Controllers\Admin\RestockController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashController;
-use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\SubMenuController;
 use App\Http\Controllers\TryController;

@@ -54,22 +54,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Access::class);
     }
 
-    public function teamLeader()
-    {
-        return $this->hasOne(SalesTeam::class, 'leader_id');
-    }
-
-    // public function sales($id)
-    // {
-    //     $teams = SalesTeam::where('leader_id', $id)->get('sales_id');
-    //     $salesIds = [];
-    //     foreach ($teams as $sales) {
-    //         $salesIds[] = $sales->sales_id;
-    //     }
-    //     $sales = User::whereIn('id', $salesIds)->get();
-    //     return $sales;
-    // }
-
     public function leader()
     {
         return $this->belongsToMany(User::class, 'sales_teams', 'sales_id', 'leader_id')->limit(1);

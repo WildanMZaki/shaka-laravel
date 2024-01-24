@@ -129,7 +129,7 @@
         let table;
         $(document).ready(() => {
             wizeTable.init({
-                title: 'Daftar Karyawan',
+                title: 'Daftar Barang',
                 url_delete: '{!! route("products.delete") !!}',
                 columns: [
                     'merk', 'stock', 'sell_price', 'sold', 'status', 'actions'
