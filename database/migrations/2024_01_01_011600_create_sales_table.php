@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('qty')->comment('In Botol');
             $table->unsignedInteger('modal');
             $table->unsignedInteger('total');
+            $table->enum('status', ['done', 'processed', 'canceled'])->default('processed');
             $table->timestamps();
             $table->softDeletes();
         });

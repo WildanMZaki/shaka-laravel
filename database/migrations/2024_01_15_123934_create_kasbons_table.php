@@ -23,6 +23,7 @@ return new class extends Migration
             $table->enum('status', ['approved', 'rejected', 'pending'])->default('pending');
             $table->text('note')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

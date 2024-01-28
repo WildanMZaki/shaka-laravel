@@ -122,4 +122,36 @@ class PresenceController extends Controller
             ], 500);
         }
     }
+
+    public function permit_change(Request $request)
+    {
+        try {
+            $permit = Presence::findOrFail($request->id);
+        } catch (ModelNotFoundException $th) {
+            return response()->json([
+                'message' => 'Data kehadiran tidak ditemukan',
+            ], 404);
+        }
+
+        $permit->status = $request->status;
+        if ($permit->save()) {
+            $permits = Presence::with(['user.access', 'user' => function ($query) {
+                $query->select('id', 'name', 'access_id');
+            }])
+                ->whereIn('flag', ['izin', 'sakit'])
+                ->whereDate('date', now())
+                ->orderBy('entry_at', 'asc')
+                ->get();
+            return response()->json([
+                'message' => 'Permohonan ' . $permit->flag . ' ' . ($request->status == 'approved' ? 'Disetujui' : 'Ditolak'),
+                'data' => [
+                    'permits' => $permits
+                ],
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Terjadi Kesalahan',
+            ], 500);
+        }
+    }
 }

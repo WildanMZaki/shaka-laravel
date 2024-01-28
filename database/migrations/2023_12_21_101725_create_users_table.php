@@ -21,13 +21,14 @@ return new class extends Migration
             $table->string('name');
             $table->string('nik')->nullable();
             $table->string('photo')->nullable();
-            $table->string('email')->unique();
-            $table->string('phone', 16)->unique();
+            $table->string('email');
+            $table->string('phone', 16);
             $table->string('password');
             $table->boolean('is_employee')->default(true);
             $table->boolean('active')->default(true)->comment('1=active, 0=inactive');
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

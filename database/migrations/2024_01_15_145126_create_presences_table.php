@@ -25,6 +25,7 @@ return new class extends Migration
             $table->enum('flag', ['hadir', 'izin', 'sakit'])->default('hadir');
             $table->text('note')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

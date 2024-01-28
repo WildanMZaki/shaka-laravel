@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('message');
             $table->boolean('has_read')->default(false);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

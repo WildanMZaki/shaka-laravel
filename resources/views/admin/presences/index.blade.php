@@ -41,7 +41,7 @@
         </div>
     </div>
     <div class="row my-3">
-        <div class="col-lg-6 mb-lg-0 mb-3">
+        <div class="col-lg-6 mb-3">
             <div class="card">
                 <div class="card-header">
                     <div class="row">
@@ -112,7 +112,7 @@
             </div>
         </div>
         @if (count($permits))
-            <div class="col-lg-6">
+            <div class="col-lg-6 mb-3">
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
@@ -160,7 +160,16 @@
                                         <i class="ti ti-dots-vertical ti-24px"></i>
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
-                                        <a class="dropdown-item btn-permit-detail" href="javascript:void(0);" data-status="detail" data-id="{{ $permit->id }}"><i class="ti ti-list-details me-2"></i> Detail</a>
+                                        <a class="dropdown-item btn-permit-detail"
+                                            href="javascript:void(0);"
+                                            data-status="detail"
+                                            data-photo="{{ $permitImg }}"
+                                            data-reason="{{ ucfirst($permit->flag) }}"
+                                            data-note="{{ $permit->note }}"
+                                            data-employee="{{ $permit->user->name }}"
+                                            data-position="{{ $permit->user->access->name }}">
+                                            <i class="ti ti-list-details me-2"></i> Detail
+                                        </a>
                                         <a class="dropdown-item btn-permit-control" href="javascript:void(0);" data-status="approved" data-id="{{ $permit->id }}"><i class="ti ti-check me-2"></i> Setujui</a>
                                         <a class="dropdown-item btn-permit-control" href="javascript:void(0);" data-status="rejected" data-id="{{ $permit->id }}"><i class="ti ti-ban me-2"></i> Tolak</a>
                                     </div>
@@ -203,6 +212,52 @@
                 </div>
             </div>
         @endif
+    </div>
+</div>
+
+<div class="modal fade" id="modal-detail" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Izin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-3 d-flex d-lg-block justify-content-center">
+                        <img src="" alt="Avatar" class="img-fluid detail">
+                    </div>
+                    <div class="col-lg-9 col-12 mb-3">
+                        <div class="row mt-2">
+                            <div class="col">
+                                <label class="form-label">Nama</label>
+                                <input type="text" name="name" class="form-control detail" placeholder="Nama" readonly/>
+                            </div>
+                        </div>
+                        <div class="row g-1 my-lg-3 mt-2 mt-lg-0">                                                            
+                            <div class="col-lg-6">
+                                <label class="form-label">Jabatan</label>
+                                <input type="text" name="position" class="form-control detail" placeholder="Jabatan" readonly/>                            
+                            </div>
+                            <div class="col-lg-6">
+                                <label class="form-label">Alasan</label>
+                                <input type="text" name="reason" class="form-control detail" placeholder="Alasan" readonly/>                            
+                            </div>
+                        </div>
+                        <div class="row g-1">
+                            <label for="permit-note" class="form-label">Catatan</label>
+                            <textarea name="note" id="permit-note" class="form-control" readonly></textarea>
+                        </div>
+                    </div>
+                </div>                    
+            </div>
+            <div class="modal-footer">
+                <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -303,7 +358,17 @@
                                 <i class="ti ti-dots-vertical ti-24px"></i>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">
-                                <a class="dropdown-item btn-permit-detail" href="javascript:void(0);" data-status="detail" data-id="${permit.id}"><i class="ti ti-list-details me-2"></i> Detail</a>
+                                <a class="dropdown-item btn-permit-detail"
+                                    href="javascript:void(0);"
+                                    data-status="detail"
+                                    data-photo="${img}"
+                                    data-reason="${ucfirst(permit.flag)}"
+                                    data-note="${permit.note}"
+                                    data-employee="${permit.user.name}"
+                                    data-position="${permit.user.access.name}"
+                                >
+                                    <i class="ti ti-list-details me-2"></i> Detail
+                                </a>
                                 <a class="dropdown-item btn-permit-control" href="javascript:void(0);" data-status="approved" data-id="${permit.id}"><i class="ti ti-check me-2"></i> Setujui</a>
                                 <a class="dropdown-item btn-permit-control" href="javascript:void(0);" data-status="rejected" data-id="${permit.id}"><i class="ti ti-ban me-2"></i> Tolak</a>
                             </div>
@@ -494,11 +559,25 @@
                         status: status,
                     },
                     addon_success: (response) => {
-
+                        reloadPermits(response.data.permits);
                     } 
                 });
             }
         });
+    });
+
+    $(document).on('click', '.btn-permit-detail', function() {
+        const photo = $(this).data('photo');
+        const reason = $(this).data('reason');
+        const employee = $(this).data('employee');
+        const position = $(this).data('position');
+        const note = $(this).data('note');
+        $('img.detail').attr('src', photo);
+        $('.detail[name="name"]').val(employee);
+        $('.detail[name="position"]').val(position);
+        $('.detail[name="reason"]').val(reason);
+        $('textarea#permit-note').html(note);
+        $('#modal-detail').modal('show');
     });
 </script>
 @endpush

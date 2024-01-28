@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Presence;
+use App\Models\Settings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class PresenceController extends Controller
 {
@@ -24,7 +26,15 @@ class PresenceController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $user_id = $request->attributes->get('user_id');
+
+        if (Presence::where('user_id', $user_id)->whereDate('date', now())->exists()) {
+            return response()->json([
+                'message' => 'Kamu sudah absen hari ini'
+            ]);
+        }
+
+        $validator = Validator::make($request->all(), [
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
             'flag' => 'required|in:hadir,sakit,izin',
         ], [
@@ -35,7 +45,13 @@ class PresenceController extends Controller
             'photo.mimes' => 'Ekstensi foto harus antara jpeg, png, atau jpg',
             'photo.max' => 'Ukuran file foto maksimal: 5 Mb',
         ]);
-        $user_id = $request->attributes->get('user_id');
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $dir = 'presences';
         $path = $request->file('photo')->store("public/$dir");
@@ -46,6 +62,7 @@ class PresenceController extends Controller
         $presence->date = now();
         $presence->entry_at = now();
         $presence->photo = $fixPath;
+        $presence->status = Settings::of('Auto Konfirmasi Absensi') ? 'approved' : 'pending';
         $presence->flag = $request->flag;
         $presence->note = $request->note;
         $presence->save();

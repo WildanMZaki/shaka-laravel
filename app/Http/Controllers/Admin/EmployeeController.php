@@ -9,6 +9,7 @@ use App\Models\Access;
 use App\Models\SalesTeam;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -21,8 +22,7 @@ class EmployeeController extends Controller
             return response()->json($rows);
         }
         $data['rows'] = $table->resultHTML();
-        $data['team_leaders'] = User::where('access_id', 3)->get();
-        $data['positions'] = Access::whereIn('id', [3, 4])->orderBy('id', (count($data['team_leaders']) ? 'desc' : 'asc'))->get();
+        $data['positions'] = Access::whereIn('id', [3, 4])->orderBy('id', 'desc')->get();
         return view('admin.employees.index', $data);
     }
 
@@ -48,9 +48,9 @@ class EmployeeController extends Controller
     {
         $request->validate([
             'name' => ['required'],
-            'phone' => ['required', 'unique:users,phone'],
+            'phone' => ['required'],
             'password' => ['required'],
-            'email' => ['required', 'unique:users,email'],
+            'email' => ['required'],
             'nik' => ['required'],
             'photo' => 'image|mimes:jpeg,png,jpg|max:5120',
             'position' => ['required', 'in:3,4'],
@@ -69,18 +69,22 @@ class EmployeeController extends Controller
             'photo.max' => 'Ukuran file foto maksimal: 5 Mb',
         ]);
 
-        if ($request->position == 4) {
-            if (!$request->tl_id) {
-                return response()->json([
-                    'message' => 'Team Leader harus dipilih',
-                    'errors' => [
-                        'tl_id' => ['Team Leader harus dipilih'],
-                    ],
-                ], 422);
-            } else {
-                $salesTeam = new SalesTeam();
-                $salesTeam->leader_id = $request->tl_id;
-            }
+        // Validate, no and email
+        if (User::where('phone', $request->phone)->exists()) {
+            return response()->json([
+                'message' => 'Nomor ponsel telah digunakan',
+                'errors' => [
+                    'phone' => ['Nomor ponsel telah digunakan'],
+                ],
+            ], 422);
+        }
+        if (User::where('email', $request->email)->exists()) {
+            return response()->json([
+                'message' => 'Email telah digunakan',
+                'errors' => [
+                    'email' => ['Email telah digunakan'],
+                ],
+            ], 422);
         }
 
         $path = null;
@@ -99,14 +103,8 @@ class EmployeeController extends Controller
         $employee->access_id = $request->position;
         $employee->save();
 
-        if ($employee->access_id == 4) {
-            $salesTeam->sales_id = $employee->id;
-            $salesTeam->save();
-        }
-
         return response()->json([
             'message' => 'Karyawan ditambahkan',
-            'leaders' => User::where('active', 1)->where('access_id', 3)->get(['id', 'name']),
         ]);
     }
 
@@ -125,13 +123,14 @@ class EmployeeController extends Controller
             ], 400);
         }
         return response()->json([
+            'id' => $employee->id,
             'name' => $employee->name,
             'phone' => $employee->phone,
             'nik' => $employee->nik,
             'photo' => $employee->photo,
             'email' => $employee->email,
             'position' => $employee->access->name,
-            'leader' => $employee->access_id == 4 ? $employee->leader[0]->name : '-',
+            'position_id' => $employee->access_id,
         ]);
     }
 
@@ -146,43 +145,75 @@ class EmployeeController extends Controller
         ]);
     }
 
-    // public function update(Request $request)
-    // {
-    //     $request->validate([
-    //         'merk' => ['required'],
-    //         'sell_price' => ['required'],
-    //     ], [
-    //         'merk.required' => 'Merk barang harus diisi',
-    //         'sell_price.required' => 'Merk barang harus diisi',
-    //     ]);
+    public function update(Request $request)
+    {
+        try {
+            $employee = User::findOrFail($request->id);
+        } catch (ModelNotFoundException $th) {
+            return response()->json([
+                'message' => 'Karyawan tidak ditemukan'
+            ], 404);
+        }
+        $request->validate([
+            'name' => ['required'],
+            'phone' => ['required'],
+            'email' => ['required'],
+            'nik' => ['required'],
+            'photo' => 'image|mimes:jpeg,png,jpg|max:5120',
+            'position' => ['required', 'in:3,4'],
+        ], [
+            'name.required' => 'Nama karyawan harus diisi',
+            'phone.required' => 'Nomor ponsel harus diisi',
+            'phone.unique' => 'Nomor ponsel telah digunakan ',
+            'email.required' => 'Email harus diisi',
+            'email.unique' => 'Email telah digunakan',
+            'position.required' => 'Jabatan harus dipilih',
+            'position.in' => 'Jabatan tidak valid',
+            'nik.required' => 'NIK harus diisi',
+            'photo.image' => 'Foto harus gambar',
+            'photo.mimes' => 'Ekstensi foto harus antara jpeg, png, atau jpg',
+            'photo.max' => 'Ukuran file foto maksimal: 5 Mb',
+        ]);
 
-    //     $validSellPrice = Muwiza::validInt($request->sell_price);
+        if (User::where('phone', $request->phone)->whereNot('id', $request->id)->exists()) {
+            return response()->json([
+                'message' => 'Nomor ponsel telah digunakan',
+                'errors' => [
+                    'phone' => ['Nomor ponsel telah digunakan'],
+                ],
+            ], 422);
+        }
+        if (User::where('email', $request->email)->whereNot('id', $request->id)->exists()) {
+            return response()->json([
+                'message' => 'Email telah digunakan',
+                'errors' => [
+                    'email' => ['Email telah digunakan'],
+                ],
+            ], 422);
+        }
 
-    //     $product = Product::find($request->id);
-    //     if (!$product) return response()->json([
-    //         'message' => 'Produk tidak ditemukan'
-    //     ], 404);
+        $path = null;
+        $dir = 'employees';
+        if ($request->hasFile('photo')) {
+            Storage::delete('public/' . $employee->photo);
+            $path = $request->file('photo')->store("public/$dir");
+            $employee->photo = $path ? ($dir . '/' . basename($path)) : null;
+        }
 
-    //     $inputSeo = M::seo($request->merk);
-    //     $existingProduct = Product::where('seo', $inputSeo)->where('id', '!=', $request->id)->first();
-    //     if ($existingProduct) {
-    //         return response()->json([
-    //             'message' => 'SEO sudah digunakan oleh produk lain',
-    //             'errors' => [
-    //                 'merk' => ['Produk mungkin sudah ada'],
-    //             ],
-    //         ], 422);
-    //     }
+        $employee->name = $request->name;
+        if ($request->password) {
+            $employee->password = bcrypt($request->password);
+        }
+        $employee->nik = $request->nik;
+        $employee->phone = $request->phone;
+        $employee->email = $request->email;
+        $employee->access_id = $request->position;
+        $employee->save();
 
-    //     $product->merk = $request->merk;
-    //     $product->seo = $inputSeo;
-    //     $product->sell_price = $validSellPrice;
-    //     $product->save();
-
-    //     return response()->json([
-    //         'message' => 'Barang berhasil diedit'
-    //     ]);
-    // }
+        return response()->json([
+            'message' => 'Karyawan diedit',
+        ]);
+    }
 
     public function delete(Request $request)
     {
@@ -193,6 +224,9 @@ class EmployeeController extends Controller
         foreach ($request->id as $id) {
             $employee = User::whereIn('access_id', [3, 4])->find($id);
             if ($employee) {
+                if ($employee->photo) {
+                    Storage::delete('public/' . $employee->photo);
+                }
                 $employee->delete();
             } else {
                 return response()->json([
@@ -203,7 +237,6 @@ class EmployeeController extends Controller
 
         return response()->json([
             'message' => 'Karyawan berhasil dihapus',
-            'leaders' => User::where('active', 1)->where('access_id', 3)->get(['id', 'name']),
         ]);
     }
 }
