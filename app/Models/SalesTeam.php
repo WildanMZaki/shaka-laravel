@@ -11,4 +11,8 @@ class SalesTeam extends Pivot
 {
     use HasFactory, SoftDeletes;
     protected $table = 'sales_teams';
+
+    protected $fillable = [
+        'leader_id', 'sales_id', 'date'
+    ];
 }

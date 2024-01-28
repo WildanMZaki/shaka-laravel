@@ -22,8 +22,11 @@ class AuthController extends Controller
         if (!$user || !$user->active) {
             return response()->json(['error' => 'Account is not active'], 401);
         }
+        $resp['token'] = $token;
+        $resp['name'] = $user->name;
+        $resp['access'] = $user->access->name;
 
-        return response()->json(compact('token'));
+        return response()->json($resp);
     }
 
     public function logout()

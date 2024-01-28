@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('leader_id');
             $table->unsignedBigInteger('sales_id');
+            $table->date('date');
             $table->timestamps();
             $table->softDeletes();
         });

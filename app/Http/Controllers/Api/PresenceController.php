@@ -28,6 +28,7 @@ class PresenceController extends Controller
     {
         $user_id = $request->attributes->get('user_id');
 
+        // Kita coba perbaiki lagi dikit di sini
         if (Presence::where('user_id', $user_id)->whereDate('date', now())->exists()) {
             return response()->json([
                 'message' => 'Kamu sudah absen hari ini'
