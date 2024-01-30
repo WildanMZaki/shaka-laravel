@@ -36,10 +36,15 @@ class PresenceController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
             'flag' => 'required|in:hadir,sakit,izin',
         ], [
             'flag.required' => 'Flag absensi harus harus ada',
             'flag.in' => 'Flag absensi harus salah satu dari: hadir, sakit, dan izin',
+            'photo.required' => 'Foto harus diupload',
+            'photo.image' => 'Foto harus gambar',
+            'photo.mimes' => 'Ekstensi foto harus antara jpeg, png, atau jpg',
+            'photo.max' => 'Ukuran file foto maksimal: 5 Mb',
         ]);
 
         if ($validator->fails()) {
