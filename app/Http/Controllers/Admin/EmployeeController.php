@@ -15,14 +15,14 @@ class EmployeeController extends Controller
 {
     public function index(Request $request)
     {
-        $data['employees'] = User::whereIn('access_id', [3, 4])->orderBy('created_at', 'desc')->get();
+        $data['employees'] = User::whereIn('access_id', '>', 2)->orderBy('created_at', 'desc')->get();
         $table = $this->generateTable($data['employees']);
         if ($request->ajax()) {
             $rows = $table->result();
             return response()->json($rows);
         }
         $data['rows'] = $table->resultHTML();
-        $data['positions'] = Access::whereIn('id', [3, 4])->orderBy('id', 'desc')->get();
+        $data['positions'] = Access::whereIn('id', '>', 2)->orderBy('id', 'desc')->get();
         return view('admin.employees.index', $data);
     }
 

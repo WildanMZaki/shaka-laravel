@@ -28,12 +28,27 @@ class AccessesSeeder extends Seeder
         ]);
         DB::table($this->table)->insert([
             'id' => 3,
-            'name' => 'Team Leader',
+            'name' => 'Direktur',
             'editable' => true,
         ]);
         DB::table($this->table)->insert([
             'id' => 4,
-            'name' => 'Sales',
+            'name' => 'HRD',
+            'editable' => true,
+        ]);
+        DB::table($this->table)->insert([
+            'id' => 5,
+            'name' => 'Team Leader',
+            'editable' => true,
+        ]);
+        DB::table($this->table)->insert([
+            'id' => 6,
+            'name' => 'SPG Freelancer',
+            'editable' => true,
+        ]);
+        DB::table($this->table)->insert([
+            'id' => 7,
+            'name' => 'SPG Training',
             'editable' => true,
         ]);
     }

@@ -35,7 +35,7 @@ class UsersTableSeeder extends Seeder
             'name' => 'Administrator',
             'access_id' => 2,
             // 'username' => 'admin',
-            'phone' => '123',
+            'phone' => '085872111163',
             'email' => 'admin@admin.com',
             // 'email_verified_at' => now(),
             'password' => bcrypt($adminPass),
