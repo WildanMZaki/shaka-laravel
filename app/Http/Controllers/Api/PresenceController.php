@@ -18,6 +18,10 @@ class PresenceController extends Controller
             ->where('user_id', $user_id)
             ->first();
 
+        if ($presence) {
+            $presence->photo = asset("storage") . '/' . $presence->photo;
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => $presence,
