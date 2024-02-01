@@ -141,15 +141,30 @@ class WizeTable {
 
     defineButtons = () => {
         // Jika false, atau jika default
-        if (!this.btns) {
-            this.btns = [];
-            if (this.withDelete) {
-                this.btns.push(this.formatButton(this.deleteBtn));
-            }
-            this.btns.push(this.formatButton(this.defaultButton));
+        const theBtns = [];
+        if (this.withDelete) {
+            theBtns.push(this.formatButton(this.deleteBtn));
         }
-        return this.btns;
+        if (this.btns) {
+            this.btns.forEach((btn) => {
+                theBtns.push(this.formatButton(btn));
+            });
+        }
+        theBtns.push(this.formatButton(this.defaultButton));
+
+        return theBtns;
     };
+    // defineButtons = () => {
+    //     // Jika false, atau jika default
+    //     if (!this.btns) {
+    //         this.btns = [];
+    //         if (this.withDelete) {
+    //             this.btns.push(this.formatButton(this.deleteBtn));
+    //         }
+    //         this.btns.push(this.formatButton(this.defaultButton));
+    //     }
+    //     return this.btns;
+    // };
 
     deleteAction = () => {
         var id = [];

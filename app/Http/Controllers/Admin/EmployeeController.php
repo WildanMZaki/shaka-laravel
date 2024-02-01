@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\WzExcel;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\MuwizaTable;
@@ -10,6 +11,7 @@ use App\Models\SalesTeam;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
 {
@@ -53,7 +55,7 @@ class EmployeeController extends Controller
             'email' => ['required'],
             'nik' => ['required'],
             'photo' => 'image|mimes:jpeg,png,jpg|max:5120',
-            'position' => ['required', 'in:3,4'],
+            'position' => ['required'],
         ], [
             'name.required' => 'Nama karyawan harus diisi',
             'phone.required' => 'Nomor ponsel harus diisi',
@@ -62,7 +64,6 @@ class EmployeeController extends Controller
             'email.required' => 'Email harus diisi',
             'email.unique' => 'Email telah digunakan',
             'position.required' => 'Jabatan harus dipilih',
-            'position.in' => 'Jabatan tidak valid',
             'nik.required' => 'NIK harus diisi',
             'photo.image' => 'Foto harus gambar',
             'photo.mimes' => 'Ekstensi foto harus antara jpeg, png, atau jpg',
@@ -160,7 +161,7 @@ class EmployeeController extends Controller
             'email' => ['required'],
             'nik' => ['required'],
             'photo' => 'image|mimes:jpeg,png,jpg|max:5120',
-            'position' => ['required', 'in:3,4'],
+            'position' => ['required'],
         ], [
             'name.required' => 'Nama karyawan harus diisi',
             'phone.required' => 'Nomor ponsel harus diisi',
@@ -168,7 +169,6 @@ class EmployeeController extends Controller
             'email.required' => 'Email harus diisi',
             'email.unique' => 'Email telah digunakan',
             'position.required' => 'Jabatan harus dipilih',
-            'position.in' => 'Jabatan tidak valid',
             'nik.required' => 'NIK harus diisi',
             'photo.image' => 'Foto harus gambar',
             'photo.mimes' => 'Ekstensi foto harus antara jpeg, png, atau jpg',
@@ -238,5 +238,29 @@ class EmployeeController extends Controller
         return response()->json([
             'message' => 'Karyawan berhasil dihapus',
         ]);
+    }
+
+    public function export()
+    {
+        $employees = User::where('access_id', '>', 2)->orderBy('created_at', 'desc')->get();
+        $extract = ['name', 'phone', 'email', 'nik', 'position'];
+        if (auth()->user()->access_id == 1) {
+            $extract[] = 'photo';
+        }
+        $dataEmployees = MuwizaTable::generate($employees, function ($row, $cols) {
+            $cols->position = $row->access->name;
+            return $cols;
+        })->extract($extract)
+            ->withoutId()
+            ->result();
+
+        $excelHeadings = [
+            'Nama', 'Nomor WhatsApp', 'Email', 'NIK', 'Jabatan'
+        ];
+        if (auth()->user()->access_id == 1) {
+            $excelHeadings[] = 'Path Gambar';
+        }
+        $excel = new WzExcel('Data Karyawan', $excelHeadings, $dataEmployees);
+        return Excel::download($excel, 'Daftar Karyawan.xlsx');
     }
 }

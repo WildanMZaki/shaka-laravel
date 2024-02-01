@@ -235,6 +235,35 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modal-import" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="">Impor Data Karyawan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="form-import" action="" method="post">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="input-group">
+                                <input type="file" name="excel" class="form-control" id="inputGroupFile04" aria-describedby="DownloadTemplate" aria-label="Upload">
+                                <button class="btn btn-outline-secondary" type="button" id="DownloadTemplate">
+                                    <i class="ti ti-download"></i> Template
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('jsvendor')
@@ -246,6 +275,32 @@
 @endpush
 
 @push('js')
+    <script>let eximUtil = false;</script>
+    @if (env("IS_PAID_MORE", false))
+        <script>
+        eximUtil = [
+            {
+                custom: null,
+                icon: "ti ti-file-export",
+                color: "btn-label-success",
+                text: "Export",
+                action: () => {
+                    window.location.href = '{{ route("employees.export") }}';
+                },
+            },
+            {
+                custom: null,
+                icon: "ti ti-file-import",
+                color: "btn-label-info",
+                text: "Import",
+                action: () => {
+                    $('#modal-import').modal('show');
+                },
+            },
+        ];
+        </script>
+    @endif
+
     <script src="{{ asset('libs') }}/wizecode/Wize.js"></script>
     <script src="{{ asset('libs') }}/wizecode/WizeTable.js"></script>
     <script src="{{ asset('libs') }}/wizecode/applier.js"></script>
@@ -256,6 +311,7 @@
         const storeImgDefault = $('img.store').attr('src');
         const updateImgDefault = $('img.update').attr('src');
         let table;
+
         $(document).ready(() => {
             wizeTable.init({
                 title: 'Daftar Karyawan',
@@ -267,11 +323,12 @@
                     custom: null,
                     icon: "ti ti-user-plus",
                     color: "btn-primary",
-                    text: "Tambah Karyawan",
+                    text: "Tambah",
                     action: () => {
                         $('#modal-add').modal('show');
                     },
                 },
+                btns: eximUtil,
             })
             wize.activate_tooltips();
         });

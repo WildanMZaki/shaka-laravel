@@ -72,6 +72,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::patch('/', [EmployeeController::class, 'active_control'])->name('employee.active_control');
             Route::post('/', [EmployeeController::class, 'store'])->name('employee.store');
             Route::put('/', [EmployeeController::class, 'update'])->name('employee.update');
+            Route::get('/excel_data', [EmployeeController::class, 'export'])->name('employees.export');
             Route::get('/positions', [PositionController::class, 'index'])->name('employees.positions');
             Route::get('/{id}', [EmployeeController::class, 'detail'])->name('employee.detail');
             Route::delete('/', [EmployeeController::class, 'delete'])->name('employees.delete');

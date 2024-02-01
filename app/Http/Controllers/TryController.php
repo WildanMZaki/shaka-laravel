@@ -20,10 +20,24 @@ class TryController extends Controller
 
         // $result = $this->seeMuizaTable();
         // $tbl = new MuwizaTable();
-        $result = $this->seePresences();
+        $result = $this->seeEmployees();
 
         // echo $result;
         return response()->json($result);
+    }
+
+
+    private function seeEmployees()
+    {
+        $employees = User::where('access_id', '>', 2)->orderBy('created_at', 'desc')->get();
+        $tableEmployees = MuwizaTable::generate($employees, function ($row, $cols) {
+            $cols->position = $row->access->name;
+            return $cols;
+        })->extract(['name', 'phone', 'email', 'nik', 'position', 'photo'])
+            ->withoutId()
+            ->result();
+
+        return $tableEmployees;
     }
 
     private function seeActionsGenerated()
