@@ -23,7 +23,7 @@ class PresenceController extends Controller
         }
 
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'data' => $presence,
         ]);
     }
@@ -73,6 +73,7 @@ class PresenceController extends Controller
         $presence->save();
 
         return response()->json([
+            'success' => true,
             'message' => $request->flag == 'hadir'
                 ? 'Absen berhasil'
                 : "Permohonan {$request->flag} berhasil dibuat",
