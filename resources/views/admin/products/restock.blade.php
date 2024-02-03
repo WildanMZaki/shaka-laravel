@@ -13,7 +13,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-start align-items-center">
-                        <a href="{{ route('products.restocks.list') }}" class="fw-bold me-2">
+                        <a href="{{ $routeBack }}" class="fw-bold me-2">
                             <i class="ti ti-arrow-left fs-3 m-0 p-0"></i>
                         </a>
                         <h3 class="m-0 p-0">Restock Produk</h3>
@@ -175,6 +175,7 @@
     </script>
     <script>
         const wize = new Wize();
+        const back = '{{ $routeBack }}';
 
         $(document).on('submit', '#restock-product', function (e) {
             e.preventDefault();
@@ -196,6 +197,11 @@
                 data,
                 method: "POST",
                 inputSelector: '.storeInput[name="{key}"]',
+                addon_success: () => {
+                    setTimeout(() => {
+                        window.location.href = back;
+                    }, 1500);
+                },
             });
             
         })

@@ -18,7 +18,7 @@
         @foreach ($menus as $menu)
             @if ($menu->type != 'separator')
                 @if ($menu->subMenus->count())
-                    <li class="menu-item {{ Route::is($menu->route) ? 'active open' : '' }}">
+                    <li class="menu-item has-sub-menu {{ Route::is($menu->route) ? 'active open' : '' }}">
                         <a href="javascript:void(0);" class="menu-link menu-toggle">
                             <i class="menu-icon tf-icons {{ $menu->icon }}"></i>
                             <div data-i18n="{{ $menu->name }}">{{ $menu->name }}</div>

@@ -76,12 +76,14 @@ class RestockController extends Controller
                     ];
                 }
                 $data['units'] = Unit::orderBy('id', 'desc')->get();
+                $data['routeBack'] = route('products');
             } catch (ModelNotFoundException $th) {
                 abort(404);
             }
         } else {
             $data['merkOptions'] = Product::select('id', 'merk')->where('active', 1)->get();
             $data['units'] = Unit::orderBy('id', 'desc')->get();
+            $data['routeBack'] = route('products.restocks.list');
         }
         return view('admin.products.restock', $data);
     }
@@ -93,7 +95,6 @@ class RestockController extends Controller
             'unit' => ['required'],
             'merk_id' => ['required'],
             'price_total' => ['required'],
-            'price' => ['required'],
             'transaction_date' => ['required'],
             'expiration_date' => ['required'],
         ], [
@@ -147,12 +148,14 @@ class RestockController extends Controller
             ], 400);
         }
         // Next bisa juga tambah rule, kapan / berapa jangka minimal tanggal kadaluarsa
+
+        $qty = $request->qty * $request->unit;
         $restock = new Restock();
         $restock->product_id = $productId;
-        $restock->qty = $request->qty * $request->unit;
+        $restock->qty = $qty;
         $restock->restock_date = date('Y-m-d', $restockDate);
         $restock->expiration_date = date('Y-m-d', $expDate);
-        $restock->price = $request->price;
+        $restock->price = $request->price_total / $qty;
         $restock->price_total = $request->price_total;
         $restock->price_sale = $product->sell_price;
         $restock->description = $request->description;
@@ -268,11 +271,13 @@ class RestockController extends Controller
             ], 400);
         }
         // Next bisa juga tambah rule, kapan / berapa jangka minimal tanggal kadaluarsa
+        $qty = $request->qty * $request->unit;
+
         $restock->product_id = $productId;
-        $restock->qty = $request->qty * $request->unit;
+        $restock->qty = $qty;
         $restock->restock_date = date('Y-m-d', $restockDate);
         $restock->expiration_date = date('Y-m-d', $expDate);
-        $restock->price = $request->price;
+        $restock->price = $request->price_total / $qty;
         $restock->price_total = $request->price_total;
         $restock->price_sale = $product->sell_price;
         $restock->description = $request->description;

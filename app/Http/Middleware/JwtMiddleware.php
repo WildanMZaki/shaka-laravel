@@ -26,11 +26,11 @@ class JwtMiddleware
             ]);
         } catch (Exception $e) {
             if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
-                return response()->json(['error' => 'Token is invalid'], 401);
+                return response()->json(['success' => false, 'message' => 'Token tidak valid'], 401);
             } else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
-                return response()->json(['error' => 'Token has expired'], 401);
+                return response()->json(['success' => false, 'message' => 'Token otorisasi telah kadaluwarsa'], 401);
             } else {
-                return response()->json(['error' => 'Authorization Token not found'], 401);
+                return response()->json(['success' => false, 'message' => 'Token otorisasi tidak ditemukan'], 401);
             }
         }
         return $next($request);

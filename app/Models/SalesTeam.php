@@ -13,6 +13,6 @@ class SalesTeam extends Pivot
     protected $table = 'sales_teams';
 
     protected $fillable = [
-        'leader_id', 'sales_id', 'date'
+        'leader_id', 'sales_id', 'created_at'
     ];
 }

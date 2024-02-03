@@ -96,6 +96,20 @@
 
     <!-- Page JS -->
     <script>
+      $(document).ready(function () {
+        $('li.menu-item.has-sub-menu').hover(
+          // Mouseover event
+          function () {
+            $(this).addClass('open');
+          },
+          // Mouseout event
+          function () {
+            if (!$(this).hasClass('active')) {
+              $(this).removeClass('open');
+            }
+          }
+      );
+      })
       const STORAGE = '{{ asset("storage") }}' + '/';
       $('.logout-btn').click(() => {
         Swal.fire({

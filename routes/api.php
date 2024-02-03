@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\KasbonController;
 use App\Http\Controllers\Api\PresenceController;
+use App\Http\Controllers\Api\SalesController;
 use App\Http\Controllers\Api\TeamController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,8 +29,18 @@ Route::middleware('jwt')->group(function () {
         Route::post('/', [PresenceController::class, 'store']);
     });
     Route::prefix('teams')->group(function () {
-        Route::get('/', [TeamController::class, 'today']);
+        Route::get('/', [TeamController::class, 'index']);
+        Route::get('/spgs', [TeamController::class, 'spgs']);
+        Route::delete('/spgs/{sales_id}', [TeamController::class, 'delete_spg']);
         Route::post('/', [TeamController::class, 'store']);
+    });
+    Route::prefix('sales')->group(function () {
+        Route::get('/', [SalesController::class, 'index']);
+        Route::get('/products', [SalesController::class, 'products']);
+        Route::post('/save', [SalesController::class, 'save']);
+        Route::put('/{sales_id}', [SalesController::class, 'update']);
+        Route::post('/', [SalesController::class, 'store']);
+        Route::delete('/{sales_id}', [SalesController::class, 'delete']);
     });
     Route::prefix('kasbon')->group(function () {
         Route::get('/', [KasbonController::class, 'index']);

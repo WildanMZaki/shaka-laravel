@@ -116,7 +116,7 @@
 @endpush
 
 @push('js')
-    <script src="{{ asset('libs') }}/wizecode/select2-caller.js"></script>
+    <script src="{{ asset('libs') }}/wizecode/applier.js"></script>
     <script src="{{ asset('libs') }}/wizecode/Wize.js"></script>
     <script>
         // CallBack Functions: 
@@ -176,6 +176,7 @@
     </script>
     <script>
         const wize = new Wize();
+        const back = '{{ route("products.restocks.list") }}';
 
         $(document).on('submit', '#update-restock-product', function (e) {
             e.preventDefault();
@@ -199,7 +200,9 @@
                 method: "PUT",
                 inputSelector: '.updateInput[name="{key}"]',
                 addon_success: () => {
-                    window.location.href = '{{ route("products.restocks.list") }}'
+                    setTimeout(() => {
+                        window.location.href = back;
+                    }, 1500);
                 },
             });
             

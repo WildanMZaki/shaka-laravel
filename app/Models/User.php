@@ -46,9 +46,18 @@ class User extends Authenticatable implements JWTSubject
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function avatar()
+    {
+        return 'https://ui-avatars.com/api/?name=' . $this->name . '&color=343a55&background=f1f0f3';
+    }
+
+    public function photoPath()
+    {
+        return $this->photo ? asset("storage") . '/' . $this->photo : $this->avatar();
+    }
 
     public function access()
     {
@@ -78,5 +87,11 @@ class User extends Authenticatable implements JWTSubject
     public function presences()
     {
         return $this->hasMany(Presence::class);
+    }
+
+    // Ini penjualan
+    public function selling()
+    {
+        return $this->hasMany(Sale::class);
     }
 }

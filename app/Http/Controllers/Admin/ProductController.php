@@ -31,15 +31,10 @@ class ProductController extends Controller
     private function generateTable($rowsData)
     {
         return
-            MuwizaTable::generate($rowsData, function ($row, $cols) {
-                $cols->stock = $row->restocks->sum('qty');
-                return $cols;
-            })->extract(['merk'])
+            MuwizaTable::generate($rowsData)->extract(['merk'])
             ->col('stock', 'ribuan', '{data} Botol')
             ->col('sell_price', 'rupiah')
-            ->col('sold', function ($row) {
-                return '33 dummy';
-            })
+            ->col('sold', 'ribuan', '{data} Botol')
             ->col('status', function ($row) {
                 return  $row->active ? '<span class="badge bg-label-success">Aktif</span>' : '<span class="badge bg-label-danger">Nonaktif</span>';
             })
