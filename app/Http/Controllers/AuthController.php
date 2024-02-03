@@ -21,7 +21,7 @@ class AuthController extends Controller
             'password' => ['required']
         ]);
 
-        $user = User::where('phone', $request->phone)->first();
+        $user = User::where('phone', $request->phone)->whereIn('access_id', [1, 2])->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->withErrors([
                 'msg' => 'Nomor ponsel atau password salah'

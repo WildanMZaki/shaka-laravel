@@ -14,6 +14,11 @@ class Sale extends Model
         'product_id', 'user_id', 'qty', 'modal_item', 'modal', 'price_item', 'total', 'status',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function product()
     {
         return $this->belongsTo(Product::class);
