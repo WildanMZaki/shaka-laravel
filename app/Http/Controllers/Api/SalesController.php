@@ -25,7 +25,7 @@ class SalesController extends Controller
             }])
             ->where('status', $status)
             ->whereDate('created_at', now())
-            ->get(['id', 'qty', 'total', 'status', 'product_id']);
+            ->get(['id', 'qty', 'created_at', 'total', 'status', 'product_id']);
 
         return response()->json([
             'success' => true, 'data' => $mySelling,
