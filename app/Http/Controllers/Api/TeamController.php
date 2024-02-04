@@ -63,7 +63,7 @@ class TeamController extends Controller
             ->with(['presences' => function ($query) {
                 $query->select('id', 'flag', 'status')->whereDate('date', now());
             }])
-            ->get(['id', 'name', 'photo', 'phone']);
+            ->get(['id', 'access_id', 'name', 'photo', 'phone']);
         foreach ($salesReady as $i => $sales) {
             $salesReady[$i]->photo = $sales->photoPath();
             $salesReady[$i]->presences = empty($sales->presences) ? null : $sales->presences;
