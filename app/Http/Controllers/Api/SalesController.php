@@ -45,12 +45,12 @@ class SalesController extends Controller
         $totalToday = $user->selling()
             ->where('status', 'done')
             ->whereDate('created_at', $today)
-            ->count();
+            ->sum('qty');
 
         $totalInWeek = $user->selling()
             ->where('status', 'done')
             ->whereBetween('created_at', [$startOfWeek, $endOfDay])
-            ->count();
+            ->sum('qty');
 
         return response()->json([
             'success' => true,
