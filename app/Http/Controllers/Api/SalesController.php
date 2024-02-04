@@ -56,8 +56,8 @@ class SalesController extends Controller
             'success' => true,
             'data' => [
                 'dailyTarget' => $dailyTarget,
-                'totalToday' => $totalToday,
-                'totalInWeek' => $totalInWeek,
+                'totalToday' => intval($totalToday),
+                'totalInWeek' => intval($totalInWeek),
             ],
         ]);
     }
