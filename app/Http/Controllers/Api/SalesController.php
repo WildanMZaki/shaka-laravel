@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Settings;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -40,6 +41,7 @@ class SalesController extends Controller
         $startOfWeek = Carbon::now()->startOfWeek();
         $endOfDay = Carbon::now()->endOfDay();
 
+        $dailyTarget = Settings::of('Target Jual Harian SPG Freelancer');
         $totalToday = $user->selling()
             ->where('status', 'done')
             ->whereDate('created_at', $today)
@@ -53,6 +55,7 @@ class SalesController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
+                'dailyTarget' => $dailyTarget,
                 'totalToday' => $totalToday,
                 'totalInWeek' => $totalInWeek,
             ],
