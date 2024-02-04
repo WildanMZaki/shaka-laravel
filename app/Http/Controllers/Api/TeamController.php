@@ -57,9 +57,9 @@ class TeamController extends Controller
         $salesReady = User::where('active', true)
             ->whereNotIn('id', $salesIds)
             ->whereIn('access_id', [6, 7])
-            ->whereHas('presences', function ($query) {
-                $query->where('flag', 'hadir')->whereDate('date', now());
-            })
+            ->with(['presences' => function ($query) {
+                $query->select('id', 'flag', 'status')->whereDate('date', now());
+            }])
             ->get(['id', 'name', 'photo', 'phone']);
         foreach ($salesReady as $i => $sales) {
             $salesReady[$i]->photo = $sales->photoPath();
