@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Sale;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,7 +13,6 @@ class SalesController extends Controller
 {
     public function index(Request $request)
     {
-        $access_id = $request->attributes->get('access_id');
         $user = $request->attributes->get('user');
         $status = $request->status;
         if (!$status) {
@@ -29,6 +29,33 @@ class SalesController extends Controller
 
         return response()->json([
             'success' => true, 'data' => $mySelling,
+        ]);
+    }
+
+    public function statistics(Request $request)
+    {
+        $user = $request->attributes->get('user');
+
+        $today = Carbon::today();
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $endOfDay = Carbon::now()->endOfDay();
+
+        $totalToday = $user->selling()
+            ->where('status', 'done')
+            ->whereDate('created_at', $today)
+            ->count();
+
+        $totalInWeek = $user->selling()
+            ->where('status', 'done')
+            ->whereBetween('created_at', [$startOfWeek, $endOfDay])
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'totalToday' => $totalToday,
+                'totalInWeek' => $totalInWeek,
+            ],
         ]);
     }
 
