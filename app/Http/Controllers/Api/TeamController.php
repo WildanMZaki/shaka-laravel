@@ -63,6 +63,7 @@ class TeamController extends Controller
             ->get(['id', 'name', 'photo', 'phone']);
         foreach ($salesReady as $i => $sales) {
             $salesReady[$i]->photo = $sales->photoPath();
+            $salesReady[$i]->position = $sales->access->name;
         }
         return response()->json(['success' => true, 'data' => $salesReady]);
     }
