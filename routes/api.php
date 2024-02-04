@@ -29,8 +29,8 @@ Route::middleware('jwt')->group(function () {
         Route::post('/', [PresenceController::class, 'store']);
     });
     Route::prefix('teams')->group(function () {
-        Route::get('/', [TeamController::class, 'index']);
         Route::get('/spgs', [TeamController::class, 'spgs']);
+        Route::get('/', [TeamController::class, 'index']);
         Route::delete('/spgs/{sales_id}', [TeamController::class, 'delete_spg']);
         Route::post('/', [TeamController::class, 'store']);
     });
