@@ -222,7 +222,7 @@ class EmployeeController extends Controller
         ], 400);
 
         foreach ($request->id as $id) {
-            $employee = User::whereIn('access_id', [3, 4])->find($id);
+            $employee = User::where('access_id', '>', 2)->find($id);
             if ($employee) {
                 if ($employee->photo) {
                     Storage::delete('public/' . $employee->photo);
