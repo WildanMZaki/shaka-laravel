@@ -188,6 +188,9 @@
                         $('#modal-add').modal('show');
                     },
                 },
+                callback_reload: (resp) => {
+                    $('#totalExpenditure').html(resp.totalExpenditure);
+                },
             })
             wize.activate_tooltips();
 
@@ -202,10 +205,11 @@
         $('#form-add').on('submit', function(e) {
             e.preventDefault();
             const url = $(this).attr('action');
+            const nominal = validInt($('.store[name="nominal"]').val());
             const data = {
                 user_id: $('.store[name="user_id"]').val(),
                 expenditures_date: $('.store[name="expenditures_date"]').val(),
-                nominal: validInt($('.store[name="nominal"]').val()),
+                nominal: nominal ? nominal : '',
                 note: $('.store[name="note"]').val(),
             };
 

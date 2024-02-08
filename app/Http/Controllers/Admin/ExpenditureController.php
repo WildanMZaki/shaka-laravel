@@ -32,7 +32,7 @@ class ExpenditureController extends Controller
                 'rows' => $rows,
                 'totalExpenditure' => $totalExpenditure,
             ];
-            return response()->json($rows);
+            return response()->json($response);
         }
         $data['table'] = $table;
         $data['leaders'] = User::where('access_id', 5)->where('active', true)->get(['id', 'access_id', 'name']);
