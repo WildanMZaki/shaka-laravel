@@ -1,2 +1,4 @@
 *
 !.gitignore
+!presences
+!presences/default.png

@@ -292,9 +292,9 @@
                                 </div>
                             </div>
                             <div class="iamright">
-                                <button class="btn btn-icon btn-label-success"><i class="mdi mdi-contacts"></i></button>
-                                <button class="btn btn-icon btn-label-info"><i class="ti ti-car"></i></button>
-                                <button class="btn btn-icon btn-label-warning"><i class="ti ti-mood-sad"></i></button>
+                                <button data-flag="hadir" data-user_id="{{ $unpresence->id }}" class="manual-sign-btn btn btn-icon btn-label-success" data-bs-toggle='tooltip' data-bs-placement="top" title="Tandai Hadir"><i class="mdi mdi-contacts"></i></button>
+                                <button data-flag="izin" data-user_id="{{ $unpresence->id }}" class="manual-sign-btn btn btn-icon btn-label-info" data-bs-toggle='tooltip' data-bs-placement="bottom" title="Tandai Izin"><i class="ti ti-car"></i></button>
+                                <button data-flag="sakit" data-user_id="{{ $unpresence->id }}" class="manual-sign-btn btn btn-icon btn-label-warning" data-bs-toggle='tooltip' data-bs-placement="right" title="Tandai Sakit"><i class="ti ti-mood-sad"></i></button>
                             </div>
                         </div>
                     </div>
@@ -625,6 +625,48 @@
         $('.detail[name="reason"]').val(reason);
         $('textarea#permit-note').html(note);
         $('#modal-detail').modal('show');
+    });
+
+    $(document).on('click', '.manual-sign-btn', function (e) {
+        const user_id = $(this).data('user_id');
+        const flag = $(this).data('flag');
+        const titles = {
+            hadir: 'Tandai Hadir?',
+            izin: 'Tandai Izin?',
+            sakit: 'Tandai Sakit?',
+        };
+        const title = titles[flag];
+        Swal.fire({
+            text: title,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Ya",
+            cancelButtonText: "Batal",
+            customClass: {
+                confirmButton: "btn btn-primary",
+                cancelButton: "btn btn-outline-danger ms-1",
+            },
+            buttonsStyling: false,
+        }).then((result) => {
+            if (result.value) {
+                wize.ajax({
+                    url: '{!! route("presences.sign_manual") !!}',
+                    method: 'POST',
+                    data: {
+                        user_id: user_id,
+                        flag: flag,
+                    },
+                    addon_success: (response) => {
+                        setTimeout(() => {
+                            wize.show_loading();
+                        }, 1000);
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } 
+                });
+            }
+        });
     });
 </script>
 @endpush

@@ -82,6 +82,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
 
         Route::prefix('presences')->group(function () {
             Route::get('/', [PresenceController::class, 'index'])->name('presences');
+            Route::post('/', [PresenceController::class, 'manual'])->name('presences.sign_manual');
             Route::patch('/', [PresenceController::class, 'change'])->name('presences.change');
             Route::put('/all', [PresenceController::class, 'confirm_all'])->name('presences.confirm_all');
             Route::prefix('permits')->group(function () {

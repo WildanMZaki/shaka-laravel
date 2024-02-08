@@ -154,4 +154,29 @@ class PresenceController extends Controller
             ], 500);
         }
     }
+
+    public function manual(Request $request)
+    {
+        $request->validate([
+            'user_id' => ['required'],
+            'flag' => ['required'],
+        ], [
+            'user_id.required' => 'Diperlukan data pegawai',
+            'flag.required' => 'Flag diperlukan',
+        ]);
+
+        $sign = new Presence();
+        $sign->user_id = $request->user_id;
+        $sign->flag = strtolower($request->flag);
+        $sign->note = $request->flag;
+        $sign->date = date('Y-m-d');
+        $sign->entry_at = date('H:i:s');
+        $sign->status = 'approved';
+        $sign->photo = 'presences/default.png';
+        $sign->save();
+
+        return response()->json([
+            'message' => 'Berhasil',
+        ]);
+    }
 }
