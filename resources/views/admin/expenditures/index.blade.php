@@ -25,7 +25,7 @@
                                     <input type="hidden" name="end_date" id="end_date" value="{{ $end_date }}">
                                 </div>
                                 <div class="col-lg-3 mb-3">
-                                    <label for="leader_id" class="form-label">Berdasarkan Leader</label>
+                                    <label for="leader_id" class="form-label">Berdasarkan Karyawan</label>
                                     <select class="select-merk store form-select" name="leader_id" id="leader_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
                                         <option value="" {{ $leaderSelected ? "" : "selected"}}>Semua leader</option>
                                         @foreach ($leaders as $leader)
@@ -52,7 +52,7 @@
                                 <tr>
                                     <td id="select-all-container"></td>
                                     <th>Tanggal</th>
-                                    <th>Nama Leader</th>
+                                    <th>Nama Karyawan</th>
                                     <th>Nominal</th>
                                     <th>Keterangan</th>
                                 </tr>
@@ -88,16 +88,16 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col mb-3">
-                                <label for="user_id" class="form-label">Pilih Leader <span class="text-danger">*</span></label>
+                                <label for="user_id" class="form-label">Pilih Karyawan <span class="text-danger">*</span></label>
                                 <select class="select-merk store form-select" name="user_id" id="user_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
-                                    <option value="" selected disabled>Pilih leader</option>
+                                    <option value="" selected disabled>Pilih Karyawan</option>
                                     @foreach ($leaders as $leader)
                                         <option value="{{ $leader->id }}">{{ $leader->name }} | {{ $leader->access->name }}</option>
                                     @endforeach
                                 </select>
                                 <span class="invalid-feedback" id="user_id-invalid-msg"></span>
                                 @empty($leaders)
-                                    <small class="text-danger">*** Ups.. sepertinya belum ada leader yang ditambahkan</small>
+                                    <small class="text-danger">*** Ups.. sepertinya belum ada karyawan yang ditambahkan</small>
                                 @endempty
                             </div>
                         </div>

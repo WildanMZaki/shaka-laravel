@@ -35,7 +35,7 @@ class ExpenditureController extends Controller
             return response()->json($response);
         }
         $data['table'] = $table;
-        $data['leaders'] = User::where('access_id', '>', 1)->where('active', true)->get(['id', 'access_id', 'name']);
+        $data['leaders'] = User::where('access_id', '>', 1)->where('access_id', '<=', 5)->where('active', true)->get(['id', 'access_id', 'name']);
         $data['leaderSelected'] = $leader_id;
         $data['start_date'] = $start_date;
         $data['end_date'] = $end_date;
