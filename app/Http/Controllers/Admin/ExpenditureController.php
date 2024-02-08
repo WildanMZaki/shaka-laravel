@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
 use App\Http\Controllers\Controller;
 use App\Models\Expenditure;
@@ -17,15 +18,20 @@ class ExpenditureController extends Controller
         $end_date = $request->input('end_date', $today);
         $leader_id = $request->leader_id;
 
-        $salesQuery = Expenditure::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
+        $expenditureQuery = Expenditure::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
 
         if ($leader_id) {
-            $salesQuery->where('user_id', $leader_id);
+            $expenditureQuery->where('user_id', $leader_id);
         }
-        $salesData = $salesQuery->orderBy('id', 'DESC')->get();
-        $table = $this->generateTable($salesData);
+        $totalExpenditure = Muwiza::rupiah($expenditureQuery->sum('nominal'));
+        $expenditureData = $expenditureQuery->orderBy('id', 'DESC')->get();
+        $table = $this->generateTable($expenditureData);
         if ($request->ajax()) {
             $rows = $table->result();
+            $response = (object)[
+                'rows' => $rows,
+                'totalExpenditure' => $totalExpenditure,
+            ];
             return response()->json($rows);
         }
         $data['table'] = $table;
@@ -33,6 +39,7 @@ class ExpenditureController extends Controller
         $data['leaderSelected'] = $leader_id;
         $data['start_date'] = $start_date;
         $data['end_date'] = $end_date;
+        $data['totalExpenditure'] = $totalExpenditure;
         return view('admin.expenditures.index', $data);
     }
 

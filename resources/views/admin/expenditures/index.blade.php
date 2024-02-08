@@ -64,6 +64,12 @@
                                     ])->resultHTML() 
                                 !!}
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4">Total</td>
+                                    <td id="totalExpenditure" class="fw-bold">{{ $totalExpenditure }}</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>

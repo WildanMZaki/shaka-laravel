@@ -77,8 +77,8 @@
                             <tfoot>
                                 <tr>
                                     <td colspan="4">Total</td>
-                                    <td id="totalQty">{{ $totalQty }}</td>
-                                    <td id="totalIncome">{{ $totalIncome }}</td>
+                                    <td id="totalQty" class="fw-bold">{{ $totalQty }}</td>
+                                    <td id="totalIncome" class="fw-bold">{{ $totalIncome }}</td>
                                 </tr>
                             </tfoot>
                         </table>
