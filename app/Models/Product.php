@@ -39,9 +39,6 @@ class Product extends Model
             $query->whereHas('restocks', function ($query) {
                 $query->whereNull('restocks.deleted_at');
             })
-            ->whereHas('sales', function ($query) {
-                $query->whereNull('sales.deleted_at');
-            })
             ->where(function ($query) {
                 $query->whereRaw('
                     (select sum(qty) from restocks where restocks.product_id = products.id and restocks.deleted_at is null) - 

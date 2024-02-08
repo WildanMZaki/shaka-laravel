@@ -13,4 +13,9 @@ class Expenditure extends Model
     protected $fillable = [
         'user_id', 'nominal', 'note'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class)->withTrashed();
+    }
 }

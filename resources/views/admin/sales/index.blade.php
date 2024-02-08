@@ -15,16 +15,16 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{!! route('sales') !!}" method="get">
+                        <form action="{!! route('sales') !!}" method="get" id="form-filter">
                             <h4 class="card-title">Filter</h4>
                             <div class="row">
-                                <div class="col-lg-4">
+                                <div class="col-lg-4 mb-3">
                                     <label for="sales_daterange" class="form-label">Rentang Tanggal Penjualan</label>
                                     <input type="text" id="sales_daterange" name="sales_daterange" value="" class="form-control">
                                     <input type="hidden" name="start_date" id="start_date" value="{{ $start_date }}">
                                     <input type="hidden" name="end_date" id="end_date" value="{{ $end_date }}">
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-3 mb-3">
                                     <label for="filter_product_id" class="form-label">Berdasarkan Merk</label>
                                     <select class="select-merk store form-select" name="filter_product_id" id="filter_product_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
                                         <option value="" {{ $productSelected ? "" : "selected"}}>Semua Produk</option>
@@ -33,7 +33,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-lg-3">
+                                <div class="col-lg-3 mb-3">
                                     <label for="spg_id" class="form-label">Berdasarkan SPG</label>
                                     <select class="select-merk store form-select" name="spg_id" id="spg_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
                                         <option value="" {{ $spgSelected ? "" : "selected"}}>Semua SPG</option>
@@ -42,7 +42,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-lg-2 d-flex align-items-end">
+                                <div class="col-lg-2 d-flex justify-content-end align-items-end mb-3">
                                     <button class="btn btn-primary" type="submit">Terapkan</button>
                                 </div>
                             </div>
@@ -74,6 +74,13 @@
                                     ])->resultHTML() 
                                 !!}
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4">Total</td>
+                                    <td id="totalQty">{{ $totalQty }}</td>
+                                    <td id="totalIncome">{{ $totalIncome }}</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -211,6 +218,10 @@
                             });
                         }
                     }
+                },
+                callback_reload: (resp) => {
+                    $('#totalQty').html(resp.totalQty);
+                    $('#totalIncome').html(resp.totalIncome);
                 },
             })
             wize.activate_tooltips();

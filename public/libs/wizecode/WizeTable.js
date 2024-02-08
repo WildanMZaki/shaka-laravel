@@ -25,6 +25,7 @@ class WizeTable {
             action: () => {},
         },
         addon_delete = null,
+        callback_reload = null,
         defaultDelete = true,
     }) => {
         // Yang jelas di bawah ini untuk mencegah terjadinya auto sort ketika tabel diinisialisasi
@@ -37,6 +38,7 @@ class WizeTable {
         this.defaultButton = defaultButton;
         this.btns = btns;
         this.addon_delete = addon_delete;
+        this.callback_reload = callback_reload;
         this.defaultDelete = defaultDelete;
 
         if (this.withDelete) {
@@ -265,17 +267,28 @@ class WizeTable {
         }
     };
 
-    reload = () => {
+    /**
+     * Sedikit dokumentasi, update terbaru ada callback khusus, jika ingin menggunakan callback
+     * Syarat:
+     * 1. Response dari server harus memiliki property rows
+     * 2. Gunakan callback sesuai kebutuhan
+     */
+    reload = (customUrl = null) => {
         $.ajax({
-            url: this.url,
+            url: !customUrl ? this.url : customUrl,
             type: "GET",
             dataType: "json",
-            success: (rows) => {
+            success: (response) => {
                 $('[data-bs-toggle="tooltip"]').tooltip("hide");
                 $('[data-bs-toggle="tooltip"]').tooltip("dispose");
 
                 this.wizeTable.clear().draw();
-                this.wizeTable.rows.add(rows).draw();
+                if (!this.callback_reload) {
+                    this.wizeTable.rows.add(response).draw();
+                } else {
+                    this.wizeTable.rows.add(response.rows).draw();
+                    this.callback_reload(response);
+                }
 
                 $(".is-checkbox-delete").change(function () {
                     const allChecked =

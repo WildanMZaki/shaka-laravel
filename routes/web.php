@@ -98,6 +98,8 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
 
         Route::prefix('expenditures')->group(function () {
             Route::get('/', [ExpenditureController::class, 'index'])->name('expenditures');
+            Route::post('/', [ExpenditureController::class, 'store'])->name('expenditures.store');
+            Route::delete('/', [ExpenditureController::class, 'delete'])->name('expenditures.delete');
         });
 
         Route::prefix('kasbons')->group(function () {

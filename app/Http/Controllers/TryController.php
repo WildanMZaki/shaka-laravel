@@ -20,13 +20,20 @@ class TryController extends Controller
 
         // $result = $this->seeMuizaTable();
         // $tbl = new MuwizaTable();
-        $result = $this->seeLastMonday();
+        $result = $this->seeProducts();
 
         // echo $result;
         return response()->json($result);
     }
 
-    function seeLastMonday() {
+    private function seeProducts()
+    {
+        $data['activeProducts'] = Product::withPositiveStock()->where('active', true)->get(['id', 'merk']);
+        return $data;
+    }
+
+    function seeLastMonday()
+    {
         $start_of_week_monday = date('Y-m-d', strtotime('last Monday', strtotime(date('Y-m-d'))));
         return $start_of_week_monday;
     }

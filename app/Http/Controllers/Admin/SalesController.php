@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
@@ -26,11 +27,18 @@ class SalesController extends Controller
         if ($spg_id) {
             $salesQuery->where('user_id', $spg_id);
         }
+        $totalQtySold = Muwiza::ribuan($salesQuery->sum('qty')) . ' Botol';
+        $totalIncome = Muwiza::rupiah($salesQuery->sum('total'));
         $salesData = $salesQuery->orderBy('id', 'DESC')->get();
         $table = $this->generateTable($salesData);
         if ($request->ajax()) {
             $rows = $table->result();
-            return response()->json($rows);
+            $response = (object)[
+                'rows' => $rows,
+                'totalQty' => $totalQtySold,
+                'totalIncome' => $totalIncome,
+            ];
+            return response()->json($response);
         }
         $data['table'] = $table;
         $data['activeProducts'] = Product::withPositiveStock()->where('active', true)->get(['id', 'merk']);
@@ -40,6 +48,8 @@ class SalesController extends Controller
         $data['spgSelected'] = $spg_id;
         $data['start_date'] = $start_date;
         $data['end_date'] = $end_date;
+        $data['totalQty'] = $totalQtySold;
+        $data['totalIncome'] = $totalIncome;
         return view('admin.sales.index', $data);
     }
 
@@ -64,10 +74,10 @@ class SalesController extends Controller
             'sales_date' => ['required'],
             'qty' => ['required'],
         ], [
-            'product_id.required' => 'Nama karyawan harus diisi',
-            'user_id.required' => 'Nomor ponsel harus diisi',
-            'sales_date.required' => 'Email harus diisi',
-            'qty.required' => 'NIK harus diisi',
+            'product_id.required' => 'Produk harus dipilih',
+            'user_id.required' => 'SPG harus dipilih',
+            'sales_date.required' => 'Tanggal penjualan harus diisi',
+            'qty.required' => 'Jumlah barang harus diisi',
         ]);
 
         $user_id = $request->user_id;
@@ -132,7 +142,7 @@ class SalesController extends Controller
 
         $activeProducts = Product::withPositiveStock()->where('active', true)->get(['id', 'merk']);
         return response()->json([
-            'message' => 'Karyawan berhasil dihapus',
+            'message' => 'Pengeluaran berhasil dihapus',
             'data' => [
                 'activeProducts' => $activeProducts,
             ],
