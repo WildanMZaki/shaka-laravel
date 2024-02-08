@@ -38,7 +38,7 @@
                                     <span class="invalid-feedback" id="merk_id-invalid-msg"></span>
                                     @if ($isOptionEmpty)
                                         <small class="text-danger">*** Ups.. sepertinya belum ada produk yang pernah ditambahkan</small>
-                                    @endif                            
+                                    @endif
                                 </div>
 
                                 <div class="col-lg-3 col-xl-3 mt-3 mt-lg-0 mt-xl-0">

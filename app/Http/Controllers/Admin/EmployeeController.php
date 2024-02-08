@@ -59,7 +59,6 @@ class EmployeeController extends Controller
         ], [
             'name.required' => 'Nama karyawan harus diisi',
             'phone.required' => 'Nomor ponsel harus diisi',
-            'phone.unique' => 'Nomor ponsel telah digunakan ',
             'password.required' => 'Password harus diisi',
             'email.required' => 'Email harus diisi',
             'email.unique' => 'Email telah digunakan',
@@ -165,7 +164,6 @@ class EmployeeController extends Controller
         ], [
             'name.required' => 'Nama karyawan harus diisi',
             'phone.required' => 'Nomor ponsel harus diisi',
-            'phone.unique' => 'Nomor ponsel telah digunakan ',
             'email.required' => 'Email harus diisi',
             'email.unique' => 'Email telah digunakan',
             'position.required' => 'Jabatan harus dipilih',

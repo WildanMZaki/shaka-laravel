@@ -42,7 +42,7 @@
                     <h5 class="modal-title" id="">Tambah Barang</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="form-add" action="{!! route('product.store') !!}" method="post" e>
+                <form id="form-add" action="{!! route('product.store') !!}" method="post">
                     <div class="modal-body">
                         <div class="row">
                             <div class="col mb-3">

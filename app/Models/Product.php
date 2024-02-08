@@ -35,11 +35,18 @@ class Product extends Model
 
     public function scopeWithPositiveStock($query)
     {
-        return $query->whereHas('restocks')->where(function ($query) {
-            $query->whereRaw('
-                (select sum(qty) from restocks where restocks.product_id = products.id) - 
-                    (select coalesce(sum(qty), 0) from sales where sales.product_id = products.id) > 0
-            ');
-        });
+        return
+            $query->whereHas('restocks', function ($query) {
+                $query->whereNull('restocks.deleted_at');
+            })
+            ->whereHas('sales', function ($query) {
+                $query->whereNull('sales.deleted_at');
+            })
+            ->where(function ($query) {
+                $query->whereRaw('
+                    (select sum(qty) from restocks where restocks.product_id = products.id and restocks.deleted_at is null) - 
+                    (select coalesce(sum(qty), 0) from sales where sales.product_id = products.id and sales.deleted_at is null) > 0
+                ');
+            });
     }
 }

@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\ExpenditureController;
 use App\Http\Controllers\Admin\KasbonController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\PresenceController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RestockController;
+use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashController;
@@ -86,6 +88,16 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
                 Route::patch('/', [PresenceController::class, 'permit_change'])->name('presences.permits.change');
                 Route::put('/all', [PresenceController::class, 'allow_all'])->name('presences.permits.allow_all');
             });
+        });
+
+        Route::prefix('sales')->group(function () {
+            Route::get('/', [SalesController::class, 'index'])->name('sales');
+            Route::post('/', [SalesController::class, 'store'])->name('sales.store');
+            Route::delete('/', [SalesController::class, 'delete'])->name('sales.delete');
+        });
+
+        Route::prefix('expenditures')->group(function () {
+            Route::get('/', [ExpenditureController::class, 'index'])->name('expenditures');
         });
 
         Route::prefix('kasbons')->group(function () {

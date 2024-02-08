@@ -1,0 +1,5 @@
+Yang baru dan tidak masuk di DatabaseSeeder:
+InsentifSettingsSeeder1 to settings
+
+MenusSeeder2 to menus
+MenuAccessesSeeder2 to menu_accesses
