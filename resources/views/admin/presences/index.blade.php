@@ -20,9 +20,16 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-12">
-                            <h4 class="p-0 m-0">Kehadiran Hari Ini</h4>
-                            <p class="p-0 m-0">{{ \App\Helpers\Muwiza::today() }}</p>
+                        <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-lg-center">
+                            <div class="iamleft">
+                                <h4 class="p-0 m-0">Kehadiran Hari Ini</h4>
+                                <p class="p-0 m-0">{{ \App\Helpers\Muwiza::today() }}</p>
+                            </div>
+                            <div class="iamright d-flex d-md-block justify-content-end">
+                                <button class="btn btn-primary btn-manual-add">
+                                    <i class="ti ti-plus"></i> Tambah Manual
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -261,6 +268,42 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal-add" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="">Tambah Manual</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @foreach ($unpresences as $unpresence)                        
+                    <div class="row g-1">
+                        <div class="col-12 border shadow d-flex justify-content-between align-items-center rounded-3 p-2 mb-2">
+                            <div class="iamleft d-flex">
+                                @php
+                                    $unpresenceImg = $unpresence->photo ? (asset('storage') . '/' . $unpresence->photo) : asset('assets/img/avatars').'/'.rand(1,7).'.png';
+                                @endphp
+                                <a href="{{ $unpresenceImg }}" class="apply-magnific">
+                                    <img src="{{ $unpresenceImg }}" alt="" height="50" class="me-3">
+                                </a>
+                                <div class="d-flex flex-column">
+                                    <h5 class="m-0 p-0">{{ $unpresence->name }}</h5>
+                                    <small>{{ $unpresence->access->name }}</small>
+                                </div>
+                            </div>
+                            <div class="iamright">
+                                <button class="btn btn-icon btn-label-success"><i class="mdi mdi-contacts"></i></button>
+                                <button class="btn btn-icon btn-label-info"><i class="ti ti-car"></i></button>
+                                <button class="btn btn-icon btn-label-warning"><i class="ti ti-mood-sad"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('jsvendor')
@@ -384,6 +427,10 @@
 
     $(document).ready(function () {
         wize.maginificatePopup();
+
+        $(document).on('click', '.btn-manual-add', function () {
+            $('#modal-add').modal('show');
+        })
     })
 
     $(document).on('click', '#confirm-all', function (e) {
