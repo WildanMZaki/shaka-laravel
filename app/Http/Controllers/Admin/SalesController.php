@@ -14,19 +14,19 @@ class SalesController extends Controller
     public function index(Request $request)
     {
         $today = date('Y-m-d');
-        $start_date = $request->input('start_date', date('Y-m-d', strtotime('last Monday', strtotime($today)))) . ' 00:00:00';
-        $end_date = $request->input('end_date', $today) . ' 23:59:59';
-        $product_id = $request->product_id;
+        $start_date = $request->input('start_date', date('Y-m-d', strtotime('last Monday', strtotime($today))));
+        $end_date = $request->input('end_date', $today);
+        $product_id = $request->filter_product_id;
         $spg_id = $request->spg_id;
 
-        $salesQuery = Sale::whereBetween('created_at', [$start_date, $end_date]);
+        $salesQuery = Sale::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
         if ($product_id) {
             $salesQuery->where('product_id', $product_id);
         }
         if ($spg_id) {
             $salesQuery->where('user_id', $spg_id);
         }
-        $salesData = $salesQuery->get();
+        $salesData = $salesQuery->orderBy('id', 'DESC')->get();
         $table = $this->generateTable($salesData);
         if ($request->ajax()) {
             $rows = $table->result();
@@ -34,7 +34,12 @@ class SalesController extends Controller
         }
         $data['table'] = $table;
         $data['activeProducts'] = Product::withPositiveStock()->where('active', true)->get(['id', 'merk']);
+        $data['allProducts'] = Product::get(['id', 'merk']);
         $data['spgs'] = User::whereIn('access_id', [6, 7])->where('active', true)->get(['id', 'access_id', 'name']);
+        $data['productSelected'] = $product_id;
+        $data['spgSelected'] = $spg_id;
+        $data['start_date'] = $start_date;
+        $data['end_date'] = $end_date;
         return view('admin.sales.index', $data);
     }
 

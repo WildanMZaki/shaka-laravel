@@ -4,12 +4,54 @@
 
 @push('css')
     <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets') }}/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css" />
     <link rel="stylesheet" href="{{ asset('assets') }}/vendor/libs/select2/select2.css" />
     <link rel="stylesheet" href="{{ asset('assets') }}/vendor/libs/flatpickr/flatpickr.css" />
 @endpush
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="{!! route('sales') !!}" method="get">
+                            <h4 class="card-title">Filter</h4>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <label for="sales_daterange" class="form-label">Rentang Tanggal Penjualan</label>
+                                    <input type="text" id="sales_daterange" name="sales_daterange" value="" class="form-control">
+                                    <input type="hidden" name="start_date" id="end_date" value="{{ $start_date }}">
+                                    <input type="hidden" name="end_date" id="end_date" value="{{ $end_date }}">
+                                </div>
+                                <div class="col-lg-3">
+                                    <label for="filter_product_id" class="form-label">Berdasarkan Merk</label>
+                                    <select class="select-merk store form-select" name="filter_product_id" id="filter_product_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
+                                        <option value="" {{ $productSelected ? "" : "selected"}}>Semua Produk</option>
+                                        @foreach ($allProducts as $product)
+                                            <option value="{{ $product->id }}" {{ $productSelected == $product->id ? "selected" : ""}}>{{ $product->merk }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label for="spg_id" class="form-label">Berdasarkan SPG</label>
+                                    <select class="select-merk store form-select" name="user_id" id="user_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
+                                        <option value="" {{ $spgSelected ? "" : "selected"}}>Semua SPG</option>
+                                        @foreach ($spgs as $spg)
+                                            <option value="{{ $spg->id }}" {{ $spgSelected == $spg->id ? "selected" : ""}}>{{ $spg->name }} | {{ $spg->access->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-lg-2 d-flex align-items-end">
+                                    <button class="btn btn-primary" type="submit">Terapkan</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -107,6 +149,8 @@
 
 @push('jsvendor')
     <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.js"></script>
+    <script src="{{ asset('assets') }}/vendor/libs/moment/moment.js"></script>
+    <script src="{{ asset('assets') }}/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js"></script>
     <script src="{{ asset('assets') }}/vendor/libs/select2/select2.js"></script>
     <script src="{{ asset('assets') }}/vendor/libs/flatpickr/flatpickr.js"></script>
 @endpush
@@ -120,6 +164,25 @@
         const wizeTable = new WizeTable();
         let table;
         $(document).ready(() => {
+            const startDate = moment().clone().startOf('isoWeek').format('DD MMM YYYY');
+            const endDate = moment().format('DD MMM YYYY');
+            console.log(startDate, endDate);
+            $(function() {
+                $('input[name="sales_daterange"]').daterangepicker({
+                    opens: 'left',
+                    startDate: startDate,
+                    endDate: endDate,
+                    locale: {
+                        format: 'DD MMM YYYY',
+                    },
+                }, function(start, end, label) {
+                    const strDate = start.format('YYYY-MM-DD');
+                    const eDate = end.format('YYYY-MM-DD');
+                    $('#start_date').val(strDate);
+                    $('#end_date').val(eDate);
+                });
+            });
+
             wizeTable.init({
                 title: 'Riwayat Penjualan',
                 url_delete: '{!! route("sales.delete") !!}',

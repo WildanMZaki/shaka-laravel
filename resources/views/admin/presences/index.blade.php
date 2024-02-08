@@ -145,7 +145,7 @@
                                 <div class="col-7 px-2">
                                     <b class="d-block text-overflow">{{ $permit->user->name }}</b>
                                     <small>{{ $permit->user->access->name }}</small>
-                                    <h6 class="my-1">Alasan: {{ ucfirst($permit->flag) }}</h6>                           
+                                    <h6 class="my-1">Alasan: {{ ucfirst($permit->note) }}</h6>                           
                                     <small class="badge bg-label-{{ $statusColor[$permit->status] }}">{{ ucfirst($permit->status) }}</small>
                                 </div>
                                 <div class="col-1">
@@ -194,7 +194,7 @@
                     <div class="card-body" id="unpresences-data">
                         <div class="row g-1">
                             @foreach ($unpresences as $unpresence)                        
-                                <div class="col-6 border shadow d-flex rounded-3 p-2 mb-2">
+                                <div class="col-lg-6 border shadow d-flex rounded-3 p-2 mb-2">
                                     @php
                                         $unpresenceImg = $unpresence->photo ? (asset('storage') . '/' . $unpresence->photo) : asset('assets/img/avatars').'/'.rand(1,7).'.png';
                                     @endphp
