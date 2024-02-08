@@ -35,7 +35,7 @@
                                 </div>
                                 <div class="col-lg-3">
                                     <label for="spg_id" class="form-label">Berdasarkan SPG</label>
-                                    <select class="select-merk store form-select" name="user_id" id="user_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
+                                    <select class="select-merk store form-select" name="spg_id" id="spg_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
                                         <option value="" {{ $spgSelected ? "" : "selected"}}>Semua SPG</option>
                                         @foreach ($spgs as $spg)
                                             <option value="{{ $spg->id }}" {{ $spgSelected == $spg->id ? "selected" : ""}}>{{ $spg->name }} | {{ $spg->access->name }}</option>
