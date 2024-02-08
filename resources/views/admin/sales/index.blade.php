@@ -21,7 +21,7 @@
                                 <div class="col-lg-4">
                                     <label for="sales_daterange" class="form-label">Rentang Tanggal Penjualan</label>
                                     <input type="text" id="sales_daterange" name="sales_daterange" value="" class="form-control">
-                                    <input type="hidden" name="start_date" id="end_date" value="{{ $start_date }}">
+                                    <input type="hidden" name="start_date" id="start_date" value="{{ $start_date }}">
                                     <input type="hidden" name="end_date" id="end_date" value="{{ $end_date }}">
                                 </div>
                                 <div class="col-lg-3">
@@ -164,9 +164,9 @@
         const wizeTable = new WizeTable();
         let table;
         $(document).ready(() => {
-            const startDate = moment().clone().startOf('isoWeek').format('DD MMM YYYY');
-            const endDate = moment().format('DD MMM YYYY');
-            console.log(startDate, endDate);
+            const startDate = moment($('#start_date').val(), 'YYYY-MM-DD').format('DD MMM YYYY');
+            const endDate = moment($('#end_date').val(), 'YYYY-MM-DD').format('DD MMM YYYY');
+            
             $(function() {
                 $('input[name="sales_daterange"]').daterangepicker({
                     opens: 'left',
