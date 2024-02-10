@@ -6,6 +6,7 @@ use App\Helpers\WzExcel;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\MuwizaTable;
+use App\Imports\EmployeesImport;
 use App\Models\Access;
 use App\Models\SalesTeam;
 use App\Models\User;
@@ -240,6 +241,7 @@ class EmployeeController extends Controller
 
     public function export()
     {
+        // Next Task: Add Only Selected Id Or All
         $employees = User::where('access_id', '>', 2)->orderBy('created_at', 'desc')->get();
         $extract = ['name', 'phone', 'email', 'nik', 'position'];
         if (auth()->user()->access_id == 1) {
@@ -260,5 +262,22 @@ class EmployeeController extends Controller
         }
         $excel = new WzExcel('Data Karyawan', $excelHeadings, $dataEmployees);
         return Excel::download($excel, 'Daftar Karyawan.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'excel' => 'required|mimes:xls,xlsx'
+        ], [
+            'excel.required' => 'File Excel diperlukan',
+        ]);
+
+        $file = $request->file('excel');
+
+        Excel::import(new EmployeesImport, $file);
+
+        return response()->json([
+            'message' => 'Data Karyawan berhasil diupload',
+        ]);
     }
 }

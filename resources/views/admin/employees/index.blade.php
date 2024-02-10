@@ -241,11 +241,11 @@
                     <h5 class="modal-title" id="">Impor Data Karyawan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="form-import" action="" method="post">
+                <form id="form-import" action="{!! route('employees.import') !!}" method="post">
                     <div class="modal-body">
                         <div class="row">
                             <div class="input-group">
-                                <input type="file" name="excel" class="form-control" id="inputGroupFile04" aria-describedby="DownloadTemplate" aria-label="Upload">
+                                <input type="file" name="excel" class="form-control import" id="inputGroupFile04" aria-describedby="DownloadTemplate" aria-label="Upload">
                                 <button class="btn btn-outline-secondary" type="button" id="DownloadTemplate">
                                     <i class="ti ti-download"></i> Template
                                 </button>
@@ -392,7 +392,7 @@
                     $('img.store').attr('src', storeImgDefault);
                 },
             });
-        });        
+        });      
         
         $('#form-edit').on('submit', function(e) {
             e.preventDefault();
@@ -440,6 +440,24 @@
                     });
                 }
             });
-        })
+        });
+
+        $('#form-import').on('submit', function(e) {
+            e.preventDefault();
+            const url = $(this).attr('action');
+            const data = new FormData(this);
+
+            wize.ajax({
+                url,
+                data,
+                method: "POST",
+                inputSelector: '.import[name="{key}"]',
+                modalSelector: '#modal-import',
+                addon_success: (data) => {
+                    wizeTable.reload();
+                    $(this).get(0).reset();    
+                },
+            });
+        });  
     </script>
 @endpush
