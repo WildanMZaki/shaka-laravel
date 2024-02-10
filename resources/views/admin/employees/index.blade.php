@@ -272,7 +272,7 @@
 
 @push('js')
     <script>let eximUtil = false;</script>
-    @if (env("IS_PAID_MORE", false))
+    @if (env("IS_PAID_MORE", false) || $auth->access_id == 1)
         <script>
         eximUtil = [
             {

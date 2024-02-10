@@ -2,13 +2,164 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Muwiza;
+use App\Helpers\MuwizaTable;
 use App\Http\Controllers\Controller;
+use App\Models\Kasbon;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class KasbonController extends Controller
 {
     public function index(Request $request)
     {
-        return view('admin.kasbon.index');
+        $today = date('Y-m-d');
+        $start_date = $request->input('start_date', $today);
+        $end_date = $request->input('end_date', $today);
+        $employee_id = $request->employee_id;
+
+        $kasbonQuery = Kasbon::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
+
+        if ($employee_id) {
+            $kasbonQuery->where('user_id', $employee_id);
+        }
+        $kasbonData = $kasbonQuery->orderBy('id', 'DESC')->get();
+        $table = $this->generateTable($kasbonData);
+        if ($request->ajax()) {
+            $rows = $table->result();
+            return response()->json($rows);
+        }
+        $data['table'] = $table;
+        $data['employees'] = User::where('access_id', '>', 4)
+            ->where('active', true)
+            ->orderBy('access_id', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'access_id', 'name']);
+        $data['employeeSelected'] = $employee_id;
+        $data['start_date'] = $start_date;
+        $data['end_date'] = $end_date;
+        return view('admin.kasbon.index', $data);
+    }
+
+    private function generateTable($rowsData): MuwizaTable
+    {
+        return
+            MuwizaTable::generate($rowsData, function ($row, $cols) {
+                $cols->employee = $row->user->name;
+                return $cols;
+            })->extract(['employee'])
+            ->col('tanggal', ['passDate', 'created_at'])
+            ->col('nominal', 'rupiah')
+            ->col('status', function ($row) {
+                $badges = [
+                    'pending' => '<span class="badge bg-label-warning">Pending</span>',
+                    'approved' => '<span class="badge bg-label-success">Approved</span>',
+                    'rejected' => '<span class="badge bg-label-danger">Rejected</span>',
+                ];
+                return $badges[$row->status];
+            })
+            ->col('keterangan', ['{data}', 'note'])
+            ->actions(['success', 'danger'], function ($btns, $row) {
+                $btns['success']['classIcon'] = 'ti ti-thumb-up';
+                $btns['success']['tooltip'] = 'Setujui';
+                $btns['success']['selector'] = 'btn-change-status';
+                $btns['success']['data']['status'] = 'approved';
+                $btns['danger']['classIcon'] = 'ti ti-thumb-down';
+                $btns['danger']['tooltip'] = 'Tolak';
+                $btns['danger']['selector'] = 'btn-change-status';
+                $btns['danger']['data']['status'] = 'rejected';
+                return $btns;
+            });
+    }
+
+    public function manual(Request $request)
+    {
+        $request->validate([
+            'user_id' => ['required'],
+            'kasbon_date' => ['required'],
+            'nominal' => ['required'],
+        ], [
+            'user_id.required' => 'Karyawan harus dipilih',
+            'kasbon_date.required' => 'Tanggal kasbon harus diisi',
+            'nominal.required' => 'Nominal kasbon harus diisi',
+        ]);
+
+        $kasbonUserLeft = Kasbon::of($request->user_id);
+        $nominal = $request->nominal;
+        if (intval($nominal) > $kasbonUserLeft) {
+            $allowed = Muwiza::rupiah($kasbonUserLeft);
+            return response()->json([
+                'success' => false,
+                'message' => "Mencapai limit, kasbon diizinkan: $allowed ",
+            ], 404);
+        }
+
+
+        $kasbon = new Kasbon();
+        $kasbon->user_id = $request->user_id;
+        $kasbon->nominal = $nominal;
+        $kasbon->note = $request->note ?? '';
+        $kasbon->status = 'approved';
+        $kasbon->created_at = date('Y-m-d', strtotime($request->kasbon_date)) . date(' H:i:s');
+        $kasbon->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kasbon ditambahkan',
+        ]);
+    }
+
+    public function change_status(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+            'status' => ['required', 'in:approved,rejected'],
+        ], [
+            'id.required' => 'Id data kasbon diperlukan',
+            'status.required' => 'Status diperlukan',
+            'status.in' => 'Status harus antara approved atau rejected',
+        ]);
+
+        try {
+            $kasbon = Kasbon::findOrFail($request->id);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data kasbon tidak ditemukan',
+            ], 404);
+        }
+
+        $status = $request->status;
+        $kasbon->status = $status;
+        $kasbon->save();
+
+        $msg = $status == 'approved' ? 'Pengajuan kasbon disetujui' : 'Pengajuan kasbon ditolak';
+
+        return response()->json([
+            'success' => true,
+            'message' => $msg,
+        ]);
+    }
+
+    public function delete(Request $request)
+    {
+        if (!$request->ajax()) return response()->json([
+            'message' => 'Invalid request'
+        ], 400);
+
+        foreach ($request->id as $id) {
+            $sale = Kasbon::find($id);
+            if ($sale) {
+                $sale->delete();
+            } else {
+                return response()->json([
+                    'message' => 'Data kasbon tidak ditemukan'
+                ], 400);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Data kasbon berhasil dihapus',
+        ]);
     }
 }

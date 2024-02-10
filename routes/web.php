@@ -105,6 +105,9 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
 
         Route::prefix('kasbons')->group(function () {
             Route::get('/', [KasbonController::class, 'index'])->name('kasbons');
+            Route::post('/', [KasbonController::class, 'manual'])->name('kasbons.manual');
+            Route::patch('/', [KasbonController::class, 'change_status'])->name('kasbons.change_status');
+            Route::delete('/', [KasbonController::class, 'delete'])->name('kasbons.delete');
         });
 
         Route::prefix('settings')->group(function () {

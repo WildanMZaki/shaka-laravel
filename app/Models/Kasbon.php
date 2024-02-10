@@ -12,13 +12,18 @@ class Kasbon extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id', 'kasbon_date', 'nominal', 'note', 'status'
+        'user_id', 'nominal', 'note', 'status'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class)->withTrashed();
+    }
 
     public static function of($user_id, $withHistory = false): int|object
     {
         $now = Carbon::now();
-        $startOfWeek = $now->startOfWeek();
+        $startOfWeek = $now->startOfWeek(Carbon::MONDAY);
 
         $kasbons = self::where('user_id', $user_id)
             ->where('created_at', '>=', $startOfWeek)
@@ -28,6 +33,7 @@ class Kasbon extends Model
         $left = $limitThisWeek - $totalThisWeek;
         if ($withHistory) {
             return (object)[
+                'totalThisWeek' => $totalThisWeek,
                 'left' => $left,
                 'history' => $kasbons,
             ];

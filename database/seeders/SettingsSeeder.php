@@ -20,7 +20,7 @@ class SettingsSeeder extends Seeder
 
         \App\Models\Settings::create([
             'rule' => 'Limit Kasbon',
-            'value' => 400000,
+            'value' => 200000,
             'type' => 'int',
         ]);
 
