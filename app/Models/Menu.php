@@ -9,6 +9,11 @@ class Menu extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'order', 'name', 'route', 'icon', 'type', 'active',
+    ];
+    public $timestamps = false;
+
     public function menuAccesses()
     {
         return $this->hasMany(MenuAccess::class);

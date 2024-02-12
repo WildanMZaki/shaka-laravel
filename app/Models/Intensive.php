@@ -5,14 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MenuAccess extends Model
+class Intensive extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-
-    public function menu()
-    {
-        return $this->belongsTo(Menu::class);
-    }
+    protected $fillable = ['access_id', 'sales_qty', 'intensive', 'type', 'period'];
 }

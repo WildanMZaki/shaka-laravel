@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PresenceController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RestockController;
 use App\Http\Controllers\Admin\SalesController;
+use App\Http\Controllers\Admin\SallaryController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashController;
@@ -109,6 +110,13 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::post('/', [KasbonController::class, 'manual'])->name('kasbons.manual');
             Route::patch('/', [KasbonController::class, 'change_status'])->name('kasbons.change_status');
             Route::delete('/', [KasbonController::class, 'delete'])->name('kasbons.delete');
+        });
+
+        Route::prefix('sallaries')->group(function () {
+            Route::prefix('rules')->group(function () {
+                Route::get('/', [SallaryController::class, 'rules'])->name('sallaries.rules');
+            });
+            Route::get('/', [SallaryController::class, 'index'])->name('sallaries.list');
         });
 
         Route::prefix('settings')->group(function () {

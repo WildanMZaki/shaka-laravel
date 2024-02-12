@@ -20,14 +20,17 @@ class KasbonController extends Controller
     {
         $request->validate([
             'nominal' => 'required',
+            'type' => 'required',
         ], [
             'nominal.required' => 'Nominal harus diisi',
+            'type.required' => 'Tipe kasbon harus dipilih',
         ]);
         $user_id = $request->attributes->get('user_id');
 
         $limitLeft = Kasbon::of($user_id);
         if ($request->nominal > $limitLeft) {
             return response()->json([
+                'succes' => false,
                 'message' => 'Limit kasbon tercapai',
                 'errors' => [
                     'nominal' => ['Nominal melebihi maksimal batas yang diizinkan'],
@@ -38,12 +41,13 @@ class KasbonController extends Controller
 
         $kasbon = new Kasbon();
         $kasbon->user_id = $user_id;
-        $kasbon->kasbon_date = now();
         $kasbon->nominal = $request->nominal;
+        $kasbon->type = $request->type;
         $kasbon->note = $request->note;
         $kasbon->save();
 
         return response()->json([
+            'success' => true,
             'message' => 'Pengajuan kasbon berhasil dibuat'
         ]);
     }

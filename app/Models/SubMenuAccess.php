@@ -9,6 +9,8 @@ class SubMenuAccess extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     public function subMenu()
     {
         return $this->belongsTo(SubMenu::class);

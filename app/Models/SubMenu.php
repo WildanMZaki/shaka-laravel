@@ -9,6 +9,8 @@ class SubMenu extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     public function subMenuAccesses()
     {
         return $this->hasMany(SubMenuAccess::class);
