@@ -12,7 +12,10 @@ class KasbonController extends Controller
     {
         $user_id = $request->attributes->get('user_id');
         $data = Kasbon::of($user_id, true);
-        return response()->json($data);
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
     }
 
     // Ini maksudnya mengajukan kasbon
