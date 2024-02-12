@@ -46,7 +46,7 @@ class KasbonController extends Controller
         $kasbon->user_id = $user_id;
         $kasbon->nominal = $request->nominal;
         $kasbon->type = $request->type;
-        $kasbon->note = $request->note;
+        $kasbon->note = $request->note ?? '';
         $kasbon->save();
 
         return response()->json([
