@@ -54,4 +54,23 @@ class KasbonController extends Controller
             'message' => 'Pengajuan kasbon berhasil dibuat'
         ]);
     }
+
+    public function delete(Request $request, $kasbon_id)
+    {
+        $user_id = $request->attributes->get('user_id');
+
+        $sale = Kasbon::where('user_id', $user_id)->where('id', $kasbon_id)->first();
+        if ($sale) {
+            $sale->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Data kasbon berhasil dihapus'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data kasbon tidak ditemukan'
+            ], 404);
+        }
+    }
 }

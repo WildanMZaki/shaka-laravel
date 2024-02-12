@@ -46,6 +46,7 @@ Route::middleware('jwt')->group(function () {
     Route::prefix('kasbon')->group(function () {
         Route::get('/', [KasbonController::class, 'index']);
         Route::post('/', [KasbonController::class, 'apply']);
+        Route::delete('/{kasbon_id}', [KasbonController::class, 'delete']);
     });
 });
 
