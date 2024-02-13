@@ -37,6 +37,7 @@ Route::middleware('jwt')->group(function () {
     Route::prefix('sales')->group(function () {
         Route::get('/', [SalesController::class, 'index']);
         Route::get('/statistics', [SalesController::class, 'statistics']);
+        Route::get('/history', [SalesController::class, 'history']);
         Route::get('/products', [SalesController::class, 'products']);
         Route::post('/save', [SalesController::class, 'save']);
         Route::put('/{sales_id}', [SalesController::class, 'update']);
