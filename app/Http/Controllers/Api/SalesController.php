@@ -62,6 +62,34 @@ class SalesController extends Controller
         ]);
     }
 
+    public function history(Request $request)
+    {
+        // $period = $this->input('period', 'weekly');
+        $today = date('Y-m-d');
+        $currentDayOfWeek = date('N', strtotime($today));
+
+        if ($currentDayOfWeek == 1) {
+            $start_date = $today . ' 00:00:00';
+        } else {
+            $start_date = date('Y-m-d', strtotime('last Monday', strtotime($today))) . ' 00:00:00';
+        }
+
+        $end_date = $today . ' 23:59:59';
+
+        $user_id = $request->attributes->get('user_id');
+
+        $salesData = Sale::where('user_id', $user_id)
+            ->whereBetween('created_at', [$start_date, $end_date])
+            ->selectRaw('DATE(created_at) as date, SUM(qty) as total_qty')
+            ->groupBy('date')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $salesData,
+        ]);
+    }
+
     public function products()
     {
         $products = Product::withPositiveStock()->where('active', true)->get(['id', 'merk', 'sell_price']);

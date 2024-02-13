@@ -15,12 +15,23 @@ class SalesController extends Controller
     public function index(Request $request)
     {
         $today = date('Y-m-d');
-        $start_date = $request->input('start_date', date('Y-m-d', strtotime('last Monday', strtotime($today))));
-        $end_date = $request->input('end_date', $today);
+        $currentDayOfWeek = date('N', strtotime($today));
+
+        if ($currentDayOfWeek == 1) {
+            $start_date = $today . ' 00:00:00';
+        } else {
+            $start_date = date('Y-m-d', strtotime('last Monday', strtotime($today))) . ' 00:00:00';
+        }
+
+        $end_date = $request->input('end_date', $today . ' 23:59:59');
+
+        $start_date = $request->input('start_date', $start_date);
+
         $product_id = $request->filter_product_id;
         $spg_id = $request->spg_id;
 
-        $salesQuery = Sale::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
+        $salesQuery = Sale::whereBetween('created_at', [$start_date, $end_date]);
+
         if ($product_id) {
             $salesQuery->where('product_id', $product_id);
         }

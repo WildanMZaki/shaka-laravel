@@ -84,15 +84,15 @@ class KasbonController extends Controller
             'nominal.required' => 'Nominal kasbon harus diisi',
         ]);
 
-        $kasbonUserLeft = Kasbon::of($request->user_id);
+        // $kasbonUserLeft = Kasbon::of($request->user_id);
         $nominal = $request->nominal;
-        if (intval($nominal) > $kasbonUserLeft) {
-            $allowed = Muwiza::rupiah($kasbonUserLeft);
-            return response()->json([
-                'success' => false,
-                'message' => "Mencapai limit, kasbon diizinkan: $allowed ",
-            ], 404);
-        }
+        // if (intval($nominal) > $kasbonUserLeft) {
+        //     $allowed = Muwiza::rupiah($kasbonUserLeft);
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => "Mencapai limit, kasbon diizinkan: $allowed ",
+        //     ], 404);
+        // }
 
 
         $kasbon = new Kasbon();

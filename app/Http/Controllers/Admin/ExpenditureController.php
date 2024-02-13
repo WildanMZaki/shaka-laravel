@@ -14,11 +14,21 @@ class ExpenditureController extends Controller
     public function index(Request $request)
     {
         $today = date('Y-m-d');
-        $start_date = $request->input('start_date', date('Y-m-d', strtotime('last Monday', strtotime($today))));
-        $end_date = $request->input('end_date', $today);
+        $currentDayOfWeek = date('N', strtotime($today));
+
+        if ($currentDayOfWeek == 1) {
+            $start_date = $today . ' 00:00:00';
+        } else {
+            $start_date = date('Y-m-d', strtotime('last Monday', strtotime($today))) . ' 00:00:00';
+        }
+
+        $end_date = $request->input('end_date', $today . ' 23:59:59');
+
+        $start_date = $request->input('start_date', $start_date);
+
         $leader_id = $request->leader_id;
 
-        $expenditureQuery = Expenditure::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
+        $expenditureQuery = Expenditure::whereBetween('created_at', [$start_date, $end_date]);
 
         if ($leader_id) {
             $expenditureQuery->where('user_id', $leader_id);
