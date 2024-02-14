@@ -69,9 +69,9 @@ class TryController extends Controller
         $nominalLebih -= $kasbonPaid;
 
         foreach ($kasbons as $kasbon) {
-            if ($nominalLebih > $kasbon->nominal) {
-                $kasbon->status = 'paid';
-                $kasbon->save();
+            if ($nominalLebih >= $kasbon->nominal) {
+                // $kasbon->status = 'paid';
+                // $kasbon->save();
 
                 $nominalLebih -= $kasbon->nominal;
             }

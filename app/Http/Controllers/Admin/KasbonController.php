@@ -52,6 +52,7 @@ class KasbonController extends Controller
         return
             MuwizaTable::generate($rowsData, function ($row, $cols) {
                 $cols->employee = $row->user->name;
+                $cols->keterangan = $row->note . "({$row->type})";
                 return $cols;
             })->extract(['employee'])
             ->col('tanggal', ['passDate', 'created_at'])
@@ -66,7 +67,7 @@ class KasbonController extends Controller
                 ];
                 return $badges[$row->status];
             })
-            ->col('keterangan', ['{data}', 'note'])
+            ->col('keterangan', ['{data}', 'keterangan'])
             ->actions(['success', 'danger'], function ($btns, $row) {
                 $btns['success']['classIcon'] = 'ti ti-thumb-up';
                 $btns['success']['tooltip'] = 'Setujui';

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
 use App\Http\Controllers\Controller;
+use App\Jobs\ProcessSalesData;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
@@ -127,6 +128,8 @@ class SalesController extends Controller
         $sale->created_at = date('Y-m-d', strtotime($sales_date)) . date(' H:i:s');
         $sale->save();
 
+        ProcessSalesData::dispatch($user_id);
+
         $activeProducts = Product::withPositiveStock()->where('active', true)->get(['id', 'merk']);
         return response()->json([
             'success' => true,
@@ -156,7 +159,7 @@ class SalesController extends Controller
 
         $activeProducts = Product::withPositiveStock()->where('active', true)->get(['id', 'merk']);
         return response()->json([
-            'message' => 'Pengeluaran berhasil dihapus',
+            'message' => 'Penjualan berhasil dihapus',
             'data' => [
                 'activeProducts' => $activeProducts,
             ],

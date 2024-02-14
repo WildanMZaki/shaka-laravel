@@ -6,6 +6,7 @@ use App\Helpers\Muwiza;
 use App\Models\Kasbon;
 use App\Models\Sale;
 use App\Models\Settings;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -36,6 +37,11 @@ class ProcessSalesData implements ShouldQueue
      */
     public function handle()
     {
+        $user = User::find($this->userId);
+        if ($user->access_id != 6) {
+            return;
+        }
+
         $rangeDate = Muwiza::mondayUntilNow();
         $kasbons = Kasbon::where('user_id', $this->userId)
             ->where('type', 'keep')
@@ -52,6 +58,7 @@ class ProcessSalesData implements ShouldQueue
 
         $salesData = Sale::where('user_id', $this->userId)
             ->where('created_at', '>', $firstKasbonDate)
+            ->where('status', 'done')
             ->selectRaw('DATE(created_at) as date, SUM(qty) as total_qty, SUM(total) as total_income')
             ->groupBy('date')
             ->get();
@@ -73,7 +80,7 @@ class ProcessSalesData implements ShouldQueue
         $nominalLebih -= $kasbonPaid;
 
         foreach ($kasbons as $kasbon) {
-            if ($nominalLebih > $kasbon->nominal) {
+            if ($nominalLebih >= $kasbon->nominal) {
                 $kasbon->status = 'paid';
                 $kasbon->save();
 

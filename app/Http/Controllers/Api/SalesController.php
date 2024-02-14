@@ -146,11 +146,6 @@ class SalesController extends Controller
         $sale->total = $total;
         $sale->save();
 
-        $access_id = $request->attributes->get('access_id');
-        if ($access_id == 6) {
-            ProcessSalesData::dispatch($user_id);
-        }
-
         return response()->json([
             'success' => true,
             'message' => 'Barang disimpan',
@@ -161,10 +156,12 @@ class SalesController extends Controller
     {
         $user_id = $request->attributes->get('user_id');
 
-        $affectedRows = Sale::where('user_id', $user_id)
+        Sale::where('user_id', $user_id)
             ->whereDate('created_at', now())
             ->where('status', 'processed')
             ->update(['status' => 'done']);
+
+        ProcessSalesData::dispatch($user_id);
 
         return response()->json([
             'success' => true,
