@@ -54,7 +54,10 @@ class SalesController extends Controller
         $data['table'] = $table;
         $data['activeProducts'] = Product::withPositiveStock()->where('active', true)->get(['id', 'merk']);
         $data['allProducts'] = Product::get(['id', 'merk']);
-        $data['spgs'] = User::whereIn('access_id', [6, 7])->where('active', true)->get(['id', 'access_id', 'name']);
+        $data['spgs'] = User::whereIn('access_id', [6, 7])
+            ->where('active', true)
+            ->orderBy('name', 'asc')
+            ->get(['id', 'access_id', 'name']);
         $data['productSelected'] = $product_id;
         $data['spgSelected'] = $spg_id;
         $data['start_date'] = $start_date;

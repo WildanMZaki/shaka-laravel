@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ProcessSalesData;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Settings;
@@ -144,6 +145,11 @@ class SalesController extends Controller
         $sale->price_item = $price_item;
         $sale->total = $total;
         $sale->save();
+
+        $access_id = $request->attributes->get('access_id');
+        if ($access_id == 6) {
+            ProcessSalesData::dispatch($user_id);
+        }
 
         return response()->json([
             'success' => true,

@@ -130,4 +130,36 @@ trait Formatter
             return "malam";
         }
     }
+
+    /**
+     * @param string|null $datetime in format YYYY-mm-dd
+     * @return string first monday from the date time
+     */
+    public static function firstMonday(?string $datetime = null): string
+    {
+        $datetime = $datetime ?? date('Y-m-d');
+        $currentDayOfWeek = date('N', strtotime($datetime));
+
+        if ($currentDayOfWeek == 1) {
+            $firstMonday = $datetime . ' 00:00:00';
+        } else {
+            $firstMonday = date('Y-m-d', strtotime('last Monday', strtotime($datetime))) . ' 00:00:00';
+        }
+
+        return $firstMonday;
+    }
+
+    public static function mondayUntilNow(): array
+    {
+        $start = self::firstMonday();
+        $end = date('Y-m-d 23:59:59');
+        return [$start, $end];
+    }
+
+    /**
+     * @param string|null $start_date
+     */
+    public static function rangeDateFrom(?string $start_date = null, ?string $end_date = null)
+    {
+    }
 }

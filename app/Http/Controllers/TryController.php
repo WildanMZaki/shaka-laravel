@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
+use App\Models\Kasbon;
 use App\Models\Menu;
 use App\Models\Notification;
 use App\Models\Presence;
 use App\Models\Product;
 use App\Models\Restock;
+use App\Models\Sale;
 use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,10 +22,62 @@ class TryController extends Controller
 
         // $result = $this->seeMuizaTable();
         // $tbl = new MuwizaTable();
-        $result = $this->seeProducts();
+        $result = $this->seeSaleAfterKasbon();
 
         // echo $result;
         return response()->json($result);
+    }
+
+    private function seeSaleAfterKasbon()
+    {
+        // Check if the user has kasbons
+        $user_id = 23;
+        $rangeDate = Muwiza::mondayUntilNow();
+        $kasbons = Kasbon::where('user_id', $user_id)
+            ->where('type', 'keep')
+            ->where('status', 'approved')
+            ->whereBetween('created_at', $rangeDate)
+            ->get();
+
+        // If there are no kasbons, stop the job
+        if ($kasbons->isEmpty()) {
+            return;
+        }
+
+        $firstKasbonDate = $kasbons->sortBy('created_at')->first()->created_at;
+
+        $salesData = Sale::where('user_id', $user_id)
+            ->where('created_at', '>', $firstKasbonDate)
+            ->selectRaw('DATE(created_at) as date, SUM(qty) as total_qty, SUM(total) as total_income')
+            ->groupBy('date')
+            ->get();
+
+        $target = Settings::of('Target Jual Harian SPG Freelancer');
+
+        // Qty yang lebih dari target:
+        $qtyPass = 0;
+        foreach ($salesData as $sale) {
+            if ($sale->total_qty > $target) {
+                $qtyPass += ($sale->total_qty - $target);
+            }
+        }
+
+        $defaultSalePrice = Settings::of('Default Harga Jual');
+        $nominalLebih = $qtyPass * $defaultSalePrice;
+
+        $kasbonPaid = Kasbon::where('user_id', $user_id)->where('status', 'paid')->where('type', 'keep')->sum('nominal');
+        $nominalLebih -= $kasbonPaid;
+
+        foreach ($kasbons as $kasbon) {
+            if ($nominalLebih > $kasbon->nominal) {
+                $kasbon->status = 'paid';
+                $kasbon->save();
+
+                $nominalLebih -= $kasbon->nominal;
+            }
+        }
+
+        return [$kasbons, $salesData, $qtyPass, $nominalLebih];
     }
 
     private function seeProducts()

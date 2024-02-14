@@ -25,14 +25,22 @@
                             </div>
                             <div class="col-lg-3 mb-3">
                                 <label for="employee_id" class="form-label">Berdasarkan Karyawan</label>
-                                <select class="select-merk store form-select" name="employee_id" id="employee_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
+                                <select class="select-merk store form-select" name="employee_id" id="employee_id" data-placeholder="Pilih Karyawan" data-allow-clear="1">
                                     <option value="" {{ $employeeSelected ? "" : "selected"}}>Semua Karyawan</option>
                                     @foreach ($employees as $employee)
                                         <option value="{{ $employee->id }}" {{ $employeeSelected == $employee->id ? "selected" : ""}}>{{ $employee->name }} | {{ $employee->access->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-lg-2 offset-lg-3 d-flex align-items-end justify-content-end mb-3">
+                            <div class="col-lg-3 mb-3">
+                                <label for="type_filter" class="form-label">Berdasarkan Tipe</label>
+                                <select class="select-merk store form-select" name="type_filter" id="type_filter" data-placeholder="Pilih Tipe" data-allow-clear="1">
+                                    <option value="" {{ $typeSelected ? "" : "selected"}}>Semua Tipe</option>
+                                    <option value="keep" {{ $typeSelected == 'keep' ? "selected" : ""}}>Keep</option>
+                                    <option value="kasbon" {{ $typeSelected == 'kasbon' ? "selected" : ""}}>Kasbon</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 d-flex align-items-end justify-content-end mb-3">
                                 <button class="btn btn-primary" type="submit">Terapkan</button>
                             </div>
                         </div>
@@ -82,10 +90,10 @@
             </div>
             <form id="form-add" action="{!! route('kasbons.manual') !!}" method="post">
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col mb-3">
+                    <div class="row g-1">
+                        <div class="col-lg-6 mb-3">
                             <label for="user_id" class="form-label">Karyawan <span class="text-danger">*</span></label>
-                            <select class="select-merk store form-select" name="user_id" id="user_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
+                            <select class="select-user store form-select" name="user_id" id="user_id" data-placeholder="Pilih Karyawan" data-allow-clear="1">
                                 <option value="" selected disabled>Pilih Karyawan</option>
                                 @foreach ($employees as $employee)
                                     <option value="{{ $employee->id }}">{{ $employee->name }} | {{ $employee->access->name }}</option>
@@ -96,8 +104,16 @@
                                 <small class="text-danger">*** Ups.. sepertinya belum ada karyawan yang ditambahkan</small>
                             @endempty
                         </div>
+                        <div class="col-lg-6 mb-3">
+                            <label for="type" class="form-label">Tipe <span class="text-danger">*</span></label>
+                            <select class="select-type store form-select" name="type" id="type" data-placeholder="Pilih Tipe Kasbon" data-allow-clear="1">
+                                <option value="keep" selected>Keep</option>
+                                <option value="kasbon">Kasbon</option>
+                            </select>
+                            <span class="invalid-feedback" id="type-invalid-msg"></span>
+                        </div>
                     </div>
-                    <div class="row">
+                    <div class="row g-1">
                         <div class="col-lg-6 mb-3">
                             <label class="form-label" for="kasbon_date">Tanggal kasbon <span class="text-danger">*</span></label>
                             <input type="date" name="kasbon_date" id="kasbon_date" class="form-control store">
@@ -200,6 +216,7 @@
             const nominal = validInt($('.store[name="nominal"]').val());
             const data = {
                 user_id: $('.store[name="user_id"]').val(),
+                type: $('.store[name="type"]').val(),
                 kasbon_date: $('.store[name="kasbon_date"]').val(),
                 nominal: nominal ? nominal : '',
                 note: $('.store[name="note"]').val(),

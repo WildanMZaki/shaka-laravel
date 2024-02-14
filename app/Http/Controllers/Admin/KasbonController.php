@@ -17,12 +17,17 @@ class KasbonController extends Controller
         $start_date = $request->input('start_date', $today);
         $end_date = $request->input('end_date', $today);
         $employee_id = $request->employee_id;
+        $type = $request->type_filter;
 
         $kasbonQuery = Kasbon::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
 
         if ($employee_id) {
             $kasbonQuery->where('user_id', $employee_id);
         }
+        if ($type) {
+            $kasbonQuery->where('type', $type);
+        }
+
         $kasbonData = $kasbonQuery->orderBy('id', 'DESC')->get();
         $table = $this->generateTable($kasbonData);
         if ($request->ajax()) {
@@ -33,9 +38,10 @@ class KasbonController extends Controller
         $data['employees'] = User::where('access_id', '>', 4)
             ->where('active', true)
             ->orderBy('access_id', 'asc')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('name', 'asc')
             ->get(['id', 'access_id', 'name']);
         $data['employeeSelected'] = $employee_id;
+        $data['typeSelected'] = $type;
         $data['start_date'] = $start_date;
         $data['end_date'] = $end_date;
         return view('admin.kasbon.index', $data);
@@ -55,6 +61,8 @@ class KasbonController extends Controller
                     'pending' => '<span class="badge bg-label-warning">Pending</span>',
                     'approved' => '<span class="badge bg-label-success">Approved</span>',
                     'rejected' => '<span class="badge bg-label-danger">Rejected</span>',
+                    'paid' => '<span class="badge bg-label-info">Terbayar</span>',
+                    'unpaid' => '<span class="badge bg-label-secondary">Dikasbon</span>',
                 ];
                 return $badges[$row->status];
             })
@@ -77,11 +85,13 @@ class KasbonController extends Controller
         $request->validate([
             'user_id' => ['required'],
             'kasbon_date' => ['required'],
+            'type' => ['required'],
             'nominal' => ['required'],
         ], [
             'user_id.required' => 'Karyawan harus dipilih',
             'kasbon_date.required' => 'Tanggal kasbon harus diisi',
             'nominal.required' => 'Nominal kasbon harus diisi',
+            'type.required' => 'Tipe kasbon harus dipilih',
         ]);
 
         // $kasbonUserLeft = Kasbon::of($request->user_id);
@@ -98,6 +108,7 @@ class KasbonController extends Controller
         $kasbon = new Kasbon();
         $kasbon->user_id = $request->user_id;
         $kasbon->nominal = $nominal;
+        $kasbon->type = $request->type;
         $kasbon->note = $request->note ?? '';
         $kasbon->status = 'approved';
         $kasbon->created_at = date('Y-m-d', strtotime($request->kasbon_date)) . date(' H:i:s');
