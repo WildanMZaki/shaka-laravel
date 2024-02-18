@@ -29,6 +29,8 @@ class AuthController extends Controller
         $resp['success'] = true;
         $resp['token'] = $token;
         $resp['name'] = $user->name;
+        $resp['phone'] = $user->phone;
+        $resp['email'] = $user->email;
         $resp['access_id'] = $user->access_id;
         $resp['access'] = $user->access->name;
         $resp['photo'] = $user->photoPath();
