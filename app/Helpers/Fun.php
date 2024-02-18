@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Restock;
 use App\Models\Sale;
 use App\Models\User;
+use App\Models\WeeklySallary;
 use DateTime;
 use Exception;
 
@@ -76,9 +77,11 @@ class Fun
         $twoWeeksAgo = date('Y-m-d 00:00:00', strtotime($period, strtotime($today)));
         $totalIncome = Sale::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('total');
         $totalModal = Sale::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('modal');
-        $totalExpenditures = self::nominalRupiah(self::getExpenditures());
+        $totalExpenditures = self::nominalRupiah(self::getExpenditures($period));
         $totalProfit = $totalIncome - $totalModal;
         $totalProfit -= $totalExpenditures;
+        $totalGivenSallaries = self::getGivenSallaries($period);
+        $totalProfit -= $totalGivenSallaries;
         return self::rupiah($totalProfit);
     }
     public static function getIncome($period = '-14 days')
@@ -94,6 +97,13 @@ class Fun
         $twoWeeksAgo = date('Y-m-d', strtotime($period, strtotime($today)));
         $totalExpenditure = Expenditure::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('nominal');
         return self::rupiah($totalExpenditure);
+    }
+    public static function getGivenSallaries($period = '-14 days')
+    {
+        $today = date('Y-m-d');
+        $twoWeeksAgo = date('Y-m-d', strtotime($period, strtotime($today)));
+        $totalGivenSallary = WeeklySallary::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('total');
+        return $totalGivenSallary;
     }
 
     public static function periodDates(?string $mondayDate = null, $lastDay = 'Sabtu')
