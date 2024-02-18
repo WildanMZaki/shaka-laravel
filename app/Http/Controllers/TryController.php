@@ -27,8 +27,14 @@ class TryController extends Controller
         // $result = $this->seeSaleWithKeep(4);
         // $result = $this->seeSallary();
         // $result = $this->seeLeaderSelling();
-        $result = $this->seeInsentif();
+        // $result = $this->seeInsentif();
+        $result = $this->seeTotalGivenSallariesThisWeek();
         return response()->json($result);
+    }
+
+    private function seeTotalGivenSallariesThisWeek()
+    {
+        return Fun::getGivenSallaries();
     }
 
     private function seeInsentif()

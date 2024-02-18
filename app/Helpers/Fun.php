@@ -100,8 +100,8 @@ class Fun
     }
     public static function getGivenSallaries($period = '-14 days')
     {
-        $today = date('Y-m-d');
-        $twoWeeksAgo = date('Y-m-d', strtotime($period, strtotime($today)));
+        $today = date('Y-m-d 23:59:59');
+        $twoWeeksAgo = date('Y-m-d 00:00:00', strtotime($period, strtotime($today)));
         $totalGivenSallary = WeeklySallary::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('total');
         return $totalGivenSallary;
     }
