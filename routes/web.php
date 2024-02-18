@@ -16,6 +16,7 @@ use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\SubMenuController;
 use App\Http\Controllers\TryController;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,6 +49,20 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     Route::get('/run-queue-worker', function () {
         Artisan::call('queue:work');
         return 'Queue worker has been executed.';
+    });
+    Route::get('/run-artisan', function (Request $request) {
+        $key = $request->query('key');
+        $command = $request->query('command');
+        if ($key === 'D3vS3cr3tK3y') {
+            $exitCode = Artisan::call($command);
+            if ($exitCode === 0) {
+                return response("Artisan command '$command' executed successfully", 200);
+            } else {
+                return response("Error executing artisan command '$command'", 500);
+            }
+        } else {
+            return response('Unauthorized', 401);
+        }
     });
     Route::get('/', [DashController::class, 'index'])->name('dashboard');
     Route::prefix('dev-setting')->group(function () {
