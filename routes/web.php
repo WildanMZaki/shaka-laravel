@@ -122,6 +122,8 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
                 Route::get('/', [SallaryController::class, 'rules'])->name('sallaries.rules');
             });
             Route::get('/', [SallaryController::class, 'index'])->name('sallaries.list');
+            Route::post('/generate', [SallaryController::class, 'count_sallaries'])->name('sallaries.generate');
+            Route::get('/count_monitor', [SallaryController::class, 'monitor_counting'])->name('sallaries.monitor');
         });
 
         Route::prefix('settings')->group(function () {

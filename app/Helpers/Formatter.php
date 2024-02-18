@@ -104,6 +104,13 @@ trait Formatter
         return $intValue;
     }
 
+    public static function nominalRupiah(string $stringRupiah): int
+    {
+        $sanitized_str = preg_replace('/[^0-9]/', '', $stringRupiah);
+        $amount_int = (int)$sanitized_str;
+        return $amount_int;
+    }
+
     public static function simpleDate(string $dateTime): string
     {
         return date('d M Y', strtotime($dateTime));
@@ -156,10 +163,24 @@ trait Formatter
         return [$start, $end];
     }
 
-    /**
-     * @param string|null $start_date
-     */
-    public static function rangeDateFrom(?string $start_date = null, ?string $end_date = null)
+    public static function nextMondayFrom($monday): string
     {
+        $currentMondayObj = DateTime::createFromFormat('Y-m-d', $monday);
+        $nextMondayObj = $currentMondayObj->modify('+7 days');
+        return $nextMondayObj->format('Y-m-d');
+    }
+
+    public static function convertPeriod($period)
+    {
+        list($start, $end) = explode(' - ', $period);
+
+        $startDate = new DateTime($start);
+        $endDate = new DateTime($end);
+
+        if ($startDate->format('Y-m') === $endDate->format('Y-m')) {
+            return $startDate->format('d') . ' - ' . $endDate->format('d M');
+        } else {
+            return $startDate->format('d M') . ' - ' . $endDate->format('d M');
+        }
     }
 }

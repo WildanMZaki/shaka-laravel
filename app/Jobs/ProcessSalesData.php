@@ -37,54 +37,48 @@ class ProcessSalesData implements ShouldQueue
      */
     public function handle()
     {
-        $user = User::find($this->userId);
-        if ($user->access_id != 6) {
-            return;
-        }
+        $keepData = Kasbon::keepFrom($this->userId, date('Y-m-d'));
 
         $rangeDate = Muwiza::mondayUntilNow();
         $kasbons = Kasbon::where('user_id', $this->userId)
             ->where('type', 'keep')
-            ->where('status', 'approved')
+            ->whereIn('status', ['unpaid', 'approved'])
             ->whereBetween('created_at', $rangeDate)
             ->get();
 
-        // If there are no kasbons, stop the job
-        if ($kasbons->isEmpty()) {
-            return;
-        }
+        $firstKeepDate = $kasbons->sortBy('created_at')->first()->created_at;
+        $firstKeepTime = strtotime(date($firstKeepDate));
 
-        $firstKasbonDate = $kasbons->sortBy('created_at')->first()->created_at;
-
-        $salesData = Sale::where('user_id', $this->userId)
-            ->where('created_at', '>', $firstKasbonDate)
-            ->where('status', 'done')
-            ->selectRaw('DATE(created_at) as date, SUM(qty) as total_qty, SUM(total) as total_income')
-            ->groupBy('date')
-            ->get();
+        $salesData = Sale::fromSPG($this->userId);
 
         $target = Settings::of('Target Jual Harian SPG Freelancer');
+        $defaultSalePrice = Settings::of('Default Harga Jual');
 
         // Qty yang lebih dari target:
         $qtyPass = 0;
-        foreach ($salesData as $sale) {
-            if ($sale->total_qty > $target) {
-                $qtyPass += ($sale->total_qty - $target);
+        foreach ($salesData as $i => $sale) {
+            $keepQty = Kasbon::getQtyKeepByDate($keepData, $sale->date);
+            $realQty = $sale->total_qty - $keepQty;
+            $salesData[$i]->realQty = $realQty;
+            $salesData[$i]->keep = $keepQty * $defaultSalePrice;
+            if ($realQty > $target && strtotime(date($sale->date)) > $firstKeepTime) {
+                $qtyPass += ($realQty - $target);
             }
         }
 
-        $defaultSalePrice = Settings::of('Default Harga Jual');
         $nominalLebih = $qtyPass * $defaultSalePrice;
 
         $kasbonPaid = Kasbon::where('user_id', $this->userId)->where('status', 'paid')->where('type', 'keep')->sum('nominal');
         $nominalLebih -= $kasbonPaid;
 
         foreach ($kasbons as $kasbon) {
-            if ($nominalLebih >= $kasbon->nominal) {
-                $kasbon->status = 'paid';
-                $kasbon->save();
+            if ($kasbon->status != 'paid') {
+                if ($nominalLebih >= $kasbon->nominal) {
+                    $kasbon->status = 'paid';
+                    $kasbon->save();
 
-                $nominalLebih -= $kasbon->nominal;
+                    $nominalLebih -= $kasbon->nominal;
+                }
             }
         }
     }

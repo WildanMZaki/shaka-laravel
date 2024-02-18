@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('intensives', function (Blueprint $table) {
+        Schema::create('insentifs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('access_id');
             $table->foreign('access_id')
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('intensives');
+        Schema::dropIfExists('insentifs');
     }
 };

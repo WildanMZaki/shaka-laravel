@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Fun;
 use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
+use App\Models\Insentif;
 use App\Models\Kasbon;
 use App\Models\Menu;
 use App\Models\Notification;
@@ -11,8 +13,10 @@ use App\Models\Presence;
 use App\Models\Product;
 use App\Models\Restock;
 use App\Models\Sale;
+use App\Models\Sallary;
 use App\Models\Settings;
 use App\Models\User;
+use App\Models\WeeklySallary;
 use Illuminate\Http\Request;
 
 class TryController extends Controller
@@ -20,12 +24,93 @@ class TryController extends Controller
     public function debug()
     {
 
-        // $result = $this->seeMuizaTable();
-        // $tbl = new MuwizaTable();
-        $result = $this->seeSaleAfterKasbon();
-
-        // echo $result;
+        // $result = $this->seeSaleWithKeep(4);
+        // $result = $this->seeSallary();
+        // $result = $this->seeLeaderSelling();
+        $result = $this->seeInsentif();
         return response()->json($result);
+    }
+
+    private function seeInsentif()
+    {
+        return (object)[
+            'insentive' => Insentif::detailFor(6, Sale::fromLeader(6)),
+            'presence' => Presence::hadBy(6),
+        ];
+    }
+
+    private function seeSallary()
+    {
+        $user = User::find(6);
+        return WeeklySallary::currentWeekFrom($user);
+    }
+
+    private function seeSaleWithKeep($user_id, ?string $dateTime = null)
+    {
+        $keepData = Kasbon::keepFrom($user_id, $dateTime);
+
+        $rangeDate = Muwiza::mondayUntilNow();
+        $kasbons = Kasbon::where('user_id', $user_id)
+            ->where('type', 'keep')
+            ->whereBetween('created_at', $rangeDate)
+            ->get();
+
+        $firstKeepDate = $kasbons->sortBy('created_at')->first()->created_at;
+        $firstKeepTime = strtotime(date($firstKeepDate));
+
+        $salesData = Sale::fromSPG($user_id);
+
+        $target = Settings::of('Target Jual Harian SPG Freelancer');
+        $defaultSalePrice = Settings::of('Default Harga Jual');
+
+        // Qty yang lebih dari target:
+        $qtyPass = 0;
+        foreach ($salesData as $i => $sale) {
+            // $keep = $this->getQtyKeepByDate($keepData, $sale->date);
+            $keepQty = $this->getQtyKeepByDate($keepData, $sale->date);
+            $realQty = $sale->total_qty - $keepQty;
+            $salesData[$i]->realQty = $realQty;
+            $salesData[$i]->keep = $keepQty * $defaultSalePrice;
+            if ($realQty > $target && strtotime(date($sale->date)) > $firstKeepTime) {
+                $qtyPass += ($realQty - $target);
+            }
+        }
+
+        $nominalLebih = $qtyPass * $defaultSalePrice;
+
+        return ['salesData' => $salesData, 'keep' => $keepData, 'nominal_lebih' => $nominalLebih, 'qty_lebih' => $qtyPass];
+    }
+
+    private function getQtyKeepByDate($data, $date)
+    {
+        foreach ($data as $item) {
+            if ($item['date'] === $date) {
+                return $item['qty_keep'];
+            }
+        }
+        // Return 0 if no match is found
+        return 0;
+    }
+
+    public function seeLeaderSelling()
+    {
+        return Sale::fromLeader(11);
+    }
+
+    private function seeSalesDetail()
+    {
+        return Sale::fromSPG(17);
+    }
+
+    private function seePeriods()
+    {
+        // $thisWeek = Muwiza::mondayUntilNow();
+        // $workDay = Presence::workDayThisWeek();
+
+        // $presencesDetail = Presence::hadBy(8);
+        $user = User::find(8);
+        $presencesDetail = $user->presenceThisWeek();
+        return $presencesDetail;
     }
 
     private function seeSaleAfterKasbon()

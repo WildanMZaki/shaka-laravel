@@ -2,27 +2,39 @@
 
 namespace Database\Seeders;
 
-use App\Models\Intensive;
+use App\Models\Insentif;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class IntensivesSeeder extends Seeder
+class InsentifsSeeder extends Seeder
 {
     protected $table;
     public function __construct()
     {
-        $this->table = 'intensives';
+        $this->table = 'insentifs';
     }
 
     public function run(): void
     {
         // Note: 5. Team Leader, 6. SPG Freelancer, 7. SPG Trainer
-        $intensives = [
+        $insentifs = [
             [
                 'access_id' => 5,
                 'sales_qty' => 160,
                 'insentive' => 50000,
+                'period' => 'daily',
+            ],
+            [
+                'access_id' => 5,
+                'sales_qty' => 200,
+                'insentive' => 100000,
+                'period' => 'daily',
+            ],
+            [
+                'access_id' => 5,
+                'sales_qty' => 250,
+                'insentive' => 150000,
                 'period' => 'daily',
             ],
             [
@@ -98,13 +110,32 @@ class IntensivesSeeder extends Seeder
             ],
             [
                 'access_id' => 7,
-                'sales_qty' => 60,
+                'sales_qty' => 15,
+                'insentive' => 65000,
+                'period' => 'daily',
+            ],
+            [
+                'access_id' => 7,
+                'sales_qty' => 25,
                 'insentive' => 100000,
+                'period' => 'daily',
+            ],
+            [
+                'access_id' => 7,
+                'sales_qty' => 35,
+                'insentive' => 150000,
+                'period' => 'daily',
+            ],
+            [
+                'access_id' => 7,
+                'sales_qty' => 45,
+                'insentive' => 200000,
+                'period' => 'daily',
             ],
         ];
 
-        foreach ($intensives as $intensive) {
-            Intensive::create($intensive);
+        foreach ($insentifs as $insentif) {
+            Insentif::create($insentif);
         }
     }
 }

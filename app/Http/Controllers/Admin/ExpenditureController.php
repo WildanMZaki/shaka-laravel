@@ -13,18 +13,8 @@ class ExpenditureController extends Controller
 {
     public function index(Request $request)
     {
-        $today = date('Y-m-d');
-        $currentDayOfWeek = date('N', strtotime($today));
-
-        if ($currentDayOfWeek == 1) {
-            $start_date = $today . ' 00:00:00';
-        } else {
-            $start_date = date('Y-m-d', strtotime('last Monday', strtotime($today))) . ' 00:00:00';
-        }
-
-        $end_date = $request->input('end_date', $today . ' 23:59:59');
-
-        $start_date = $request->input('start_date', $start_date);
+        $start_date = $request->input('start_date', Muwiza::firstMonday());
+        $end_date = $request->input('end_date', date('Y-m-d 23:59:59'));
 
         $leader_id = $request->leader_id;
 
@@ -34,7 +24,7 @@ class ExpenditureController extends Controller
             $expenditureQuery->where('user_id', $leader_id);
         }
         $totalExpenditure = Muwiza::rupiah($expenditureQuery->sum('nominal'));
-        $expenditureData = $expenditureQuery->orderBy('id', 'DESC')->get();
+        $expenditureData = $expenditureQuery->orderBy('created_at', 'DESC')->get();
         $table = $this->generateTable($expenditureData);
         if ($request->ajax()) {
             $rows = $table->result();

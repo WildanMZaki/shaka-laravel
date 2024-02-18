@@ -80,6 +80,7 @@ class SalesController extends Controller
         $user_id = $request->attributes->get('user_id');
 
         $salesData = Sale::where('user_id', $user_id)
+            ->where('status', 'done')
             ->whereBetween('created_at', [$start_date, $end_date])
             ->selectRaw('DATE(created_at) as date, SUM(qty) as total_qty')
             ->groupBy('date')
@@ -161,7 +162,7 @@ class SalesController extends Controller
             ->where('status', 'processed')
             ->update(['status' => 'done']);
 
-        ProcessSalesData::dispatch($user_id);
+        // ProcessSalesData::dispatch($user_id);
 
         return response()->json([
             'success' => true,

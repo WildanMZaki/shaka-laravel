@@ -146,6 +146,7 @@ class Wize {
             headers = {},
             addon_success = null,
             successDefault = true,
+            showLoading = true,
             addon_error = null,
             inputSelector = null,
             modalSelector = null,
@@ -167,8 +168,10 @@ class Wize {
             contentType: isFormData ? false : "application/json",
             processData: isFormData ? false : true,
             beforeSend: () => {
-                this.clear_errors();
-                this.show_loading();
+                if (showLoading) {
+                    this.clear_errors();
+                    this.show_loading();
+                }
             },
             success: (data) => {
                 if (addon_success != null) {

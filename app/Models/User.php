@@ -94,4 +94,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Sale::class);
     }
+
+    public function kasbons()
+    {
+        return $this->hasMany(Kasbon::class);
+    }
+
+    public function presenceThisWeek()
+    {
+        return Presence::hadBy($this->id);
+    }
 }

@@ -9,7 +9,7 @@ class Settings extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['rule', 'value', 'type'];
+    protected $fillable = ['rule', 'value', 'type', 'tag'];
 
     public static function of(string $rule)
     {

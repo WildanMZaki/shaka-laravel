@@ -15,18 +15,8 @@ class SalesController extends Controller
 {
     public function index(Request $request)
     {
-        $today = date('Y-m-d');
-        $currentDayOfWeek = date('N', strtotime($today));
-
-        if ($currentDayOfWeek == 1) {
-            $start_date = $today . ' 00:00:00';
-        } else {
-            $start_date = date('Y-m-d', strtotime('last Monday', strtotime($today))) . ' 00:00:00';
-        }
-
-        $end_date = $request->input('end_date', $today . ' 23:59:59');
-
-        $start_date = $request->input('start_date', $start_date);
+        $start_date = $request->input('start_date', Muwiza::firstMonday());
+        $end_date = $request->input('end_date', date('Y-m-d 23:59:59'));
 
         $product_id = $request->filter_product_id;
         $spg_id = $request->spg_id;
@@ -41,7 +31,7 @@ class SalesController extends Controller
         }
         $totalQtySold = Muwiza::ribuan($salesQuery->sum('qty')) . ' Botol';
         $totalIncome = Muwiza::rupiah($salesQuery->sum('total'));
-        $salesData = $salesQuery->orderBy('id', 'DESC')->get();
+        $salesData = $salesQuery->orderBy('created_at', 'DESC')->get();
         $table = $this->generateTable($salesData);
         if ($request->ajax()) {
             $rows = $table->result();
@@ -128,7 +118,7 @@ class SalesController extends Controller
         $sale->created_at = date('Y-m-d', strtotime($sales_date)) . date(' H:i:s');
         $sale->save();
 
-        ProcessSalesData::dispatch($user_id);
+        // ProcessSalesData::dispatch($user_id);
 
         $activeProducts = Product::withPositiveStock()->where('active', true)->get(['id', 'merk']);
         return response()->json([

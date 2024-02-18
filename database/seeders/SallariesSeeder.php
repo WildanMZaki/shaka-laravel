@@ -24,11 +24,6 @@ class SallariesSeeder extends Seeder
                 'nominal' => 550000,
                 'reducable' => true,
             ],
-            [
-                'access_id' => 7,
-                'nominal' => 550000,
-                'reducable' => true,
-            ],
         ];
         foreach ($sallaries as $sallary) {
             Sallary::create($sallary);

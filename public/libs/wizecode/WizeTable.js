@@ -91,7 +91,12 @@ class WizeTable {
                 );
             });
         } else {
-            this.wizeTable = $(selector).DataTable({});
+            this.wizeTable = $(selector).DataTable({
+                buttons: this.defineButtons(),
+                dom: '<"card-header d-flex flex-column flex-md-row flex-lg-row justify-content-between align-items-center p-0 mt-2 mb-4 "<"head-label"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+                columns: this.defineColumns(),
+                order: [],
+            });
         }
         $("div.head-label").html(
             '<h4 class="card-title mb-0">' + title + "</h4>"
