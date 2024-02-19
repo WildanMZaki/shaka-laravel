@@ -20,7 +20,8 @@ class SallaryController extends Controller
     {
         $start_date = $request->input('start_date', Muwiza::firstMonday());
         $employeeId = $request->employee_id;
-        $sallaryQuery = WeeklySallary::where('period_start', $start_date);
+        $sallaryQuery = WeeklySallary::whereYear('period_start', date('Y'))
+            ->whereMonth('period_start', date('m'));
 
         if ($employeeId) {
             $sallaryQuery->where('user_id', $employeeId);
