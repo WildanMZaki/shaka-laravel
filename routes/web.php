@@ -57,14 +57,14 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     Route::get('/create-symlink', function () {
         $laravelPath = realpath($_SERVER['DOCUMENT_ROOT'] . "/../shakapratama.wize.my.id");
         $target = $laravelPath . "/storage/app/public";
-        $link = $_SERVER['DOCUMENT_ROOT'] . "/public/storage";
+        $link = $laravelPath . "/public/storage"; // Adjusted path
 
         echo $laravelPath;
         echo '<br>';
         echo $target;
         echo '<br>';
         echo $link;
-        return;
+
         if (is_link($link)) {
             echo "Symbolic link already exists.";
         } elseif (symlink($target, $link)) {
@@ -73,6 +73,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             echo "Failed to create symbolic link.";
         }
     });
+
     Route::get('/', [DashController::class, 'index'])->name('dashboard');
     Route::prefix('dev-setting')->group(function () {
         Route::get('menu', [MenuController::class, 'index'])->name('settings.menus');
