@@ -50,6 +50,14 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         Artisan::call('queue:work');
         return 'Queue worker has been executed.';
     });
+    Route::get('/run-storage-link', function () {
+        $exitCode = Artisan::call('storage:link');
+        if ($exitCode === 0) {
+            return response("Artisan command storage:link executed successfully", 200);
+        } else {
+            return response("Error executing artisan command storage:link", 500);
+        }
+    });
     Route::get('/run-artisan', function (Request $request) {
         $key = $request->input('key');
         $command = $request->input('command');
