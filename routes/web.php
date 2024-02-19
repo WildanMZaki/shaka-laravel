@@ -57,8 +57,14 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     Route::get('/create-symlink', function () {
         $laravelPath = realpath($_SERVER['DOCUMENT_ROOT'] . "/../shakapratama.wize.my.id");
         $target = $laravelPath . "/storage/app/public";
-        $link = $_SERVER['DOCUMENT_ROOT'] . "public/storage";
+        $link = $_SERVER['DOCUMENT_ROOT'] . "/public/storage";
 
+        echo $laravelPath;
+        echo '<br>';
+        echo $target;
+        echo '<br>';
+        echo $link;
+        return;
         if (is_link($link)) {
             echo "Symbolic link already exists.";
         } elseif (symlink($target, $link)) {
