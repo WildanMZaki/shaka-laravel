@@ -29,6 +29,11 @@ class SalesController extends Controller
             ->whereDate('created_at', now())
             ->get(['id', 'qty', 'created_at', 'total', 'status', 'product_id']);
 
+        foreach ($mySelling as $i => $sale) {
+            $mySelling[$i]->qty = intval($sale->qty);
+            $mySelling[$i]->total = intval($sale->total);
+        }
+
         return response()->json([
             'success' => true, 'data' => $mySelling,
         ]);

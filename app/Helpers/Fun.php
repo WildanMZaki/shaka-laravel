@@ -58,25 +58,13 @@ class Fun
         ];
     }
 
-    public static function getProfitDebug($period = '-14 days')
+    public static function getProfit(?array $period = null)
     {
-        $today = date('Y-m-d 23:59:59');
-        $twoWeeksAgo = date('Y-m-d 00:00:00', strtotime($period, strtotime($today)));
-        $totalIncome = Sale::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('total');
-        $totalModal = Sale::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('modal');
-        $totalExpenditure = self::nominalRupiah(self::getExpenditures());
-        $totalProfit = $totalIncome - $totalModal;
-        $totalProfit -= $totalExpenditure;
-        return [
-            'income' => $totalIncome, 'modal' => $totalModal, 'expen' => $totalExpenditure, 'profit' => $totalProfit,
-        ];
-    }
-    public static function getProfit($period = '-14 days')
-    {
-        $today = date('Y-m-d 23:59:59');
-        $twoWeeksAgo = date('Y-m-d 00:00:00', strtotime($period, strtotime($today)));
-        $totalIncome = Sale::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('total');
-        $totalModal = Sale::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('modal');
+        if (!$period) {
+            $period = self::periodWithHour();
+        }
+        $totalIncome = Sale::whereBetween('created_at', $period)->sum('total');
+        $totalModal = Sale::whereBetween('created_at', $period)->sum('modal');
         $totalExpenditures = self::nominalRupiah(self::getExpenditures($period));
         $totalProfit = $totalIncome - $totalModal;
         $totalProfit -= $totalExpenditures;
@@ -84,25 +72,28 @@ class Fun
         $totalProfit -= $totalGivenSallaries;
         return self::rupiah($totalProfit);
     }
-    public static function getIncome($period = '-14 days')
+    public static function getIncome(?array $period = null)
     {
-        $today = date('Y-m-d 23:59:59');
-        $twoWeeksAgo = date('Y-m-d 00:00:00', strtotime($period, strtotime($today)));
-        $totalIncome = Sale::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('total');
+        if (!$period) {
+            $period = self::periodWithHour();
+        }
+        $totalIncome = Sale::whereBetween('created_at', $period)->sum('total');
         return self::rupiah($totalIncome);
     }
-    public static function getExpenditures($period = '-14 days')
+    public static function getExpenditures(?array $period = null)
     {
-        $today = date('Y-m-d');
-        $twoWeeksAgo = date('Y-m-d', strtotime($period, strtotime($today)));
-        $totalExpenditure = Expenditure::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('nominal');
+        if (!$period) {
+            $period = self::periodWithHour();
+        }
+        $totalExpenditure = Expenditure::whereBetween('created_at', $period)->sum('nominal');
         return self::rupiah($totalExpenditure);
     }
-    public static function getGivenSallaries($period = '-14 days')
+    public static function getGivenSallaries(?array $period = null)
     {
-        $today = date('Y-m-d 23:59:59');
-        $twoWeeksAgo = date('Y-m-d 00:00:00', strtotime($period, strtotime($today)));
-        $totalGivenSallary = WeeklySallary::whereBetween('created_at', [$twoWeeksAgo, $today])->sum('total');
+        if (!$period) {
+            $period = self::periodWithHour();
+        }
+        $totalGivenSallary = WeeklySallary::whereBetween('created_at', $period)->sum('total');
         return $totalGivenSallary;
     }
 
@@ -137,5 +128,27 @@ class Fun
         $start = reset($periodDates) . ' 00:00:00';
         $end = end($periodDates) . ' 23:59:59';
         return [$start, $end];
+    }
+
+    public static function getMondaysInMonth($year, $month)
+    {
+        // Get the number of days in the given month
+        $numDays = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+        // Initialize an empty array to store the Mondays
+        $mondays = [];
+
+        // Loop through all the days in the month
+        for ($day = 1; $day <= $numDays; $day++) {
+            // Get the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+            $dayOfWeek = date('w', mktime(0, 0, 0, $month, $day, $year));
+
+            // If the day is Monday (1), add it to the array
+            if ($dayOfWeek == 1) {
+                $mondays[] = "$year-$month-$day";
+            }
+        }
+
+        return $mondays;
     }
 }

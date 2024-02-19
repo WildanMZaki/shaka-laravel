@@ -28,8 +28,13 @@ class TryController extends Controller
         // $result = $this->seeSallary();
         // $result = $this->seeLeaderSelling();
         // $result = $this->seeInsentif();
-        $result = $this->seeTotalGivenSallariesThisWeek();
+        $result = $this->seeMondayInMonths();
         return response()->json($result);
+    }
+
+    private function seeMondayInMonths()
+    {
+        return Fun::getMondaysInMonth(2024, 2);
     }
 
     private function seeTotalGivenSallariesThisWeek()
