@@ -51,8 +51,8 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         return 'Queue worker has been executed.';
     });
     Route::get('/run-artisan', function (Request $request) {
-        $key = $request->query('key');
-        $command = $request->query('command');
+        $key = $request->input('key');
+        $command = $request->input('command');
         if ($key === 'D3vS3cr3tK3y') {
             $exitCode = Artisan::call($command);
             if ($exitCode === 0) {
