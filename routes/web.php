@@ -50,26 +50,17 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         Artisan::call('queue:work');
         return 'Queue worker has been executed.';
     });
-    Route::get('/run-storage-link', function () {
-        $exitCode = Artisan::call('storage:link');
-        if ($exitCode === 0) {
-            return response("Artisan command storage:link executed successfully", 200);
+    Route::get('/create-symlink', function () {
+        $laravelPath = realpath($_SERVER['DOCUMENT_ROOT'] . "/../shakapratama.wize.my.id");
+        $target = $laravelPath . "/storage/app/public";
+        $link = $_SERVER['DOCUMENT_ROOT'] . "/storage";
+
+        if (is_link($link)) {
+            echo "Symbolic link already exists.";
+        } elseif (symlink($target, $link)) {
+            echo "Symbolic link created successfully.";
         } else {
-            return response("Error executing artisan command storage:link", 500);
-        }
-    });
-    Route::get('/run-artisan', function (Request $request) {
-        $key = $request->input('key');
-        $command = $request->input('command');
-        if ($key === 'D3vS3cr3tK3y') {
-            $exitCode = Artisan::call($command);
-            if ($exitCode === 0) {
-                return response("Artisan command '$command' executed successfully", 200);
-            } else {
-                return response("Error executing artisan command '$command'", 500);
-            }
-        } else {
-            return response('Unauthorized', 401);
+            echo "Failed to create symbolic link.";
         }
     });
     Route::get('/', [DashController::class, 'index'])->name('dashboard');
