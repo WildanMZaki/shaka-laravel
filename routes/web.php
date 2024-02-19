@@ -50,6 +50,10 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         Artisan::call('queue:work');
         return 'Queue worker has been executed.';
     });
+    Route::get('/run-storage-link', function () {
+        Artisan::call('storage:link');
+        return 'Storage linked';
+    });
     Route::get('/create-symlink', function () {
         $laravelPath = realpath($_SERVER['DOCUMENT_ROOT'] . "/../shakapratama.wize.my.id");
         $target = $laravelPath . "/storage/app/public";
