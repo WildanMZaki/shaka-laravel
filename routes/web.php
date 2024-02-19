@@ -55,13 +55,20 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         $target = $laravelPath . "/storage/app/public";
         $link = $_SERVER['DOCUMENT_ROOT'] . "/storage";
 
-        if (is_link($link)) {
-            echo "Symbolic link already exists.";
-        } elseif (symlink($target, $link)) {
-            echo "Symbolic link created successfully.";
-        } else {
-            echo "Failed to create symbolic link.";
-        }
+        echo $laravelPath;
+        echo '<br>';
+        echo $target;
+        echo '<br>';
+        echo $link;
+        echo '<br>';
+        echo storage_path();
+        // if (is_link($link)) {
+        //     echo "Symbolic link already exists.";
+        // } elseif (symlink($target, $link)) {
+        //     echo "Symbolic link created successfully.";
+        // } else {
+        //     echo "Failed to create symbolic link.";
+        // }
     });
     Route::get('/', [DashController::class, 'index'])->name('dashboard');
     Route::prefix('dev-setting')->group(function () {
