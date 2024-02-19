@@ -116,7 +116,6 @@
               <div class="d-flex align-items-center justify-content-between">
                 <h5 class="card-title m-0 me-2">Statistik</h5>
               </div>
-              <!-- <p class="mt-3"><span class="fw-medium">Total 48.5% growth</span> 😎 this month</p> -->
             </div>
             <div class="card-body">
               <div class="row g-3">
@@ -158,7 +157,7 @@
                       </div>
                     </div>
                     <div class="ms-3">
-                      <div class="small mb-1">Pengeluaran 2 pekan</div>
+                      <div class="small mb-1">Pengeluaran minggu ini</div>
                       <h5 class="mb-0">{{ \App\Helpers\Fun::getExpenditures() }}</h5>
                     </div>
                   </div>
@@ -172,7 +171,7 @@
                       </div>
                     </div>
                     <div class="ms-3">
-                      <div class="small mb-1">Laba 2 pekan</div>
+                      <div class="small mb-1">Laba minggu ini</div>
                       <h5 class="mb-0">{{ \App\Helpers\Fun::getProfit() }}</h5>
                     </div>
                   </div>
