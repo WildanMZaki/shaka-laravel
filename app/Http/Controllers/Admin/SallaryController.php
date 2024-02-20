@@ -48,7 +48,7 @@ class SallaryController extends Controller
         $data['period'] = Muwiza::convertPeriod("{$period[0]} - {$period[1]}");
         $data['period_start'] = $start_date;
         $data['totalSallary'] = $totalSallary;
-        $data['yearsOption'] = Fun::years(2020);
+        $data['yearsOption'] = Fun::years(2024);
         $data['monthsOption'] = Fun::getMonthsId();
         $data['periodsOption'] = Fun::getPeriodsOption(date('Y'), date('m'));
         $data['currentMonday'] = Muwiza::firstMonday();
