@@ -107,19 +107,36 @@
                 </div>
                 <div class="modal-body">
                     <div class="row mb-3">
-                        <div class="col">
-                            <div class="form-group">
-                                <label class="form-label">Periode</label>
-                                <div class="d-flex justify-content-between">
-                                    <div class="item">
-                                        <input type="text" name="period" class="form-control count" placeholder="" value="{{ $period }}" readonly />
-                                        <span class="invalid-feedback" id="period-invalid-msg"></span>
-                                    </div>
-                                    <button type="button" class="btn btn-info" id="start-btn" data-url="{!! route('sallaries.generate') !!}">
-                                        <i class="ti ti-player-play"></i> Mulai Hitung
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="col-lg-4">
+                            <label class="form-label">Tahun</label>
+                            <select name="year" class="form-select" id="year">
+                                @foreach ($yearsOption as $year)
+                                    <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="form-label">Bulan</label>
+                            <select name="month" class="form-select" id="month">
+                                @foreach ($monthsOption as $month)
+                                    <option value="{{ $month->value }}" {{ $month->value == intval(date('m')) ? 'selected' : '' }}>{{ $month->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="form-label">Periode</label>
+                            <select name="period" class="form-select" id="period">
+                                @foreach ($periodsOption as $period)
+                                    <option value="{{ $period->value }}" {{ $period->value == date('Y-m-d', strtotime($currentMonday)) ? 'selected' : '' }}>{{ $period->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3 justify-content-end">
+                        <div class="col-lg-6 d-flex justify-content-end">
+                            <button type="button" class="btn btn-info" id="start-btn" data-url="{!! route('sallaries.generate') !!}">
+                                <i class="ti ti-player-play"></i> Mulai Hitung
+                            </button>
                         </div>
                     </div>
                     <div class="progress">
@@ -168,10 +185,15 @@
         }
 
         function startMonitoring(intervalTime = 2000) {
+            const year = $('#year').val();
+            const month = $('#month').val();
+            const period = $('#period').val();
+            const data = {year, month, period};
             const monitoringURL = '{!! route("sallaries.monitor") !!}'
             intervalMonitoringProgressId = setInterval(function() {
                 wize.ajax({
                     url: monitoringURL,
+                    data: data,
                     method: 'get',
                     successDefault: false,
                     showLoading: false,
@@ -202,7 +224,7 @@
             wizeTable.init({
                 title: 'Riwayat Penggajian',
                 columns: [
-                    'period', 'employee', 'sales', 'main', 'total_insentif', 'total', 'kasbon',  'actions',
+                    'period', 'employee', 'sales', 'main', 'total_insentif', 'kasbon', 'total', 'actions',
                 ],
                 defaultButton: {
                     custom: null,
@@ -230,10 +252,15 @@
         $('#start-btn').on('click', function(e) {
             e.preventDefault();
             const url = $(this).data('url');
+            const year = $('#year').val();
+            const month = $('#month').val();
+            const period = $('#period').val();
+            const data = {year, month, period};
+
             $(this).addClass('d-none');
             wize.ajax({
                 url,
-                data: {},
+                data,
                 method: "POST",
                 addon_success: (resp) => {
                     startMonitoring();

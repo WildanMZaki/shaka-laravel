@@ -29,10 +29,10 @@ class Sale extends Model
     // Note, dateTime itu tanggalnya, jadi hari apapun itu akan dihitungkan dari hari senin pertamanya
     public static function fromSPG($user_id, ?string $dateTime = null)
     {
-        $period = Fun::periodWithHour(Muwiza::firstMonday($dateTime));
+        $period = Fun::periodWithHour(date('Y-m-d', strtotime(Muwiza::firstMonday($dateTime))));
 
         $salesData = self::where('user_id', $user_id)
-            ->where('status', 'done')
+            ->whereIn('status', ['done', 'processed'])
             ->whereBetween('created_at', $period)
             ->selectRaw('DATE(created_at) as date, SUM(qty) as total_qty')
             ->groupBy('date')
@@ -44,7 +44,7 @@ class Sale extends Model
     public static function fromLeader($leaderId, ?string $dateTime = null)
     {
         $leader = User::find($leaderId);
-        $periodDates = Presence::workDayFrom(Muwiza::firstMonday($dateTime));
+        $periodDates = Presence::workDayFrom(date('Y-m-d', strtotime(Muwiza::firstMonday($dateTime))));
         $leaderSales = [];
         foreach ($periodDates as $date) {
             $sales = $leader->sales()->whereDate('sales_teams.created_at', $date)->get();

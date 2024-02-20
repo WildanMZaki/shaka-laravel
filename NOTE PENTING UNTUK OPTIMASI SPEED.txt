@@ -1,0 +1,71 @@
+Untuk saat ini kombinasi WizeTable dan MuwizaTable di Server belum menggunakan serverside, untuk saat ini hanya menggunakan semi serverside
+
+untuk nanti jika dilakukan optimasi, buat response dari muwiza jadi seperti berikut:
+{
+    "draw": 1,
+    "recordsTotal": 57,
+    "recordsFiltered": 57,
+    "data": [
+        {
+            "id": 1,
+            "name": "John",
+            "age": 30,
+            "city": "New York"
+        },
+        {
+            "id": 2,
+            "name": "Alice",
+            "age": 25,
+            "city": "Los Angeles"
+        },
+        {
+            "id": 3,
+            "name": "Bob",
+            "age": 35,
+            "city": "Chicago"
+        }
+    ]
+}
+
+Kemudian atur property tambahan di WizeTable agar ada property isServerSide default true,
+dan untuk method reload ubah agar ketika isServerSide aktif maka jangan gunakan perintah ajax biasa, tapi gunakan table.ajax.reload
+
+berikut catatan untuk konfigurasi umum datatable dengan serverside
+table = $('#data-table-simple').DataTable({ 
+	"language": {                
+        "infoFiltered": "", 
+        processing: '<div class="loader-product">Loading&#8230;</div>'
+   	},
+	"processing": true, 
+    "serverSide": true, 
+    "bDestroy": true,
+    "order": [], 
+     
+    "ajax": {
+        "url": 'report/mutasi/get_data',
+        "type": "POST", 
+        "data": function (data){
+            data.start_date = $('#start_date').val();
+            data.end_date = $('#end_date').val();
+            data.code_toko = $('#code_toko').val();
+      	}, 
+        "error": function (jqXHR, textStatus, errorThrown) {
+                Materialize.toast("Data Tidak Ditemukan !", 2500); 
+                setTimeout(function() {
+					location.reload();
+				}, 1000);
+            }
+        },
+          
+        "columnDefs": [
+    		{ 
+        		"targets": [ 0 ], 
+        		"orderable": false, 
+        	},
+      	],
+});
+
+
+fokus dan cermati di property ajax
+
+Wildan, 20 - 02 - 2024

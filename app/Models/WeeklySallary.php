@@ -45,8 +45,10 @@ class WeeklySallary extends Model
 
         $currentMonday = Muwiza::firstMonday($dateTime);
         $gapok = Sallary::where('access_id', $user->access_id)->first()->nominal ?? 0;
-        $presence = Presence::hadBy($user->id);
-        $period = Fun::period();
+
+        $workDays = Presence::workDayFrom($currentMonday);
+        $presence = Presence::hadBy($user->id, $workDays);
+        $period = Fun::period($currentMonday);
         $period_start = $period[0];
         $period_end = $period[1];
 
@@ -70,9 +72,9 @@ class WeeklySallary extends Model
         }
 
         // Cek Jabatan: 5: Team Leader, 6: SPG Freelancer, 7: SPG Training
-        $salesData = Sale::fromSPG($user->id);
+        $salesData = Sale::fromSPG($user->id, $dateTime);
         if ($user->access_id == 5) {
-            $salesData = Sale::fromLeader($user->id);
+            $salesData = Sale::fromLeader($user->id, $dateTime);
         }
 
         $sold = Sale::totalSales($salesData);
@@ -87,7 +89,7 @@ class WeeklySallary extends Model
             return;
         }
 
-        $kasbon = Kasbon::kasbonFrom($user->id);
+        $kasbon = Kasbon::kasbonFrom($user->id, $dateTime);
 
         $insentiveMingguan = 0;
         $uangAbsen = 0;
@@ -102,6 +104,11 @@ class WeeklySallary extends Model
 
         if ($user->access_id == 5) {
             // Untuk Leader, insentivenya dihitung mingguan tapi dihitung per hari gitu kan
+            if ($presence->totalHadir != $workDayTotal) {
+                $dailySallary = round($gapok / $workDayTotal, -3);
+                $gapok = $dailySallary * $presence->totalHadir;
+                $sallary->main_sallary = $gapok;
+            }
             $sallary->insentive = $uangAbsen;
             $sallary->total_kasbon = $kasbon;
             $sallary->total = $gapok + $uangAbsen - $kasbon;
@@ -122,36 +129,35 @@ class WeeklySallary extends Model
                 $sallary->main_sallary = $gapok;
             }
 
+            // Hitung keep belum terbayar: Status: 'approved', 'pending', 
+            $unpaid_keep = Kasbon::keepUnpaid($user->id, $dateTime, true);
+            $sallary->unpaid_keep = $unpaid_keep;
             $total = $gapok - $kasbon;
-            $keepCount = Kasbon::updateKeepStatusThisWeekFrom($user->id, $dateTime);
-            $unpaid_keep = $keepCount->unpaid_keep;
-            if ($unpaid_keep > 0) {
-                $total -= $unpaid_keep;
-                $sallary->unpaid_keep = $unpaid_keep;
-            }
+            $total -= $unpaid_keep;
+
             $sallary->total_kasbon = $kasbon + $unpaid_keep;
             if ($total < 0) {
-                $nextMonday = Muwiza::nextMondayFrom(date('Y-m-d', strtotime($currentMonday)));
+                $nextMonday = Muwiza::nextMondayFrom(Muwiza::onlyDate($currentMonday));
                 $nextWeekAvailable = Kasbon::where('type', 'kasbon')
-                    ->where('nominal', abs($total))
+                    ->where('note', 'Gaji Minus')
                     ->whereDate('created_at', $nextMonday)
-                    ->exists();
+                    ->first();
 
-                if (!$nextWeekAvailable) {
-                    $kasbonFromKeep = new Kasbon();
-                    $kasbonFromKeep->user_id = $user->id;
-                    $kasbonFromKeep->nominal = abs($total);
-                    $kasbonFromKeep->status = 'approved';
-                    $kasbonFromKeep->note = 'Gaji Minus';
-                    $kasbonFromKeep->type = 'kasbon';
-                    $kasbonFromKeep->created_at = $nextMonday . date(' H:i:s');
-                    $kasbonFromKeep->save();
+                if ($nextWeekAvailable) {
+                    $nextWeekAvailable->delete();
                 }
-                $total = 0;
+                $kasbonFromKeep = new Kasbon();
+                $kasbonFromKeep->user_id = $user->id;
+                $kasbonFromKeep->nominal = abs($total);
+                $kasbonFromKeep->status = 'approved';
+                $kasbonFromKeep->note = 'Gaji Minus';
+                $kasbonFromKeep->type = 'kasbon';
+                $kasbonFromKeep->created_at = $nextMonday . date(' H:i:s');
+                $kasbonFromKeep->save();
             }
             $sallary->total = $total + $uangAbsen + $insentiveMingguan;
             $sallary->save();
-            return $sallary;
+            return;
         }
     }
 }

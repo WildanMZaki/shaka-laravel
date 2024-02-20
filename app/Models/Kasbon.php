@@ -60,7 +60,7 @@ class Kasbon extends Model
 
     public static function kasbonFrom($user_id, ?string $dateTime = null)
     {
-        $period = Fun::periodWithHour(Muwiza::firstMonday($dateTime));
+        $period = Fun::periodWithHour(Muwiza::onlyDate(Muwiza::firstMonday($dateTime)));
 
         $totalKasbon = self::where('user_id', $user_id)
             ->where('type', 'kasbon')
@@ -68,6 +68,22 @@ class Kasbon extends Model
             ->sum('nominal');
 
         return (int)$totalKasbon;
+    }
+    public static function keepUnpaid($user_id, ?string $dateTime = null, $autoUpdate = false)
+    {
+        $period = Fun::periodWithHour(Muwiza::onlyDate(Muwiza::firstMonday($dateTime)));
+
+        $totalKeepUnpaids = self::where('user_id', $user_id)
+            ->where('type', 'keep')
+            ->whereIn('status', ['approved', 'pending', 'unpaid'])
+            ->whereBetween('created_at', $period);
+
+        $nominal = $totalKeepUnpaids->sum('nominal');
+        if ($autoUpdate) {
+            $totalKeepUnpaids->update(['status' => 'unpaid']);
+        }
+
+        return (int)$nominal;
     }
 
     public static function updateKeepStatusThisWeekFrom($user_id, ?string $dateTime = null)

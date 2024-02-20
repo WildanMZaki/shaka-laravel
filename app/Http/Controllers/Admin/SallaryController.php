@@ -48,6 +48,10 @@ class SallaryController extends Controller
         $data['period'] = Muwiza::convertPeriod("{$period[0]} - {$period[1]}");
         $data['period_start'] = $start_date;
         $data['totalSallary'] = $totalSallary;
+        $data['yearsOption'] = Fun::years(2020);
+        $data['monthsOption'] = Fun::getMonthsId();
+        $data['periodsOption'] = Fun::getPeriodsOption(date('Y'), date('m'));
+        $data['currentMonday'] = Muwiza::firstMonday();
         return view('admin.sallaries.index', $data);
     }
 
@@ -83,19 +87,28 @@ class SallaryController extends Controller
             });
     }
 
-    public function count_sallaries()
+    public function count_sallaries(Request $request)
     {
-        GenerateSallaries::dispatch();
+        $monday = $request->period;
+        GenerateSallaries::dispatch($monday);
         return response()->json([
             'message' => 'Penghitungan Gaji Dimulai',
+            'data' => [
+                'monday' => $monday,
+                'year' => $request->year,
+                'month' => $request->month,
+            ],
         ]);
     }
 
-    public function monitor_counting()
+    public function monitor_counting(Request $request)
     {
-        $period_start = Muwiza::firstMonday();
         $totalUser = User::where('access_id', '>=', 5)->where('active', true)->count();
-        $counted = WeeklySallary::where('period_start', $period_start)->count();
+        $monday = $request->period;
+        if (!$monday) {
+            $monday = Muwiza::onlyDate(Muwiza::firstMonday());
+        }
+        $counted = WeeklySallary::where('period_start', $monday)->count();
 
         $progress = floor($counted * 100 / $totalUser);
         return response()->json([

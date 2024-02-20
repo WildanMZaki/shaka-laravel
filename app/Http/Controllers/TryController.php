@@ -25,16 +25,33 @@ class TryController extends Controller
     {
 
         // $result = $this->seeSaleWithKeep(4);
-        // $result = $this->seeSallary();
+        $result = $this->seeSallary();
+        // $result = $this->seeSalesDetail();
         // $result = $this->seeLeaderSelling();
         // $result = $this->seeInsentif();
-        $result = $this->seeMondayInMonths();
+        // $result = $this->seeMondayInMonths();
+        // $result = $this->seePresenceDataOf(6, '2024-02-12');
+        // $result = Muwiza::onlyDate(Muwiza::firstMonday());
+        // $result = Fun::years(2024);
         return response()->json($result);
+    }
+
+
+    private function seeSallary()
+    {
+        $user = User::find(16);
+        return WeeklySallary::currentWeekFrom($user, '2024-02-12');
+    }
+
+    private function seePresenceDataOf($userId, $date)
+    {
+        $workDays = Presence::workDayFrom($date);
+        return Presence::hadBy($userId, $workDays);
     }
 
     private function seeMondayInMonths()
     {
-        return Fun::getMondaysInMonth(2024, 2);
+        return Fun::getMondaysInMonth(date('Y'), date('m'));
     }
 
     private function seeTotalGivenSallariesThisWeek()
@@ -48,12 +65,6 @@ class TryController extends Controller
             'insentive' => Insentif::detailFor(6, Sale::fromLeader(6)),
             'presence' => Presence::hadBy(6),
         ];
-    }
-
-    private function seeSallary()
-    {
-        $user = User::find(6);
-        return WeeklySallary::currentWeekFrom($user);
     }
 
     private function seeSaleWithKeep($user_id, ?string $dateTime = null)
@@ -110,7 +121,7 @@ class TryController extends Controller
 
     private function seeSalesDetail()
     {
-        return Sale::fromSPG(17);
+        return Sale::fromSPG(17, '2024-02-12');
     }
 
     private function seePeriods()

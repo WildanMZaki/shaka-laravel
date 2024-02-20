@@ -23,7 +23,7 @@ class GenerateSallaries implements ShouldQueue
      */
     public function __construct($period_start = null)
     {
-        $this->periodStart = $period_start ?? Muwiza::firstMonday();
+        $this->periodStart = $period_start ?? date('Y-m-d', strtotime(Muwiza::firstMonday()));
     }
 
     /**
@@ -31,13 +31,11 @@ class GenerateSallaries implements ShouldQueue
      */
     public function handle(): void
     {
-        $periodStartDate = date('Y-m-d', strtotime($this->periodStart));
-        WeeklySallary::where('period_start', $periodStartDate)->delete();
+        WeeklySallary::where('period_start', $this->periodStart)->delete();
 
         $users = User::where('access_id', '>=', 5)->where('active', true)->get();
         foreach ($users as $user) {
-
-            WeeklySallary::currentWeekFrom($user, $periodStartDate);
+            WeeklySallary::currentWeekFrom($user, $this->periodStart);
         }
     }
 }

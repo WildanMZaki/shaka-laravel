@@ -23,7 +23,7 @@ class Presence extends Model
 
     public static function workDayFrom(?string $mondayDate = null, $lastDay = 'Sabtu')
     {
-        $thisWeek = Fun::period($mondayDate ?? Muwiza::firstMonday(), $lastDay);
+        $thisWeek = Fun::periodWithHour($mondayDate ?? Muwiza::onlyDate(Muwiza::firstMonday()), $lastDay);
         $workDay = Presence::whereBetween('date', $thisWeek)->groupBy('date')->pluck('date')->toArray();
         return $workDay;
     }

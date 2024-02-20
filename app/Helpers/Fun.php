@@ -20,6 +20,7 @@ class Fun
     use Formatter;
 
     public static $days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at', 'Sabtu'];
+
     // Dapatkan total Karyawan & Kehadirannya
     public static function presenceEmployee()
     {
@@ -150,5 +151,44 @@ class Fun
         }
 
         return $mondays;
+    }
+
+    public static function years($start = 2024): array
+    {
+        $result = [];
+        $now = intval(date('Y'));
+        do {
+            $result[] = $start;
+            $start++;
+        } while ($start <= $now);
+        return $result;
+    }
+
+    public static function getMonthsId()
+    {
+        $result = [];
+        $months = self::$idLongMonths;
+        foreach ($months as $i => $month) {
+            $result[] = (object)[
+                'value' => $i + 1,
+                'name' => $month
+            ];
+        }
+        return $result;
+    }
+
+    public static function getPeriodsOption($year, $month)
+    {
+        $result = [];
+        $mondays = Fun::getMondaysInMonth($year, $month);
+        foreach ($mondays as $i => $monday) {
+            $saturday = Fun::period($monday)[1];
+            $show = self::convertPeriod("$monday - $saturday");
+            $result[] = (object)[
+                'value' => $monday,
+                'name' => $show,
+            ];
+        }
+        return $result;
     }
 }

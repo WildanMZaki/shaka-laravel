@@ -13,6 +13,9 @@ trait Formatter
         'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
         'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
     ];
+    public static $idLongMonths = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+    ];
 
     /** 
      * @param string date YYYY-mm-dd HH:ii:ss
@@ -182,5 +185,10 @@ trait Formatter
         } else {
             return $startDate->format('d M') . ' - ' . $endDate->format('d M');
         }
+    }
+
+    public static function onlyDate(string $dateTime): string
+    {
+        return date('Y-m-d', strtotime($dateTime));
     }
 }
