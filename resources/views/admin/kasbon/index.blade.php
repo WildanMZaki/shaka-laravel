@@ -243,6 +243,7 @@
             const titles = {
                 approved: 'Setujui pengajuan kasbon?',
                 rejected: 'Tolak pengajuan kasbon?',
+                paid: 'Tandai terbayar?',
             };
             const title = titles[status];
             Swal.fire({

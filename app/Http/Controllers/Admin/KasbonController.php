@@ -68,7 +68,15 @@ class KasbonController extends Controller
                 return $badges[$row->status];
             })
             ->col('keterangan', ['{data}', 'keterangan'])
-            ->actions(['success', 'danger'], function ($btns, $row) {
+            ->actions(['success', 'danger', 'info'], function ($btns, $row) {
+                if ($row->type == 'kasbon') {
+                    unset($btns['info']);
+                } else {
+                    $btns['info']['classIcon'] = 'ti ti-cash';
+                    $btns['info']['tooltip'] = 'Terbayar';
+                    $btns['info']['selector'] = 'btn-change-status';
+                    $btns['info']['data']['status'] = 'paid';
+                }
                 $btns['success']['classIcon'] = 'ti ti-thumb-up';
                 $btns['success']['tooltip'] = 'Setujui';
                 $btns['success']['selector'] = 'btn-change-status';
@@ -125,7 +133,7 @@ class KasbonController extends Controller
     {
         $request->validate([
             'id' => 'required',
-            'status' => ['required', 'in:approved,rejected'],
+            'status' => ['required', 'in:approved,rejected,paid'],
         ], [
             'id.required' => 'Id data kasbon diperlukan',
             'status.required' => 'Status diperlukan',

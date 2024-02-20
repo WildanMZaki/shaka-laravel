@@ -185,15 +185,13 @@
         }
 
         function startMonitoring(intervalTime = 2000) {
-            const year = $('#year').val();
-            const month = $('#month').val();
             const period = $('#period').val();
             const data = {year, month, period};
-            const monitoringURL = '{!! route("sallaries.monitor") !!}'
+            const monitoringURL = '{!! route("sallaries.monitor") !!}' + `?period=${period}`;
+            console.log(monitoringURL);
             intervalMonitoringProgressId = setInterval(function() {
                 wize.ajax({
                     url: monitoringURL,
-                    data: data,
                     method: 'get',
                     successDefault: false,
                     showLoading: false,
