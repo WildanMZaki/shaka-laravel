@@ -12,6 +12,7 @@ use App\Models\Presence;
 use App\Models\Settings;
 use App\Models\User;
 use App\Models\WeeklySallary;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
@@ -151,8 +152,8 @@ class SallaryController extends Controller
         }
         $data['gaji'] = $gaji;
 
-        $pdf = PDF::loadView('admin.sallaries.download', $data);
+        $pdf = FacadePdf::loadView('admin.sallaries.download', $data);
         return $pdf->download("Slip Gaji {$sallary->user->name}");
-        return view('admin.sallaries.download', $data);
+        // return view('admin.sallaries.download', $data);
     }
 }
