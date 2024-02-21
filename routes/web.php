@@ -50,6 +50,14 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     //     Artisan::call('queue:work');
     //     return 'Queue worker has been executed.';
     // });
+    Route::get('/run-recache', function () {
+        $exitCode1 = Artisan::call('cache:clear');
+        $exitCode2 = Artisan::call('config:cache');
+
+        echo $exitCode1;
+        echo '<br>';
+        echo $exitCode2;
+    });
     Route::get('/create-symlink', function () {
         $laravelPath = realpath($_SERVER['DOCUMENT_ROOT'] . "/../shakapratama.wize.my.id");
         $target = $laravelPath . "/storage/app/public";
