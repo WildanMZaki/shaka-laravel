@@ -46,14 +46,10 @@ Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('test', [TryController::class, 'debug']);
 
 Route::prefix('/')->middleware(['auth'])->group(function () {
-    Route::get('/run-queue-worker', function () {
-        Artisan::call('queue:work');
-        return 'Queue worker has been executed.';
-    });
-    Route::get('/run-storage-link', function () {
-        Artisan::call('storage:link');
-        return 'Storage linked';
-    });
+    // Route::get('/run-queue-worker', function () {
+    //     Artisan::call('queue:work');
+    //     return 'Queue worker has been executed.';
+    // });
     Route::get('/create-symlink', function () {
         $laravelPath = realpath($_SERVER['DOCUMENT_ROOT'] . "/../shakapratama.wize.my.id");
         $target = $laravelPath . "/storage/app/public";
@@ -147,6 +143,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
                 Route::get('/', [SallaryController::class, 'rules'])->name('sallaries.rules');
             });
             Route::get('/', [SallaryController::class, 'index'])->name('sallaries.list');
+            Route::get('/download/{weekly_sallary_id}', [SallaryController::class, 'download'])->name('sallaries.download');
             Route::post('/generate', [SallaryController::class, 'count_sallaries'])->name('sallaries.generate');
             Route::get('/count_monitor', [SallaryController::class, 'monitor_counting'])->name('sallaries.monitor');
         });

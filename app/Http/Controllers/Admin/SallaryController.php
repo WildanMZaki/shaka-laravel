@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
+use PDF;
 use App\Helpers\Fun;
 use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
 use App\Http\Controllers\Controller;
 use App\Jobs\GenerateSallaries;
+use App\Models\Presence;
+use App\Models\Settings;
 use App\Models\User;
 use App\Models\WeeklySallary;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class SallaryController extends Controller
@@ -83,6 +87,7 @@ class SallaryController extends Controller
                 $btns['success']['classIcon'] = 'ti ti-download';
                 $btns['success']['tooltip'] = 'Download';
                 $btns['success']['selector'] = 'btn-download';
+                $btns['success']['url'] = route('sallaries.download', $row->id);
                 return $btns;
             });
     }
@@ -116,5 +121,38 @@ class SallaryController extends Controller
             'counted' => $counted,
             'total_user' => $totalUser,
         ]);
+    }
+
+    public function download($weekly_sallary_id)
+    {
+        try {
+            $sallary = WeeklySallary::findOrFail($weekly_sallary_id);
+        } catch (ModelNotFoundException $th) {
+            abort(404);
+        }
+        $workDays = Presence::workDayFrom($sallary->period_start);
+        $presence = Presence::hadBy($sallary->user_id, $workDays);
+        $defaultTotalWorkDay = Settings::of('Jumlah Hari Kerja');
+        $defaultGajiBotolan = Muwiza::ribuan(Settings::of('Default Gaji Botolan'));
+
+        $data['sallary'] = $sallary;
+        $gaji = Muwiza::ribuan($sallary->main_sallary);
+        if ($sallary->user->access_id == 5 && $presence->totalHadir != 0) {
+            if ($presence->totalHadir < $defaultTotalWorkDay) {
+                $daily = Muwiza::ribuan($sallary->main_sallary / $presence->totalHadir);
+                $total = Muwiza::ribuan($sallary->main_sallary);
+                $gaji = "{$presence->totalHadir} x $daily = $total";
+            }
+        } else if ($sallary->user->access_id == 6) {
+            if ($sallary->total_sold < $sallary->min_sold) {
+                $total = Muwiza::ribuan($sallary->main_sallary);
+                $gaji = "{$sallary->total_sold} x $defaultGajiBotolan = $total";
+            }
+        }
+        $data['gaji'] = $gaji;
+
+        $pdf = PDF::loadView('admin.sallaries.download', $data);
+        return $pdf->download("Slip Gaji {$sallary->user->name}");
+        return view('admin.sallaries.download', $data);
     }
 }
