@@ -42,6 +42,31 @@
                         <form action="{!! route('sallaries.list') !!}" method="get" id="form-filter">
                             <h4 class="card-title">Filter</h4>
                             <div class="row">
+                                <div class="col-lg-2">
+                                    <label class="form-label">Tahun</label>
+                                    <select name="year_select" class="form-select change-period filter" id="year_select">
+                                        @foreach ($yearsOption as $year)
+                                            <option value="{{ $year }}" {{ $year == $yearSelected ? 'selected' : '' }}>{{ $year }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-lg-2">
+                                    <label class="form-label">Bulan</label>
+                                    <select name="month_select" class="form-select change-period filter" id="month_select">
+                                        @foreach ($monthsOption as $month)
+                                            <option value="{{ $month->value }}" {{ $month->value == intval($monthSelected) ? 'selected' : '' }}>{{ $month->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label class="form-label">Periode</label>
+                                    <select name="period_select" class="form-select" id="period_select">
+                                        <option value="">Semua Periode</option>
+                                        @foreach ($periodsOption as $period)
+                                            <option value="{{ $period->value }}" {{ $period->value == $periodSelected ? 'selected' : '' }}>{{ $period->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="col-lg-3 mb-3">
                                     <label for="employee_id" class="form-label">Berdasarkan Karyawan</label>
                                     <select class="select-merk store form-select" name="employee_id" id="employee_id" data-placeholder="Pilih Merk Barang" data-allow-clear="1">
@@ -109,7 +134,7 @@
                     <div class="row mb-3">
                         <div class="col-lg-4">
                             <label class="form-label">Tahun</label>
-                            <select name="year" class="form-select" id="year">
+                            <select name="year" class="form-select change-period" id="year">
                                 @foreach ($yearsOption as $year)
                                     <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}</option>
                                 @endforeach
@@ -117,7 +142,7 @@
                         </div>
                         <div class="col-lg-4">
                             <label class="form-label">Bulan</label>
-                            <select name="month" class="form-select" id="month">
+                            <select name="month" class="form-select change-period" id="month">
                                 @foreach ($monthsOption as $month)
                                     <option value="{{ $month->value }}" {{ $month->value == intval(date('m')) ? 'selected' : '' }}>{{ $month->name }}</option>
                                 @endforeach
@@ -126,10 +151,10 @@
                         <div class="col-lg-4">
                             <label class="form-label">Periode</label>
                             <select name="period" class="form-select" id="period">
-                                @foreach ($periodsOption as $period)
+                                @foreach ($periodsForSallary as $period)
                                     <option value="{{ $period->value }}" {{ $period->value == date('Y-m-d', strtotime($currentMonday)) ? 'selected' : '' }}>{{ $period->name }}</option>
                                 @endforeach
-                            </select>
+                            </select> 
                         </div>
                     </div>
                     <div class="row mb-3 justify-content-end">
@@ -244,6 +269,30 @@
                 dateFormat: "j M Y",
                 defaultDate: new Date(),
                 maxDate: new Date(),
+            });
+
+            $('.change-period').on('change', function () {
+                const isFilter = $(this).hasClass('filter');
+                const year = $(`#${isFilter ? 'year_select' : 'year'}`).val();
+                const month = $(`#${isFilter ? 'month_select' : 'month'}`).val();
+                const mondays = getMondays(Number(year), Number(month));
+                const periods = [];
+                mondays.forEach(monday => {
+                    const saturday = addDaysToDate(monday, 5);
+                    const label = convertPeriod(`${monday} - ${saturday}`);
+                    periods.push({
+                        value: monday,
+                        label,
+                    });
+                });
+                const select = isFilter ? '#period_select' : '#period';
+                $(select).html('');
+                periods.forEach(period => {
+                    $(select).append(`<option value="${period.value}">${period.label}</option>`)
+                });
+                if (isFilter) {
+                    $(select).prepend('<option value="">Semua Periode</option>');
+                }
             });
         });
 

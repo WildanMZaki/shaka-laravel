@@ -88,6 +88,92 @@ const mustInRupiahCurrency = (
     }
 };
 
+function getMondays(year, month) {
+    const result = [];
+    const date = new Date(year, month - 1, 1); // Membuat objek Date untuk tanggal 1 dari bulan yang diberikan
+    const dayOfWeek = date.getDay(); // Mendapatkan hari dalam seminggu (0 = Minggu, 1 = Senin, ..., 6 = Sabtu)
+    const firstMondayDate = 1 + ((1 - dayOfWeek + 7) % 7); // Menemukan tanggal Senin pertama dalam bulan
+
+    for (let day = firstMondayDate; day <= 31; day += 7) {
+        const currentDate = new Date(year, month - 1, day); // Membuat objek Date untuk tanggal yang sedang diperiksa
+        if (currentDate.getMonth() + 1 === month) {
+            // Memastikan tanggal tersebut masih berada di bulan yang diberikan
+            result.push(
+                `${year}-${month.toString().padStart(2, "0")}-${day
+                    .toString()
+                    .padStart(2, "0")}`
+            );
+        }
+    }
+
+    return result;
+}
+
+function convertPeriod(period) {
+    const [start, end] = period.split(" - ");
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const startMonthYear = startDate.toLocaleString("default", {
+        month: "short",
+        year: "numeric",
+    });
+    const endMonthYear = endDate.toLocaleString("default", {
+        month: "short",
+        year: "numeric",
+    });
+
+    if (
+        startDate.getFullYear() === endDate.getFullYear() &&
+        startDate.getMonth() === endDate.getMonth()
+    ) {
+        return (
+            startDate.getDate() + " - " + endDate.getDate() + " " + endMonthYear
+        );
+    } else {
+        return (
+            startDate.getDate() +
+            " " +
+            startMonthYear +
+            " - " +
+            endDate.getDate() +
+            " " +
+            endMonthYear
+        );
+    }
+}
+
+function addDaysToDate(inputDate, numberOfDays) {
+    // Parse the input date string
+    var parts = inputDate.split("-");
+    var year = parseInt(parts[0]);
+    var month = parseInt(parts[1]) - 1; // Months are 0 indexed
+    var day = parseInt(parts[2]);
+
+    // Create a Date object
+    var date = new Date(year, month, day);
+
+    // Add the number of days
+    date.setDate(date.getDate() + numberOfDays);
+
+    // Get the new date components
+    var newYear = date.getFullYear();
+    var newMonth = date.getMonth() + 1; // Adding 1 to convert back to 1-indexed month
+    var newDay = date.getDate();
+
+    // Format the new date
+    var newDateStr =
+        newYear +
+        "-" +
+        (newMonth < 10 ? "0" : "") +
+        newMonth +
+        "-" +
+        (newDay < 10 ? "0" : "") +
+        newDay;
+
+    return newDateStr;
+}
+
 class Wize {
     // ajax = (options = {}) => {
     //     const {

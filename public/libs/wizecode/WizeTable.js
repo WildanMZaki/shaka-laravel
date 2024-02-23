@@ -28,8 +28,6 @@ class WizeTable {
         callback_reload = null,
         defaultDelete = true,
     }) => {
-        // Yang jelas di bawah ini untuk mencegah terjadinya auto sort ketika tabel diinisialisasi
-        // $(selector).data("order", "");
         this.url = url;
         this.columns = columns;
         this.message_delete = message_delete;

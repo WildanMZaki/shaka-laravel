@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use PDF;
 use App\Helpers\Fun;
 use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
@@ -23,10 +22,18 @@ class SallaryController extends Controller
     }
     public function index(Request $request)
     {
-        $start_date = $request->input('start_date', Muwiza::firstMonday());
         $employeeId = $request->employee_id;
-        $sallaryQuery = WeeklySallary::whereYear('period_start', date('Y'))
-            ->whereMonth('period_start', date('m'));
+
+        $data['yearSelected'] = $request->input('year_select', date('Y'));
+        $data['monthSelected'] = $request->input('month_select', date('m'));
+        $data['periodSelected'] = $request->input('period_select', '');
+
+        $sallaryQuery = WeeklySallary::whereYear('period_start', $data['yearSelected'])
+            ->whereMonth('period_start', $data['monthSelected']);
+
+        if ($data['periodSelected']) {
+            $sallaryQuery->where('period_start', $data['periodSelected']);
+        }
 
         if ($employeeId) {
             $sallaryQuery->where('user_id', $employeeId);
@@ -51,11 +58,11 @@ class SallaryController extends Controller
         $data['employeeSelected'] = $employeeId;
         $period = Fun::period();
         $data['period'] = Muwiza::convertPeriod("{$period[0]} - {$period[1]}");
-        $data['period_start'] = $start_date;
         $data['totalSallary'] = $totalSallary;
         $data['yearsOption'] = Fun::years(2024);
         $data['monthsOption'] = Fun::getMonthsId();
-        $data['periodsOption'] = Fun::getPeriodsOption(date('Y'), date('m'));
+        $data['periodsOption'] = Fun::getPeriodsOption($data['yearSelected'], $data['monthSelected']);
+        $data['periodsForSallary'] = Fun::getPeriodsOption(date('Y'), date('m'));
         $data['currentMonday'] = Muwiza::firstMonday();
         return view('admin.sallaries.index', $data);
     }
