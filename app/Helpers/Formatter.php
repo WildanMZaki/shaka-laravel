@@ -244,4 +244,11 @@ trait Formatter
         }
         return ucwords($hasil) . ' Rupiah';
     }
+
+    public static function oneMonthSince(string $dateString)
+    {
+        $nextMonthDate = date('Y-m-d', strtotime($dateString . ' +1 month'));
+        $resultDate = date('Y-m-d', strtotime($nextMonthDate . ' -1 day'));
+        return $resultDate;
+    }
 }

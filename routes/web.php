@@ -3,12 +3,14 @@
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\ExpenditureController;
 use App\Http\Controllers\Admin\KasbonController;
+use App\Http\Controllers\Admin\MonthlyInsentiveController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\PresenceController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RestockController;
 use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\SallaryController;
+use App\Http\Controllers\Admin\SallaryRuleController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashController;
@@ -50,6 +52,14 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     //     Artisan::call('queue:work');
     //     return 'Queue worker has been executed.';
     // });
+    Route::get('/run-migrate', function () {
+        $exitCode = Artisan::call('migrate');
+        return 'Migration Completed.' . "($exitCode)";
+    });
+    Route::get('/run-seeder', function () {
+        $exitCode = Artisan::call('db:seed --class=MonthlySallarySubMenuSeeder');
+        return 'Seeding executed.' . "($exitCode)";
+    });
     Route::get('/run-recache', function () {
         $exitCode1 = Artisan::call('cache:clear');
         $exitCode2 = Artisan::call('config:cache');
@@ -148,7 +158,11 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
 
         Route::prefix('sallaries')->group(function () {
             Route::prefix('rules')->group(function () {
-                Route::get('/', [SallaryController::class, 'rules'])->name('sallaries.rules');
+                Route::get('/', [SallaryRuleController::class, 'index'])->name('sallaries.rules');
+            });
+            Route::prefix('monthly')->group(function () {
+                Route::get('/', [MonthlyInsentiveController::class, 'index'])->name('sallaries.monthly');
+                Route::post('/', [MonthlyInsentiveController::class, 'count'])->name('sallaries.monthly.generate');
             });
             Route::get('/', [SallaryController::class, 'index'])->name('sallaries.list');
             Route::get('/download/{weekly_sallary_id}', [SallaryController::class, 'download'])->name('sallaries.download');

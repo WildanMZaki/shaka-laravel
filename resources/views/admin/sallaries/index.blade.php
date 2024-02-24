@@ -1,12 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Penjualan')
+@section('title', 'Penggajian Karyawan')
 
 @push('css')
     <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('assets') }}/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.css" />
-    <link rel="stylesheet" href="{{ asset('assets') }}/vendor/libs/select2/select2.css" />
-    <link rel="stylesheet" href="{{ asset('assets') }}/vendor/libs/flatpickr/flatpickr.css" />
     <style>
         .progress {
             background-color: #d8d8d8;
@@ -178,10 +175,6 @@
 
 @push('jsvendor')
     <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.js"></script>
-    <script src="{{ asset('assets') }}/vendor/libs/moment/moment.js"></script>
-    <script src="{{ asset('assets') }}/vendor/libs/bootstrap-daterangepicker/bootstrap-daterangepicker.js"></script>
-    <script src="{{ asset('assets') }}/vendor/libs/select2/select2.js"></script>
-    <script src="{{ asset('assets') }}/vendor/libs/flatpickr/flatpickr.js"></script>
 @endpush
 
 @push('js')
@@ -239,9 +232,6 @@
         }
 
         $(document).ready(() => {
-            const startDate = moment($('#start_date').val(), 'YYYY-MM-DD').format('DD MMM YYYY');
-            const endDate = moment($('#end_date').val(), 'YYYY-MM-DD').format('DD MMM YYYY');
-
             setProgressDone();
 
             wizeTable.init({
@@ -263,13 +253,6 @@
                 },
             })
             wize.activate_tooltips();
-
-            $('#sales_date').flatpickr({
-                enableTime: false,
-                dateFormat: "j M Y",
-                defaultDate: new Date(),
-                maxDate: new Date(),
-            });
 
             $('.change-period').on('change', function () {
                 const isFilter = $(this).hasClass('filter');

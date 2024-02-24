@@ -104,4 +104,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return Presence::hadBy($this->id);
     }
+
+    public function monthlyIncentives()
+    {
+        return $this->hasMany(MonthlyInsentive::class);
+    }
 }

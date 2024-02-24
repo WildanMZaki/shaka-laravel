@@ -25,7 +25,7 @@ class TryController extends Controller
     {
 
         // $result = $this->seeSaleWithKeep(4);
-        $result = $this->seeSallary();
+        // $result = $this->seeSallary();
         // $result = $this->seeSalesDetail();
         // $result = $this->seeLeaderSelling();
         // $result = $this->seeInsentif();
@@ -33,9 +33,15 @@ class TryController extends Controller
         // $result = $this->seePresenceDataOf(6, '2024-02-12');
         // $result = Muwiza::onlyDate(Muwiza::firstMonday());
         // $result = Fun::years(2024);
+
+        $result = $this->seeOneMonthSince('2024-02-06');
         return response()->json($result);
     }
 
+    private function seeOneMonthSince($dateTime)
+    {
+        return Muwiza::oneMonthSince($dateTime);
+    }
 
     private function seeSallary()
     {

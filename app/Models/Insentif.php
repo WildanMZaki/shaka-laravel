@@ -45,7 +45,7 @@ class Insentif extends Model
         ];
     }
 
-    private static function getInsentive($sales_qty, $insentifs)
+    public static function getInsentive($sales_qty, $insentifs)
     {
         $selectedIncentive = 0;
 

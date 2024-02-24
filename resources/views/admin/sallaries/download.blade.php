@@ -86,7 +86,7 @@
                 </tr>
                 <tr>
                     <td class="text-dark">Bonus Target</td>
-                    <td class="text-dark">: </td>
+                    <td class="text-dark">: {{ $bonusTarget }}</td>
                     <td class="text-dark"></td>
                     <td class="text-dark"></td>
                 </tr>
