@@ -52,14 +52,14 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     //     Artisan::call('queue:work');
     //     return 'Queue worker has been executed.';
     // });
-    Route::get('/run-migrate', function () {
-        $exitCode = Artisan::call('migrate');
-        return 'Migration Completed.' . "($exitCode)";
-    });
-    Route::get('/run-seeder', function () {
-        $exitCode = Artisan::call('db:seed --class=MonthlySallarySubMenuSeeder');
-        return 'Seeding executed.' . "($exitCode)";
-    });
+    // Route::get('/run-migrate', function () {
+    //     $exitCode = Artisan::call('migrate');
+    //     return 'Migration Completed.' . "($exitCode)";
+    // });
+    // Route::get('/run-seeder', function () {
+    //     $exitCode = Artisan::call('db:seed --class=MonthlySallarySubMenuSeeder');
+    //     return 'Seeding executed.' . "($exitCode)";
+    // });
     Route::get('/run-recache', function () {
         $exitCode1 = Artisan::call('cache:clear');
         $exitCode2 = Artisan::call('config:cache');

@@ -159,10 +159,10 @@ class SallaryController extends Controller
 
         // Cek adakah monthlyInsentive yang dimiliki
         // 1. Cek berdasarkan adakah yang punya id sama
-        $monthInsentive = MonthlyInsentive::where('weekly_sallaries_id', $weekly_sallary_id)->where('user_id', $sallary->user_id)->first();
+        $monthInsentive = MonthlyInsentive::where('weekly_sallaries_id', $weekly_sallary_id)->where('user_id', $sallary->user_id)->orderBy('id', 'DESC')->first();
         $data['bonusTarget'] = is_null($monthInsentive) ? '' : $monthInsentive->insentive;
         $pdf = FacadePdf::loadView('admin.sallaries.download', $data);
-        return $pdf->download("Slip Gaji {$sallary->user->name}");
+        return $pdf->download("Slip Gaji {$sallary->user->name}.pdf");
         // return view('admin.sallaries.download', $data);
     }
 }

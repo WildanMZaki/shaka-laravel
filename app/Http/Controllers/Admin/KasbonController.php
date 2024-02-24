@@ -13,13 +13,12 @@ class KasbonController extends Controller
 {
     public function index(Request $request)
     {
-        $today = date('Y-m-d');
-        $start_date = $request->input('start_date', $today);
-        $end_date = $request->input('end_date', $today);
+        $start_date = $request->input('start_date', Muwiza::firstMonday());
+        $end_date = $request->input('end_date', date('Y-m-d 23:59:59'));
         $employee_id = $request->employee_id;
         $type = $request->type_filter;
 
-        $kasbonQuery = Kasbon::whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59']);
+        $kasbonQuery = Kasbon::whereBetween('created_at', [$start_date, $end_date]);
 
         if ($employee_id) {
             $kasbonQuery->where('user_id', $employee_id);
