@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\SallaryController as AdminSallaryController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\KasbonController;
 use App\Http\Controllers\Api\PresenceController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SalesController;
+use App\Http\Controllers\Api\SallaryController;
 use App\Http\Controllers\Api\TeamController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,9 +24,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
 
+Route::get('/sallaries/download/{weekly_sallary_id}', [AdminSallaryController::class, 'download'])->name('api.sallaries.download');
+
 Route::middleware('jwt')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
+    Route::put('profile', [ProfileController::class, 'change']);
     Route::prefix('presences')->group(function () {
         Route::get('/', [PresenceController::class, 'check']);
         Route::post('/', [PresenceController::class, 'store']);
@@ -43,6 +49,10 @@ Route::middleware('jwt')->group(function () {
         Route::put('/{sales_id}', [SalesController::class, 'update']);
         Route::post('/', [SalesController::class, 'store']);
         Route::delete('/{sales_id}', [SalesController::class, 'delete']);
+    });
+    Route::prefix('sallaries')->group(function () {
+        Route::get('/', [SallaryController::class, 'index']);
+        Route::get('/{sallary_id}', [SallaryController::class, 'detail']);
     });
     Route::prefix('kasbon')->group(function () {
         Route::get('/', [KasbonController::class, 'index']);

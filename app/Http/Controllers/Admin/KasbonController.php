@@ -27,7 +27,7 @@ class KasbonController extends Controller
             $kasbonQuery->where('type', $type);
         }
 
-        $kasbonData = $kasbonQuery->orderBy('id', 'DESC')->get();
+        $kasbonData = $kasbonQuery->orderBy('created_at', 'DESC')->get();
         $table = $this->generateTable($kasbonData);
         if ($request->ajax()) {
             $rows = $table->result();
