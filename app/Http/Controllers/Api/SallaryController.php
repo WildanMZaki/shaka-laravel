@@ -26,6 +26,7 @@ class SallaryController extends Controller
             ->get()
             ->map(function ($sallary) {
                 $sallary->download = route('api.sallaries.download', $sallary->id);
+                $sallary->period = Muwiza::convertPeriod("{$sallary->period_start} - {$sallary->period_end}");
                 return $sallary;
             });
 

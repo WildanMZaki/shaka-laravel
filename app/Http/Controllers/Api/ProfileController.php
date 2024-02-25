@@ -13,7 +13,7 @@ class ProfileController extends Controller
         $user = $request->attributes->get('user');
 
         if ($request->has('name')) {
-            $user->name = $request->input('name');
+            $user->name = $request->name;
         }
 
         if ($request->hasFile('photo')) {

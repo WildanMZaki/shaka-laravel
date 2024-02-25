@@ -29,7 +29,8 @@ Route::get('/sallaries/download/{weekly_sallary_id}', [AdminSallaryController::c
 Route::middleware('jwt')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
-    Route::put('profile', [ProfileController::class, 'change']);
+    Route::post('profile', [ProfileController::class, 'change']);
+
     Route::prefix('presences')->group(function () {
         Route::get('/', [PresenceController::class, 'check']);
         Route::post('/', [PresenceController::class, 'store']);
