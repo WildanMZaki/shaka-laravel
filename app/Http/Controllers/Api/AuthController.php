@@ -33,6 +33,7 @@ class AuthController extends Controller
         $resp['email'] = $user->email;
         $resp['access_id'] = $user->access_id;
         $resp['access'] = $user->access->name;
+        $resp['since'] = date('Y', strtotime($user->created_at));
         $resp['photo'] = $user->photoPath();
 
         return response()->json($resp);
