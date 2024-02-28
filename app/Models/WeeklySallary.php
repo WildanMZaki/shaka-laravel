@@ -83,7 +83,20 @@ class WeeklySallary extends Model
         // SPG Training
         // Note: Perhitungan SPG Training Mirip Seperti Menghitung Insentif Harian
         if ($user->access_id == 7) {
-            $total = Insentif::detailFor(7, $salesData)->total_daily_insentive;
+            $dailiyInsentiveTraining = Insentif::where('access_id', $user->access_id)
+                ->orderBy('sales_qty', 'asc')
+                ->where('period', 'daily')
+                ->get(['sales_qty', 'insentive', 'type', 'period']);
+
+            $total = 0;
+            $gajiBotolan = Settings::of('Default Gaji Botolan');
+            foreach ($salesData as $sale) {
+                $insentiveDaily = Insentif::getInsentive($sale->total_qty, $dailiyInsentiveTraining);
+                if ($insentiveDaily == 0) {
+                    $insentiveDaily = $gajiBotolan * $sale->total_qty;
+                }
+                $total += $insentiveDaily;
+            }
             $sallary->total = $total;
             $sallary->save();
             return;
