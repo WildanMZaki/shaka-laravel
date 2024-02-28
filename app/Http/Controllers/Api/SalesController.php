@@ -58,12 +58,19 @@ class SalesController extends Controller
             ->whereBetween('created_at', [$startOfWeek, $endOfDay])
             ->sum('qty');
 
+        $startOfMonth = date('Y-m-1 00:00:00');
+        $totalInMonth = $user->selling()
+            ->where('status', 'done')
+            ->whereBetween('created_at', [$startOfMonth, $endOfDay])
+            ->sum('qty');
+
         return response()->json([
             'success' => true,
             'data' => [
                 'dailyTarget' => $dailyTarget,
                 'totalToday' => intval($totalToday),
                 'totalInWeek' => intval($totalInWeek),
+                'totalInMonth' => intval($totalInMonth),
             ],
         ]);
     }
