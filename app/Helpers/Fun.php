@@ -192,14 +192,14 @@ class Fun
         return $result;
     }
 
-    public static function generateDateList()
+    public static function generateDateList($year, $month)
     {
-        $today = date('Y-m-d');
-        $firstDayOfMonth = date('Y-m-01');
+        $firstDayOfMonth = date("$year-$month-01");
+        $endOfMonth = Muwiza::oneMonthSince($firstDayOfMonth);
         $dates = [];
 
         $currentDate = $firstDayOfMonth;
-        while ($currentDate <= $today) {
+        while ($currentDate <= $endOfMonth) {
             $dates[] = $currentDate;
             $currentDate = date('Y-m-d', strtotime($currentDate . ' +1 day'));
         }

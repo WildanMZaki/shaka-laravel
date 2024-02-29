@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\Fun;
+use App\Helpers\Muwiza;
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessSalesData;
 use App\Models\Product;
@@ -75,7 +76,7 @@ class SalesController extends Controller
             $totalInWeek = Sale::totalSales(Sale::fromLeader($user->id));
 
             $totalInMonth = 0;
-            $datesInMonth = Fun::generateDateList();
+            $datesInMonth = Fun::generateDateList(date('Y'), date('m'));
             foreach ($datesInMonth as $date) {
                 $salesTeams = $user->sales()->whereDate('sales_teams.created_at', $date)->get();
                 foreach ($salesTeams as $spg) {
@@ -106,6 +107,7 @@ class SalesController extends Controller
 
         $today = date('Y-m-d 23:59:59');
         $startOfMonth = date("$year-$month-1 00:00:00");
+        $endOfMonth = Muwiza::oneMonthSince($startOfMonth);
 
         $user = $request->attributes->get('user');
 
@@ -118,7 +120,7 @@ class SalesController extends Controller
         } else {
             if ($user->access_id == 5) {
                 $salesData = [];
-                $oneMonthDates = Fun::generateDateList();
+                $oneMonthDates = Fun::generateDateList($year, $month);
                 foreach ($oneMonthDates as $date) {
                     $sales = $user->sales()->whereDate('sales_teams.created_at', $date)->get();
                     $qty = 0;
@@ -136,7 +138,7 @@ class SalesController extends Controller
             } else {
                 $salesData = Sale::where('user_id', $user->id)
                     ->whereIn('status', ['done', 'processed'])
-                    ->whereBetween('created_at', [$startOfMonth, $today])
+                    ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
                     ->selectRaw('DATE(created_at) as date, SUM(qty) as total_qty')
                     ->groupBy('date')
                     ->get();
