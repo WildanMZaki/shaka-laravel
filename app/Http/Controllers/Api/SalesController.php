@@ -101,8 +101,11 @@ class SalesController extends Controller
     public function history(Request $request)
     {
         $period = $request->input('period', 'weekly');
+        $year = $request->input('year', date('Y'));
+        $month = $request->input('month', date('m'));
+
         $today = date('Y-m-d 23:59:59');
-        $startOfMonth = date('Y-m-1 00:00:00');
+        $startOfMonth = date("$year-$month-1 00:00:00");
 
         $user = $request->attributes->get('user');
 
