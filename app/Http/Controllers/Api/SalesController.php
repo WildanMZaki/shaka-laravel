@@ -57,11 +57,11 @@ class SalesController extends Controller
                 ->sum('qty');
             $totalInWeek = $user->selling()
                 ->where('status', 'done')
-                ->whereBetween('created_at', [$startOfWeek, $endOfDay])
+                ->whereBetween('created_at', [$startOfWeek, date('Y-m-d 23:59:59')])
                 ->sum('qty');
             $totalInMonth = $user->selling()
                 ->where('status', 'done')
-                ->whereBetween('created_at', [$startOfMonth, $endOfDay])
+                ->whereBetween('created_at', [$startOfMonth, date('Y-m-d 23:59:59')])
                 ->sum('qty');
         } else {
             // Statistik untuk Leader:
