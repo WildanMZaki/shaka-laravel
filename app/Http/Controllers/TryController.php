@@ -34,7 +34,8 @@ class TryController extends Controller
         // $result = Muwiza::onlyDate(Muwiza::firstMonday());
         // $result = Fun::years(2024);
 
-        $result = $this->seeOneMonthSince('2024-02-06');
+        // $result = $this->seeOneMonthSince('2024-02-06');
+        $result = Fun::generateDateList();
         return response()->json($result);
     }
 

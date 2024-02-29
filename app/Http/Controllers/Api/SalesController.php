@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\Fun;
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessSalesData;
 use App\Models\Product;
@@ -48,21 +49,43 @@ class SalesController extends Controller
         $endOfDay = Carbon::now()->endOfDay();
 
         $dailyTarget = Settings::of('Target Jual Harian SPG Freelancer');
-        $totalToday = $user->selling()
-            ->where('status', 'done')
-            ->whereDate('created_at', $today)
-            ->sum('qty');
-
-        $totalInWeek = $user->selling()
-            ->where('status', 'done')
-            ->whereBetween('created_at', [$startOfWeek, $endOfDay])
-            ->sum('qty');
-
         $startOfMonth = date('Y-m-1 00:00:00');
-        $totalInMonth = $user->selling()
-            ->where('status', 'done')
-            ->whereBetween('created_at', [$startOfMonth, $endOfDay])
-            ->sum('qty');
+        if ($user->access_id != 5) {
+            $totalToday = $user->selling()
+                ->where('status', 'done')
+                ->whereDate('created_at', $today)
+                ->sum('qty');
+            $totalInWeek = $user->selling()
+                ->where('status', 'done')
+                ->whereBetween('created_at', [$startOfWeek, $endOfDay])
+                ->sum('qty');
+            $totalInMonth = $user->selling()
+                ->where('status', 'done')
+                ->whereBetween('created_at', [$startOfMonth, $endOfDay])
+                ->sum('qty');
+        } else {
+            // Statistik untuk Leader:
+            $salesTeamToday = $user->sales()->whereDate('sales_teams.created_at', $today)->get();
+            $totalToday = 0;
+            foreach ($salesTeamToday as $spg) {
+                $selling = $spg->selling()->whereDate('created_at', $today)->sum('qty');
+                $totalToday += $selling;
+            }
+
+            $totalInWeek = Sale::totalSales(Sale::fromLeader($user->id));
+
+            $totalInMonth = 0;
+            $datesInMonth = Fun::generateDateList();
+            foreach ($datesInMonth as $date) {
+                $salesTeams = $user->sales()->whereDate('sales_teams.created_at', $date)->get();
+                foreach ($salesTeams as $spg) {
+                    $selling = $spg->selling()->whereDate('created_at', $date)->sum('qty');
+                    $totalInMonth += $selling;
+                }
+            }
+        }
+
+
 
         return response()->json([
             'success' => true,
@@ -77,26 +100,45 @@ class SalesController extends Controller
 
     public function history(Request $request)
     {
-        // $period = $this->input('period', 'weekly');
-        $today = date('Y-m-d');
-        $currentDayOfWeek = date('N', strtotime($today));
+        $period = $request->input('period', 'weekly');
+        $today = date('Y-m-d 23:59:59');
+        $startOfMonth = date('Y-m-1 00:00:00');
 
-        if ($currentDayOfWeek == 1) {
-            $start_date = $today . ' 00:00:00';
+        $user = $request->attributes->get('user');
+
+        if ($period == 'weekly') {
+            if ($user->access_id == 5) {
+                $salesData = Sale::fromLeader($user->id);
+            } else {
+                $salesData = Sale::fromSPG($user->id);
+            }
         } else {
-            $start_date = date('Y-m-d', strtotime('last Monday', strtotime($today))) . ' 00:00:00';
+            if ($user->access_id == 5) {
+                $salesData = [];
+                $oneMonthDates = Fun::generateDateList();
+                foreach ($oneMonthDates as $date) {
+                    $sales = $user->sales()->whereDate('sales_teams.created_at', $date)->get();
+                    $qty = 0;
+                    foreach ($sales as $spg) {
+                        $selling = $spg->selling()->whereDate('created_at', $date)->sum('qty');
+                        $qty += $selling;
+                    }
+                    if ($qty) {
+                        $salesData[] = (object)[
+                            'date' => $date,
+                            'total_qty' => $qty,
+                        ];
+                    }
+                }
+            } else {
+                $salesData = Sale::where('user_id', $user->id)
+                    ->whereIn('status', ['done', 'processed'])
+                    ->whereBetween('created_at', [$startOfMonth, $today])
+                    ->selectRaw('DATE(created_at) as date, SUM(qty) as total_qty')
+                    ->groupBy('date')
+                    ->get();
+            }
         }
-
-        $end_date = $today . ' 23:59:59';
-
-        $user_id = $request->attributes->get('user_id');
-
-        $salesData = Sale::where('user_id', $user_id)
-            ->where('status', 'done')
-            ->whereBetween('created_at', [$start_date, $end_date])
-            ->selectRaw('DATE(created_at) as date, SUM(qty) as total_qty')
-            ->groupBy('date')
-            ->get();
 
         return response()->json([
             'success' => true,

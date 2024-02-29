@@ -191,4 +191,19 @@ class Fun
         }
         return $result;
     }
+
+    public static function generateDateList()
+    {
+        $today = date('Y-m-d');
+        $firstDayOfMonth = date('Y-m-01');
+        $dates = [];
+
+        $currentDate = $firstDayOfMonth;
+        while ($currentDate <= $today) {
+            $dates[] = $currentDate;
+            $currentDate = date('Y-m-d', strtotime($currentDate . ' +1 day'));
+        }
+
+        return $dates;
+    }
 }
