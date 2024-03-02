@@ -97,6 +97,7 @@ class WeeklySallary extends Model
                 }
                 $total += $insentiveDaily;
             }
+            $sallary->main_sallary = $total;
             $sallary->total = $total;
             $sallary->save();
             return;
