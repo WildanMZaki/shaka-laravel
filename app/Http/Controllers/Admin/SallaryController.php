@@ -9,12 +9,14 @@ use App\Http\Controllers\Controller;
 use App\Jobs\GenerateSallaries;
 use App\Models\MonthlyInsentive;
 use App\Models\Presence;
+use App\Models\Sale;
 use App\Models\Settings;
 use App\Models\User;
 use App\Models\WeeklySallary;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 
 class SallaryController extends Controller
 {
@@ -93,9 +95,32 @@ class SallaryController extends Controller
                 $btns['success']['classIcon'] = 'ti ti-download';
                 $btns['success']['tooltip'] = 'Download';
                 $btns['success']['selector'] = 'btn-download';
-                $btns['success']['url'] = route('sallaries.download', $row->id);
+                $btns['success']['url'] = route('sallaries.download', Crypt::encryptString($row->id));
+                $btns['detail']['url'] = route('sallaries.detail', Crypt::encryptString($row->id));
                 return $btns;
             });
+    }
+
+    public function detail($sallary_id)
+    {
+        try {
+            $sallaryId = Crypt::decryptString($sallary_id);
+            $sallary = WeeklySallary::findOrFail($sallaryId);
+            $user = $sallary->user;
+        } catch (ModelNotFoundException $th) {
+            abort(404);
+        }
+
+        $data['workDays'] = Presence::workDayFrom($sallary->period_start);
+        $data['presences'] = Presence::hadBy($user->id, $data['workDays']);
+        $data['user'] = $user;
+        if ($user->access_id = 5) {
+            $data['salesData'] = Sale::fromLeader($user->id, $sallary->period_start);
+        } else {
+            $data['salesData'] = Sale::fromSPG($user->id, $sallary->period_start);
+        }
+        dd($data);
+        return view('admin.sallaries.detail', $data);
     }
 
     public function count_sallaries(Request $request)
@@ -132,7 +157,8 @@ class SallaryController extends Controller
     public function download($weekly_sallary_id)
     {
         try {
-            $sallary = WeeklySallary::findOrFail($weekly_sallary_id);
+            $sallaryId = Crypt::decryptString($weekly_sallary_id);
+            $sallary = WeeklySallary::findOrFail($sallaryId);
         } catch (ModelNotFoundException $th) {
             abort(404);
         }
@@ -159,7 +185,7 @@ class SallaryController extends Controller
 
         // Cek adakah monthlyInsentive yang dimiliki
         // 1. Cek berdasarkan adakah yang punya id sama
-        $monthInsentive = MonthlyInsentive::where('weekly_sallaries_id', $weekly_sallary_id)->where('user_id', $sallary->user_id)->orderBy('id', 'DESC')->first();
+        $monthInsentive = MonthlyInsentive::where('weekly_sallaries_id', $sallaryId)->where('user_id', $sallary->user_id)->orderBy('id', 'DESC')->first();
         $data['bonusTarget'] = is_null($monthInsentive) ? '' : $monthInsentive->insentive;
         $pdf = FacadePdf::loadView('admin.sallaries.download', $data);
         return $pdf->download("Slip Gaji {$sallary->user->name}.pdf");

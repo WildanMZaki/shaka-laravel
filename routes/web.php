@@ -168,6 +168,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::get('/download/{weekly_sallary_id}', [SallaryController::class, 'download'])->name('sallaries.download');
             Route::post('/generate', [SallaryController::class, 'count_sallaries'])->name('sallaries.generate');
             Route::get('/count_monitor', [SallaryController::class, 'monitor_counting'])->name('sallaries.monitor');
+            Route::get('/{sallary_id}', [SallaryController::class, 'detail'])->name('sallaries.detail');
         });
 
         Route::prefix('settings')->group(function () {

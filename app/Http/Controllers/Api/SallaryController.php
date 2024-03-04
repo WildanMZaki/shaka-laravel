@@ -10,6 +10,7 @@ use App\Models\Settings;
 use App\Models\WeeklySallary;
 use Cron\MonthField;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 
 class SallaryController extends Controller
 {
@@ -25,7 +26,7 @@ class SallaryController extends Controller
             ->where('user_id', $user_id)
             ->get()
             ->map(function ($sallary) {
-                $sallary->download = route('api.sallaries.download', $sallary->id);
+                $sallary->download = route('api.sallaries.download', Crypt::encryptString($sallary->id));
                 $sallary->period = Muwiza::convertPeriod("{$sallary->period_start} - {$sallary->period_end}");
                 return $sallary;
             });
@@ -49,7 +50,7 @@ class SallaryController extends Controller
                 'message' => 'Slip gaji tidak ditemukan',
             ]);
         }
-        $sallary->download = route('api.sallaries.download', $sallary->id);
+        $sallary->download = route('api.sallaries.download', Crypt::encryptString($sallary->id));
         $workDays = Presence::workDayFrom($sallary->period_start);
         $presence = Presence::hadBy($sallary->user_id, $workDays);
         $defaultTotalWorkDay = Settings::of('Jumlah Hari Kerja');

@@ -94,7 +94,7 @@ class Fun
         if (!$period) {
             $period = self::periodWithHour();
         }
-        $totalGivenSallary = WeeklySallary::whereBetween('created_at', $period)->sum('total');
+        $totalGivenSallary = WeeklySallary::whereBetween('period_start', $period)->sum('total');
         return $totalGivenSallary;
     }
 
