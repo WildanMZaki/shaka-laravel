@@ -35,9 +35,15 @@ class EmployeeController extends Controller
             MuwizaTable::generate($rowsData, function ($row, $cols) {
                 $cols->position = $row->access->name;
                 return $cols;
-            })->extract(['name', 'phone', 'email', 'position'])
+            })->extract(['name', 'phone', 'position'])
             ->col('status', function ($row) {
                 return  $row->active ? '<span class="badge bg-label-success">Aktif</span>' : '<span class="badge bg-label-danger">Nonaktif</span>';
+            })
+            ->col('bpjs', function ($row) {
+                $check = $row->with_insurance ? 'checked' : '';
+                return "<div class='form-check form-switch'>
+                    <input class='form-check-input switch-bpjs' type='checkbox' role='switch' id='bpjscheck{$row->id}' data-id='{$row->id}' $check>
+                </div>";
             })
             ->actions(['detail', 'edit', 'activate', 'inactivate'], function ($btns, $row) {
                 unset($btns[$row->active ? 'activate' : 'inactivate']);
@@ -106,6 +112,17 @@ class EmployeeController extends Controller
 
         return response()->json([
             'message' => 'Karyawan ditambahkan',
+        ]);
+    }
+
+    public function switch_bpjs(Request $request)
+    {
+        $employee = User::find($request->id);
+        $employee->with_insurance = !$employee->with_insurance;
+        $employee->save();
+        return response()->json([
+            'status' => 'success',
+            'message' => $employee->with_insurance ? "BPJS karyawan diaktifkan" : "BPJS karyawan dinonaktifkan"
         ]);
     }
 

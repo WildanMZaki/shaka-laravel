@@ -95,6 +95,7 @@
                                     <th>Penjualan</th>
                                     <th>Pokok</th>
                                     <th>Insentif</th>
+                                    <th>Asuransi</th>
                                     <th>Kasbon</th>
                                     <th>Total</th>
                                     <th>Action</th>
@@ -103,7 +104,7 @@
                             <tbody>
                                 {!! 
                                     $table->orderColumns([
-                                        'period', 'employee', 'sales', 'main', 'total_insentif', 'kasbon', 'total', 'actions',
+                                        'period', 'employee', 'sales', 'main', 'total_insentif', 'insurance', 'kasbon', 'total', 'actions',
                                     ])->resultHTML() 
                                 !!}
                             </tbody>
@@ -206,7 +207,6 @@
             const period = $('#period').val();
             const data = {year, month, period};
             const monitoringURL = '{!! route("sallaries.monitor") !!}' + `?period=${period}`;
-            console.log(monitoringURL);
             intervalMonitoringProgressId = setInterval(function() {
                 wize.ajax({
                     url: monitoringURL,
@@ -237,7 +237,7 @@
             wizeTable.init({
                 title: 'Riwayat Penggajian',
                 columns: [
-                    'period', 'employee', 'sales', 'main', 'total_insentif', 'kasbon', 'total', 'actions',
+                    'period', 'employee', 'sales', 'main', 'total_insentif', 'insurance', 'kasbon', 'total', 'actions',
                 ],
                 defaultButton: {
                     custom: null,

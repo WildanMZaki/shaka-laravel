@@ -21,6 +21,7 @@ class WeeklySallary extends Model
         'uang_absen',
         'insentive',
         'main_sallary',
+        'insurance',
         'kasbon',
         'unpaid_keep',
         'total_kasbon',
@@ -116,6 +117,13 @@ class WeeklySallary extends Model
 
         $sallary->kasbon = $kasbon;
 
+        $nomMontIns = Settings::of('Nominal BPJS Bulanan');
+        $totalPaidIns = self::where('user_id', $user->id)->whereBetween('period_start', [
+            date('Y-m-1 00:00:00'), date('Y-m-d 23:59:59'),
+        ])->sum('insurance');
+        $insur = ($user->with_insurance && (int)$totalPaidIns < $nomMontIns) ? round($nomMontIns / 4, -2) : 0;
+        $sallary->insurance = $insur;
+
         if ($user->access_id == 5) {
             // Untuk Leader, insentivenya dihitung mingguan tapi dihitung per hari gitu kan
             if ($presence->totalHadir != $workDayTotal) {
@@ -125,7 +133,7 @@ class WeeklySallary extends Model
             }
             $sallary->insentive = $uangAbsen;
             $sallary->total_kasbon = $kasbon;
-            $sallary->total = $gapok + $uangAbsen - $kasbon;
+            $sallary->total = $gapok + $uangAbsen - $kasbon - $insur;
             $sallary->save();
             return;
         }
@@ -169,7 +177,7 @@ class WeeklySallary extends Model
                 $kasbonFromKeep->created_at = $nextMonday . date(' H:i:s');
                 $kasbonFromKeep->save();
             }
-            $sallary->total = $total + $uangAbsen + $insentiveMingguan;
+            $sallary->total = $total + $uangAbsen + $insentiveMingguan - $insur;
             $sallary->save();
             return;
         }

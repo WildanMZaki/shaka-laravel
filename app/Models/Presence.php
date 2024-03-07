@@ -38,7 +38,7 @@ class Presence extends Model
             ->whereIn('status', ['approved', 'pending'])
             ->whereIn('date', $workDay);
 
-        $presences = $presencesQuery->get(['date', 'flag']);
+        $presences = $presencesQuery->get(['date', 'flag', 'status']);
         $totalHadir = $presences->where('flag', 'hadir')->count();
         $totalIzin = $presences->whereIn('flag', ['izin', 'sakit'])->count();
         $tanggalHadir = $presences->pluck('date')->toArray();

@@ -7,6 +7,7 @@ use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
 use App\Http\Controllers\Controller;
 use App\Jobs\GenerateSallaries;
+use App\Models\Kasbon;
 use App\Models\MonthlyInsentive;
 use App\Models\Presence;
 use App\Models\Sale;
@@ -88,6 +89,7 @@ class SallaryController extends Controller
             })
             ->col('main', ['ribuan', 'main_sallary'])
             ->col('total_insentif', ['ribuan', 'total_insentif'])
+            ->col('insurance', 'ribuan')
             ->col('kasbon', ['ribuan', 'total_kasbon'])
             ->col('total', 'rupiah')
             ->withoutId()
@@ -114,12 +116,18 @@ class SallaryController extends Controller
         $data['workDays'] = Presence::workDayFrom($sallary->period_start);
         $data['presences'] = Presence::hadBy($user->id, $data['workDays']);
         $data['user'] = $user;
-        if ($user->access_id = 5) {
+        if ($user->access_id == 5) {
             $data['salesData'] = Sale::fromLeader($user->id, $sallary->period_start);
         } else {
             $data['salesData'] = Sale::fromSPG($user->id, $sallary->period_start);
         }
-        dd($data);
+        $data['period'] = Muwiza::convertPeriod("{$sallary->period_start} - {$sallary->period_end}");
+        $data['piutang'] = Kasbon::where('user_id', $user->id)
+            ->whereBetween('created_at', Fun::periodWithHour($sallary->period_start))
+            ->selectRaw("DATE(created_at) as date, nominal, type, status")
+            ->get();
+
+        // return response()->json($data);
         return view('admin.sallaries.detail', $data);
     }
 
@@ -139,11 +147,15 @@ class SallaryController extends Controller
 
     public function monitor_counting(Request $request)
     {
-        $totalUser = User::where('access_id', '>=', 5)->where('active', true)->count();
         $monday = $request->period;
         if (!$monday) {
             $monday = Muwiza::onlyDate(Muwiza::firstMonday());
         }
+        $totalUser = User::where('access_id', '>=', 5)
+            ->where('active', true)
+            ->whereDate('created_at', '<', $monday)
+            ->count();
+
         $counted = WeeklySallary::where('period_start', $monday)->count();
 
         $progress = floor($counted * 100 / $totalUser);

@@ -18,9 +18,9 @@
                                     <td></td>
                                     <th>Nama</th>
                                     <th>Nomor Whatsapp</th>
-                                    <th>Email</th>
                                     <th>Jabatan</th>
                                     <th>Status</th>
+                                    <th>BPJS</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -313,7 +313,7 @@
                 title: 'Daftar Karyawan',
                 url_delete: '{!! route("employees.delete") !!}',
                 columns: [
-                    'name', 'phone', 'email', 'position', 'status', 'actions'
+                    'name', 'phone', 'position', 'status', 'bpjs', 'actions'
                 ],
                 defaultButton: {
                     custom: null,
@@ -411,6 +411,39 @@
                 },
             });
         });        
+
+        $(document).on('click', '.switch-bpjs', function(e) {
+            e.preventDefault();
+            const toChecked = $(this).is(':checked');
+            const title = $(this).is(':checked') ? 'Aktifkan BPJS' : 'Nonaktifkan BPJS';
+            const id = $(this).data('id');
+            console.log(title, id);
+            Swal.fire({
+                text: `${title} karyawan`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Ya",
+                cancelButtonText: "Batal",
+                customClass: {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-outline-danger ms-1",
+                },
+                buttonsStyling: false,
+            }).then((result) => {
+                if (result.value) {
+                    wize.ajax({
+                        url: '{!! route("employee.switch_bpjs") !!}',
+                        method: 'PATCH',
+                        data: {
+                            id: id,
+                        },
+                        addon_success: (data) => {
+                            wizeTable.reload();
+                        }
+                    });
+                }
+            });
+        });
 
         $(document).on('click', '.btn-active-control', function() {
             const title = $(this).attr('title') ?? $(this).data('bsOriginalTitle');

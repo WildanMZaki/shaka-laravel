@@ -33,7 +33,10 @@ class GenerateSallaries implements ShouldQueue
     {
         WeeklySallary::where('period_start', $this->periodStart)->delete();
 
-        $users = User::where('access_id', '>=', 5)->where('active', true)->get();
+        $users = User::where('access_id', '>=', 5)
+            ->where('active', true)
+            ->whereDate('created_at', '<', $this->periodStart)
+            ->get();
         foreach ($users as $user) {
             WeeklySallary::currentWeekFrom($user, $this->periodStart);
         }

@@ -146,7 +146,12 @@ class Fun
 
             // If the day is Monday (1), add it to the array
             if ($dayOfWeek == 1) {
-                $mondays[] = "$year-$month-$day";
+                // Pad month and day with leading zeros
+                $paddedMonth = str_pad($month, 2, '0', STR_PAD_LEFT);
+                $paddedDay = str_pad($day, 2, '0', STR_PAD_LEFT);
+
+                // Add to the array
+                $mondays[] = "$year-$paddedMonth-$paddedDay";
             }
         }
 

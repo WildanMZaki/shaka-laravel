@@ -72,17 +72,17 @@
                 <tr>
                     <td class="text-dark">Absen</td>
                     <td class="text-dark">: {{ $sallary->uang_absen != 0 ? \App\Helpers\Muwiza::ribuan($sallary->uang_absen) : '' }}</td>
+                    <td class="text-dark">{{ 'Asuransi'}}</td>
+                    <td class="text-dark">: {{ $sallary->insurance != 0 ? \App\Helpers\Muwiza::ribuan($sallary->insurance) : '' }}</td>
+                </tr>
+                <tr>
+                    <td class="text-dark">Insentif</td>
+                    <td class="text-dark">: {{ $sallary->insentive != 0 ? \App\Helpers\Muwiza::ribuan($sallary->insentive) : '' }}</td>
                     @php
                         $showKeep = $sallary->unpaid_keep != 0;
                     @endphp
                     <td class="text-dark">{{ $showKeep ? 'Keep' : ''}}</td>
                     <td class="text-dark">{{ $showKeep ? ': '. \App\Helpers\Muwiza::ribuan($sallary->unpaid_keep) : '' }}</td>
-                </tr>
-                <tr>
-                    <td class="text-dark">Insentif</td>
-                    <td class="text-dark">: {{ $sallary->insentive != 0 ? \App\Helpers\Muwiza::ribuan($sallary->insentive) : '' }}</td>
-                    <td class="text-dark"></td>
-                    <td class="text-dark"></td>
                 </tr>
                 <tr>
                     <td class="text-dark">Bonus Target</td>
@@ -101,7 +101,7 @@
                         Total (B)
                     </td>
                     <td>
-                        {{ \App\Helpers\Muwiza::rupiah($sallary->total_kasbon) }}
+                        {{ \App\Helpers\Muwiza::rupiah($sallary->total_kasbon + $sallary->insurance) }}
                     </td>
                 </tr>
                 <tr>

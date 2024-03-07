@@ -52,14 +52,14 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
     //     Artisan::call('queue:work');
     //     return 'Queue worker has been executed.';
     // });
-    // Route::get('/run-migrate', function () {
-    //     $exitCode = Artisan::call('migrate');
-    //     return 'Migration Completed.' . "($exitCode)";
-    // });
-    // Route::get('/run-seeder', function () {
-    //     $exitCode = Artisan::call('db:seed --class=MonthlySallarySubMenuSeeder');
-    //     return 'Seeding executed.' . "($exitCode)";
-    // });
+    Route::get('/run-migrate', function () {
+        $exitCode = Artisan::call('migrate');
+        return 'Migration Completed.' . "($exitCode)";
+    });
+    Route::get('/run-seeder', function () {
+        $exitCode = Artisan::call('db:seed --class=AllowanceFeature');
+        return 'Seeding executed.' . "($exitCode)";
+    });
     Route::get('/run-recache', function () {
         $exitCode1 = Artisan::call('cache:clear');
         $exitCode2 = Artisan::call('config:cache');
@@ -117,6 +117,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         Route::prefix('employees')->group(function () {
             Route::get('/', [EmployeeController::class, 'index'])->name('employees');
             Route::patch('/', [EmployeeController::class, 'active_control'])->name('employee.active_control');
+            Route::patch('/bpjs', [EmployeeController::class, 'switch_bpjs'])->name('employee.switch_bpjs');
             Route::post('/import_data', [EmployeeController::class, 'import'])->name('employees.import');
             Route::post('/', [EmployeeController::class, 'store'])->name('employee.store');
             Route::put('/', [EmployeeController::class, 'update'])->name('employee.update');
