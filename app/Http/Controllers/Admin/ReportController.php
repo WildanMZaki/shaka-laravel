@@ -15,4 +15,8 @@ class ReportController extends Controller
     private function generateTable(): MuwizaTable
     {
     }
+
+    function finance(Request $request)
+    {
+    }
 }

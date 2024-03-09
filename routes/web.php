@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\MonthlyInsentiveController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\PresenceController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\RestockController;
 use App\Http\Controllers\Admin\SalesController;
 use App\Http\Controllers\Admin\SallaryController;
@@ -57,7 +58,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         return 'Migration Completed.' . "($exitCode)";
     });
     Route::get('/run-seeder', function () {
-        $exitCode = Artisan::call('db:seed --class=AllowanceFeature');
+        $exitCode = Artisan::call('db:seed --class=ReportMenuSeeder');
         return 'Seeding executed.' . "($exitCode)";
     });
     Route::get('/run-recache', function () {
@@ -170,6 +171,13 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::post('/generate', [SallaryController::class, 'count_sallaries'])->name('sallaries.generate');
             Route::get('/count_monitor', [SallaryController::class, 'monitor_counting'])->name('sallaries.monitor');
             Route::get('/{sallary_id}', [SallaryController::class, 'detail'])->name('sallaries.detail');
+        });
+
+        Route::prefix('reports')->group(function () {
+            Route::get('presences', [ReportController::class, 'presences'])->name('reports.presences');
+            Route::get('teams', [ReportController::class, 'teams'])->name('reports.teams');
+            Route::get('sales', [ReportController::class, 'sales'])->name('reports.sales');
+            Route::get('finance', [ReportController::class, 'finance'])->name('reports.finance');
         });
 
         Route::prefix('settings')->group(function () {
