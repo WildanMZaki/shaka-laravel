@@ -155,7 +155,9 @@ class WizeTable {
                 theBtns.push(this.formatButton(btn));
             });
         }
-        theBtns.push(this.formatButton(this.defaultButton));
+        if (this.defaultButton != false) {
+            theBtns.push(this.formatButton(this.defaultButton));
+        }
 
         return theBtns;
     };

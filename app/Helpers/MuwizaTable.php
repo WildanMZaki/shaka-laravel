@@ -278,7 +278,7 @@ class MuwizaTable extends Muwiza
         $finalFormatter = is_string($closure) && stripos($closure, $this::$defaultPlaceholder) !== false ? $closure : null;
 
         foreach ($this->rowsData as $i => $row) {
-            $firstValue = $row->$select;
+            $firstValue = isset($row->$select) ? $row->$select : '';
             $formattedValue = $theFormat ? static::dataReplacer($firstValue, $theFormat) : (is_callable($theFormatter) ? $theFormatter($row) : static::$theFormatter($firstValue));
             $lastValue = $closure !== null ? ($finalFormatter ? static::dataReplacer($formattedValue, $finalFormatter) : $closure($formattedValue, $row)) : $formattedValue;
 
@@ -408,7 +408,9 @@ class MuwizaTable extends Muwiza
         foreach ($this->rowsData as $i => $row) {
             $this->resultData[] = [];
             foreach ($this->extractData as $item) {
-                $this->resultData[$i][$item] = $row->$item;
+                if (isset($row->$item)) {
+                    $this->resultData[$i][$item] = $row->$item;
+                }
             }
             $this->resultData[$i] += $this->processedData[$i];
         }
