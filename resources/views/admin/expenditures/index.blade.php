@@ -34,7 +34,9 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-2 offset-lg-3 d-flex align-items-end justify-content-end mb-3">
-                                    <button class="btn btn-primary" type="submit">Terapkan</button>
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="ti ti-adjustments-horizontal me-2"></i> Terapkan
+                                    </button>
                                 </div>
                             </div>
                         </form>

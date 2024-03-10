@@ -16,7 +16,7 @@ class SalesController extends Controller
     public function index(Request $request)
     {
         $start_date = $request->input('start_date', Muwiza::firstMonday());
-        $end_date = $request->input('end_date', date('Y-m-d 23:59:59'));
+        $end_date = $request->input('end_date', date('Y-m-d')) . '23:59:59';
 
         $product_id = $request->filter_product_id;
         $spg_id = $request->spg_id;

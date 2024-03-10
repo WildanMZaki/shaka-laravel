@@ -14,7 +14,7 @@ class ExpenditureController extends Controller
     public function index(Request $request)
     {
         $start_date = $request->input('start_date', Muwiza::firstMonday());
-        $end_date = $request->input('end_date', date('Y-m-d 23:59:59'));
+        $end_date = $request->input('end_date', date('Y-m-d')) . '23:59:59';
 
         $leader_id = $request->leader_id;
 
