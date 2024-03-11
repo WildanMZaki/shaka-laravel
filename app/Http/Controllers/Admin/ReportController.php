@@ -7,13 +7,95 @@ use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
 use App\Helpers\WzExcel;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
-    public function index(Request $request)
+    public $data = [];
+    public function __construct()
     {
+        $this->data['yearsOption'] = Fun::years(2024);
+        $this->data['monthsOption'] = Fun::getMonthsId();
+    }
+
+    public function presences(Request $request)
+    {
+        $y = $request->input('year', date('Y'));
+        $m = $request->input('month', date('m'));
+        $this->data['yearSelected'] = $y;
+        $this->data['monthSelected'] = $m;
+        $month = str_pad($m, 2, '0', STR_PAD_LEFT);
+        $last = date('t', strtotime("$y-$month-01"));
+        // return response()->json($lastDate);
+
+        $this->data['users'] = User::withTrashed()
+            ->whereHas('presences', function ($query) use ($y, $month, $last) {
+                $query->whereBetween('date', ["$y-$month-01", "$y-$month-$last"]);
+            })
+            ->where('access_id', '>=', 2)
+            ->where('active', true)
+            ->get();
+
+        $submit = $request->input('submit', 'fetch');
+        $this->data['dates'] = Fun::generateDateList($y, $month);
+
+        if ($submit == 'export') {
+            return $this->presencesTable($this->data['dates'], $this->data['users']);
+        }
+
+        return view('admin.reports.presences', $this->data);
+    }
+
+    private function presencesTable($dates, $employees)
+    {
+        $excelHeadings = ['Karyawan'];
+        foreach ($dates as $date) {
+            $excelHeadings[] = date('d', strtotime($date));
+        }
+        $rows = [];
+        foreach ($employees as $employee) {
+            $cols = [];
+            $cols['name'] = $employee->name;
+            foreach ($dates as $date) {
+                $presence = $employee->presences->where('date', $date)->first();
+                $presenceSymbol = '';
+                $suffix = '';
+                if ($presence) {
+                    switch ($presence->flag) {
+                        case 'hadir':
+                            $presenceSymbol = '*';
+                            break;
+                        case 'sakit':
+                            $presenceSymbol = 's';
+                            break;
+                        case 'izin':
+                            $presenceSymbol = 'i';
+                            break;
+                    }
+
+                    switch ($presence->status) {
+                        case 'approved':
+                            $suffix = '';
+                            break;
+                        case 'pending':
+                            $suffix = ' (p)';
+                            break;
+                        case 'rejected':
+                            $suffix = ' (r)';
+                            break;
+                    }
+                }
+                $cols[date('d', strtotime($date))] = $presenceSymbol . $suffix;
+            }
+            $rows[] = $cols;
+        }
+        $m = date('m', strtotime($dates[0]));
+        $y = date('Y', strtotime($dates[0]));
+        $excel = new WzExcel('Data Laporan Absensi', $excelHeadings, $rows);
+        $monthId = Muwiza::$idLongMonths[intval($m) - 1];
+        return Excel::download($excel, "Laporan Absensi $monthId $y.xlsx");
     }
 
     public function finance(Request $request)
@@ -45,12 +127,10 @@ class ReportController extends Controller
         if ($request->ajax()) {
             return response()->json($table->result());
         }
-        $data['yearsOption'] = Fun::years(2024);
-        $data['monthsOption'] = Fun::getMonthsId();
-        $data['yearSelected'] = $y;
-        $data['monthSelected'] = $m;
-        $data['rows'] = $table->resultHTML();
-        return view('admin.reports.finance', $data);
+        $this->data['yearSelected'] = $y;
+        $this->data['monthSelected'] = $m;
+        $this->data['rows'] = $table->resultHTML();
+        return view('admin.reports.finance', $this->data);
     }
 
     private function generateFinanceTable($periods): MuwizaTable
