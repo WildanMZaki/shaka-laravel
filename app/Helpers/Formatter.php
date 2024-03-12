@@ -55,6 +55,14 @@ trait Formatter
         return $formattedDate;
     }
 
+    public static function longDate(string $inputDate): string
+    {
+        $date = new DateTime($inputDate);
+        $formattedDate = self::$idDays[$date->format('w')] . ', ' . // Menggunakan 'w' untuk mendapatkan hari dalam format numerik (0-6)
+            $date->format('j') . ' ' . self::$idMonths[$date->format('n') - 1] . ' ' . $date->format('Y');
+        return $formattedDate;
+    }
+
     /**
      * Digunakan untuk memformat opsi dari array of item menjadi format yang cocok untuk input select dengan select2
      */

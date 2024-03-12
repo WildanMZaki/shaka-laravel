@@ -2,10 +2,6 @@
 
 @section('title', 'Report Absensi')
 
-@push('css')
-    <link href="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.css" rel="stylesheet">
-@endpush
-
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
         <div class="row mb-3">
@@ -107,13 +103,3 @@
         </div>
     </div>
 @endsection
-
-@push('jsvendor')
-    <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/jszip-3.10.1/dt-1.13.8/b-2.4.2/b-html5-2.4.2/r-2.5.0/datatables.min.js"></script>
-@endpush
-
-@push('js')
-    <script src="{{ asset('libs') }}/wizecode/applier.js"></script>
-    <script src="{{ asset('libs') }}/wizecode/Wize.js"></script>
-    <script src="{{ asset('libs') }}/wizecode/WizeTable.js"></script>
-@endpush

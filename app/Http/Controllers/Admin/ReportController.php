@@ -7,6 +7,7 @@ use App\Helpers\Muwiza;
 use App\Helpers\MuwizaTable;
 use App\Helpers\WzExcel;
 use App\Http\Controllers\Controller;
+use App\Models\SalesTeam;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -96,6 +97,32 @@ class ReportController extends Controller
         $excel = new WzExcel('Data Laporan Absensi', $excelHeadings, $rows);
         $monthId = Muwiza::$idLongMonths[intval($m) - 1];
         return Excel::download($excel, "Laporan Absensi $monthId $y.xlsx");
+    }
+
+    public function teams(Request $request) {
+        $s = $request->input('start_date', Muwiza::firstMonday());
+        $e = $request->input('end_date', date('Y-m-d')) . ' 23:59:59';
+
+        $createdTeams = SalesTeam::with('spg')
+            ->whereBetween('created_at', [$s, $e])
+            ->get();
+
+        // Group the teams by date created
+        $teamsGroupedByDate = $createdTeams->groupBy(function($team) {
+            return $team->created_at->format('Y-m-d');
+        });
+
+        // Group each date's teams by leader
+        $result = collect();
+        $teamsGroupedByDate->each(function($teams, $date) use (&$result) {
+            $result[$date] = $teams->groupBy('leader_id');
+        });
+
+        $data['start_date'] = $s;
+        $data['end_date'] = $e;
+        $data['result'] = $result;
+
+        return view('admin.reports.teams', $data);
     }
 
     public function finance(Request $request)

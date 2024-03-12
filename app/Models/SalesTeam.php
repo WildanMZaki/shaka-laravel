@@ -15,4 +15,18 @@ class SalesTeam extends Pivot
     protected $fillable = [
         'leader_id', 'sales_id', 'created_at'
     ];
+
+    public function leader()
+    {
+        return $this->belongsTo(User::class, 'leader_id')->withTrashed();
+    }
+
+    public function spg()
+    {
+        return $this->belongsTo(User::class, 'sales_id')->withTrashed();
+    }
+
+    public function created_date() {
+        return date('Y-m-d', strtotime($this->created_at));
+    }
 }
