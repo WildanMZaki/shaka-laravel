@@ -11,6 +11,7 @@ use App\Models\SalesTeam;
 use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -106,13 +107,19 @@ class ReportController extends Controller
         $m = $request->input('month', date('m'));
         $month = str_pad($m, 2, '0', STR_PAD_LEFT);
         $last = date('t', strtotime("$y-$month-01"));
+        $range = ["$y-$month-01", "$y-$month-$last"];
 
         $this->data['users'] = User::withTrashed()
-            ->whereHas('selling', function ($query) use ($y, $month, $last) {
-                $query->whereBetween('created_at', ["$y-$month-01", "$y-$month-$last"]);
+            ->whereHas('selling', function ($query) use ($range) {
+                $query->whereBetween('created_at', $range);
             })
             ->whereIn('access_id', [6, 7])
             ->where('active', true)
+            ->withCount(['selling as total_qty' => function ($query) use ($range) {
+                $query->select(DB::raw('sum(qty) as total_qty'))
+                    ->whereBetween('created_at', $range);
+            }])
+            ->orderBy('total_qty', 'desc')
             ->get();
 
         $submit = $request->input('submit', 'fetch');
@@ -188,6 +195,10 @@ class ReportController extends Controller
         $result = collect();
         $teamsGroupedByDate->each(function ($teams, $date) use (&$result) {
             $result[$date] = $teams->groupBy('leader_id');
+        });
+
+        $result = $result->sortByDesc(function ($value, $key) {
+            return $key;
         });
 
         $data['start_date'] = $s;

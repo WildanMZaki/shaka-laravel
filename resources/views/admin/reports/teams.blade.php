@@ -45,36 +45,38 @@
                             <div class="row">
                                 @php $no = 1; @endphp
                                 @foreach ($teams as $leader_id => $members)
-                                    <div class="col-lg-4 border rounded-3 py-2 mx-2 shadow-sm">
-                                        <h5 class="text-center m-0 p-0 mb-2">Team {{ $no }}</h5>
-                                        <h6>Leader: {{ $members[0]->leader->name }}</h6>
-                                        <table class="table text-center">
-                                            <thead>
-                                                <tr>
-                                                    <th>SPG</th>
-                                                    <th>Penjualan</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @php $total = 0; @endphp
-                                                @foreach ($members as $member)
-                                                    @php
-                                                        $qty = $member->spg->selling()->whereDate('created_at', $date)->whereIn('status', ['done', 'processed'])->sum('qty');
-                                                        $total += intval($qty);
-                                                    @endphp
+                                    <div class="col-lg-4 p-2 mb-3">
+                                        <div class="border rounded-3 shadow-sm p-2">
+                                            <h5 class="text-center m-0 p-0 mb-2">Team {{ $no }}</h5>
+                                            <h6>Leader: {{ $members[0]->leader->name }}</h6>
+                                            <table class="table text-center">
+                                                <thead>
                                                     <tr>
-                                                        <td>{{ $member->spg->name }}</td>
-                                                        <td>{{ $qty }}</td>
+                                                        <th>SPG</th>
+                                                        <th>Penjualan</th>
                                                     </tr>
-                                                @endforeach
-                                                <tr>
+                                                </thead>
+                                                <tbody>
+                                                    @php $total = 0; @endphp
+                                                    @foreach ($members as $member)
+                                                        @php
+                                                            $qty = $member->spg->selling()->whereDate('created_at', $date)->whereIn('status', ['done', 'processed'])->sum('qty');
+                                                            $total += intval($qty);
+                                                        @endphp
+                                                        <tr>
+                                                            <td>{{ $member->spg->name }}</td>
+                                                            <td>{{ $qty }}</td>
+                                                        </tr>
+                                                    @endforeach
                                                     <tr>
-                                                        <td>Total</td>
-                                                        <td>{{ \App\Helpers\Muwiza::ribuan($total) }}</td>
+                                                        <tr>
+                                                            <td>Total</td>
+                                                            <td>{{ \App\Helpers\Muwiza::ribuan($total) }}</td>
+                                                        </tr>
                                                     </tr>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                     @php $no++; @endphp
                                 @endforeach
