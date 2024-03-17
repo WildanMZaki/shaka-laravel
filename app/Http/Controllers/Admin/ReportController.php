@@ -8,6 +8,7 @@ use App\Helpers\MuwizaTable;
 use App\Helpers\WzExcel;
 use App\Http\Controllers\Controller;
 use App\Models\SalesTeam;
+use App\Models\Settings;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -99,7 +100,87 @@ class ReportController extends Controller
         return Excel::download($excel, "Laporan Absensi $monthId $y.xlsx");
     }
 
-    public function teams(Request $request) {
+    public function sales(Request $request)
+    {
+        $y = $request->input('year', date('Y'));
+        $m = $request->input('month', date('m'));
+        $month = str_pad($m, 2, '0', STR_PAD_LEFT);
+        $last = date('t', strtotime("$y-$month-01"));
+
+        $this->data['users'] = User::withTrashed()
+            ->whereHas('selling', function ($query) use ($y, $month, $last) {
+                $query->whereBetween('created_at', ["$y-$month-01", "$y-$month-$last"]);
+            })
+            ->whereIn('access_id', [6, 7])
+            ->where('active', true)
+            ->get();
+
+        $submit = $request->input('submit', 'fetch');
+        $this->data['dates'] = Fun::generateDateList($y, $month);
+
+        if ($submit == 'export') {
+            return $this->salesTable($this->data['dates'], $this->data['users']);
+        }
+
+        $this->data['yearSelected'] = $y;
+        $this->data['monthSelected'] = $m;
+        $this->data['target_default'] = Settings::of('Target Jual Harian SPG Freelancer');
+
+        return view('admin.reports.sales', $this->data);
+    }
+
+    private function salesTable($dates, $employees)
+    {
+        $excelHeadings = ['Karyawan'];
+        foreach ($dates as $date) {
+            $excelHeadings[] = date('d', strtotime($date));
+        }
+        $rows = [];
+        foreach ($employees as $employee) {
+            $cols = [];
+            $cols['name'] = $employee->name;
+            foreach ($dates as $date) {
+                $presence = $employee->presences->where('date', $date)->first();
+                $presenceSymbol = '';
+                $suffix = '';
+                if ($presence) {
+                    switch ($presence->flag) {
+                        case 'hadir':
+                            $presenceSymbol = '*';
+                            break;
+                        case 'sakit':
+                            $presenceSymbol = 's';
+                            break;
+                        case 'izin':
+                            $presenceSymbol = 'i';
+                            break;
+                    }
+
+                    switch ($presence->status) {
+                        case 'approved':
+                            $suffix = '';
+                            break;
+                        case 'pending':
+                            $suffix = ' (p)';
+                            break;
+                        case 'rejected':
+                            $suffix = ' (r)';
+                            break;
+                    }
+                }
+                $cols[date('d', strtotime($date))] = $presenceSymbol . $suffix;
+            }
+            $rows[] = $cols;
+        }
+        $m = date('m', strtotime($dates[0]));
+        $y = date('Y', strtotime($dates[0]));
+        $excel = new WzExcel('Data Laporan Absensi', $excelHeadings, $rows);
+        $monthId = Muwiza::$idLongMonths[intval($m) - 1];
+        return Excel::download($excel, "Laporan Absensi $monthId $y.xlsx");
+    }
+
+    public function teams(Request $request)
+    {
         $s = $request->input('start_date', Muwiza::firstMonday());
         $e = $request->input('end_date', date('Y-m-d')) . ' 23:59:59';
 
@@ -108,13 +189,13 @@ class ReportController extends Controller
             ->get();
 
         // Group the teams by date created
-        $teamsGroupedByDate = $createdTeams->groupBy(function($team) {
+        $teamsGroupedByDate = $createdTeams->groupBy(function ($team) {
             return $team->created_at->format('Y-m-d');
         });
 
         // Group each date's teams by leader
         $result = collect();
-        $teamsGroupedByDate->each(function($teams, $date) use (&$result) {
+        $teamsGroupedByDate->each(function ($teams, $date) use (&$result) {
             $result[$date] = $teams->groupBy('leader_id');
         });
 

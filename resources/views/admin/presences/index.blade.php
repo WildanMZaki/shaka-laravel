@@ -313,11 +313,9 @@
 
 @push('js')
 <script src="{{ asset('libs') }}/wizecode/Wize.js"></script>
-<script src="{{ asset('libs') }}/wizecode/WizeTable.js"></script>
 <script src="{{ asset('libs') }}/wizecode/applier.js"></script>
 <script>
     const wize = new Wize();
-    const wizeTable = new WizeTable();
 
     function reloadPresences(presences) {
         $('#presences-data').html('');

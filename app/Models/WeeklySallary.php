@@ -35,7 +35,7 @@ class WeeklySallary extends Model
     }
 
     // Ini khusus untuk generate gaji di minggu ini, untuk periode custom, maka gunakan fungsi lain saja lah ya, tapi base core perhitungannya kita gunakan saja yang sama
-    public static function currentWeekFrom($user, ?string $dateTime = null)
+    public static function currentWeekFrom($user, ?string $dateTime = null, $storeImmed = true)
     {
         /**
          * 1. Cek Kehadiran
@@ -68,6 +68,9 @@ class WeeklySallary extends Model
         if ($presence->totalHadir == 0) {
             $sallary->main_sallary = 0;
             $sallary->total = 0;
+            if (!$storeImmed) {
+                return $sallary;
+            }
             $sallary->save();
             return;
         }
@@ -81,8 +84,10 @@ class WeeklySallary extends Model
         $sold = Sale::totalSales($salesData);
         $sallary->total_sold = $sold;
 
+        $kasbon = Kasbon::kasbonFrom($user->id, $dateTime);
+        $sallary->kasbon = $kasbon;
+
         // SPG Training
-        // Note: Perhitungan SPG Training Mirip Seperti Menghitung Insentif Harian
         if ($user->access_id == 7) {
             $dailiyInsentiveTraining = Insentif::where('access_id', $user->access_id)
                 ->orderBy('sales_qty', 'asc')
@@ -99,12 +104,34 @@ class WeeklySallary extends Model
                 $total += $insentiveDaily;
             }
             $sallary->main_sallary = $total;
-            $sallary->total = $total;
+            $sallary->total_kasbon = $kasbon;
+            $sallary->total = $total - $kasbon;
+            $nextMonday = Muwiza::nextMondayFrom(Muwiza::onlyDate($currentMonday));
+            $nextWeekAvailable = Kasbon::where('type', 'kasbon')
+                ->where('note', 'Gaji Minus')
+                ->whereDate('created_at', $nextMonday)
+                ->first();
+
+            if ($nextWeekAvailable) {
+                $nextWeekAvailable->delete();
+            }
+
+            if ($sallary->total < 0) {
+                $kasbonGajiMinus = new Kasbon();
+                $kasbonGajiMinus->user_id = $user->id;
+                $kasbonGajiMinus->nominal = abs($sallary->total);
+                $kasbonGajiMinus->status = 'approved';
+                $kasbonGajiMinus->note = 'Gaji Minus';
+                $kasbonGajiMinus->type = 'kasbon';
+                $kasbonGajiMinus->created_at = $nextMonday . date(' H:i:s');
+                $kasbonGajiMinus->save();
+            }
+            if (!$storeImmed) {
+                return $sallary;
+            }
             $sallary->save();
             return;
         }
-
-        $kasbon = Kasbon::kasbonFrom($user->id, $dateTime);
 
         $insentiveMingguan = 0;
         $uangAbsen = 0;
@@ -114,8 +141,6 @@ class WeeklySallary extends Model
             $insentiveMingguan = $insentifData->total_weekly_insentive;
             $uangAbsen = $insentifData->total_daily_insentive;
         }
-
-        $sallary->kasbon = $kasbon;
 
         $nomMontIns = Settings::of('Nominal BPJS Bulanan');
         $totalPaidIns = self::where('user_id', $user->id)->whereBetween('period_start', [
@@ -134,6 +159,9 @@ class WeeklySallary extends Model
             $sallary->insentive = $uangAbsen;
             $sallary->total_kasbon = $kasbon;
             $sallary->total = $gapok + $uangAbsen - $kasbon - $insur;
+            if (!$storeImmed) {
+                return $sallary;
+            }
             $sallary->save();
             return;
         }
@@ -158,16 +186,17 @@ class WeeklySallary extends Model
             $total -= $unpaid_keep;
 
             $sallary->total_kasbon = $kasbon + $unpaid_keep;
-            if ($total < 0) {
-                $nextMonday = Muwiza::nextMondayFrom(Muwiza::onlyDate($currentMonday));
-                $nextWeekAvailable = Kasbon::where('type', 'kasbon')
-                    ->where('note', 'Gaji Minus')
-                    ->whereDate('created_at', $nextMonday)
-                    ->first();
+            $nextMonday = Muwiza::nextMondayFrom(Muwiza::onlyDate($currentMonday));
+            $nextWeekAvailable = Kasbon::where('type', 'kasbon')
+                ->where('note', 'Gaji Minus')
+                ->whereDate('created_at', $nextMonday)
+                ->first();
 
-                if ($nextWeekAvailable) {
-                    $nextWeekAvailable->delete();
-                }
+            if ($nextWeekAvailable) {
+                $nextWeekAvailable->delete();
+            }
+
+            if ($total < 0) {
                 $kasbonFromKeep = new Kasbon();
                 $kasbonFromKeep->user_id = $user->id;
                 $kasbonFromKeep->nominal = abs($total);
@@ -178,6 +207,9 @@ class WeeklySallary extends Model
                 $kasbonFromKeep->save();
             }
             $sallary->total = $total + $uangAbsen + $insentiveMingguan - $insur;
+            if (!$storeImmed) {
+                return $sallary;
+            }
             $sallary->save();
             return;
         }

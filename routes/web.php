@@ -61,33 +61,33 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         $exitCode = Artisan::call('db:seed --class=ReportMenuSeeder');
         return 'Seeding executed.' . "($exitCode)";
     });
-    Route::get('/run-recache', function () {
-        $exitCode1 = Artisan::call('cache:clear');
-        $exitCode2 = Artisan::call('config:cache');
+    // Route::get('/run-recache', function () {
+    //     $exitCode1 = Artisan::call('cache:clear');
+    //     $exitCode2 = Artisan::call('config:cache');
 
-        echo $exitCode1;
-        echo '<br>';
-        echo $exitCode2;
-    });
-    Route::get('/create-symlink', function () {
-        $laravelPath = realpath($_SERVER['DOCUMENT_ROOT'] . "/../shakapratama.wize.my.id");
-        $target = $laravelPath . "/storage/app/public";
-        $link = $laravelPath . "/public/storage"; // Adjusted path
+    //     echo $exitCode1;
+    //     echo '<br>';
+    //     echo $exitCode2;
+    // });
+    // Route::get('/create-symlink', function () {
+    //     $laravelPath = realpath($_SERVER['DOCUMENT_ROOT'] . "/../shakapratama.wize.my.id");
+    //     $target = $laravelPath . "/storage/app/public";
+    //     $link = $laravelPath . "/public/storage"; // Adjusted path
 
-        echo $laravelPath;
-        echo '<br>';
-        echo $target;
-        echo '<br>';
-        echo $link;
+    //     echo $laravelPath;
+    //     echo '<br>';
+    //     echo $target;
+    //     echo '<br>';
+    //     echo $link;
 
-        if (is_link($link)) {
-            echo "Symbolic link already exists.";
-        } elseif (symlink($target, $link)) {
-            echo "Symbolic link created successfully.";
-        } else {
-            echo "Failed to create symbolic link.";
-        }
-    });
+    //     if (is_link($link)) {
+    //         echo "Symbolic link already exists.";
+    //     } elseif (symlink($target, $link)) {
+    //         echo "Symbolic link created successfully.";
+    //     } else {
+    //         echo "Failed to create symbolic link.";
+    //     }
+    // });
 
     Route::get('/', [DashController::class, 'index'])->name('dashboard');
     Route::prefix('dev-setting')->group(function () {
@@ -169,6 +169,7 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
             Route::get('/', [SallaryController::class, 'index'])->name('sallaries.list');
             Route::get('/download/{weekly_sallary_id}', [SallaryController::class, 'download'])->name('sallaries.download');
             Route::post('/generate', [SallaryController::class, 'count_sallaries'])->name('sallaries.generate');
+            Route::post('/recount', [SallaryController::class, 'recount'])->name('sallaries.recount');
             Route::get('/count_monitor', [SallaryController::class, 'monitor_counting'])->name('sallaries.monitor');
             Route::get('/{sallary_id}', [SallaryController::class, 'detail'])->name('sallaries.detail');
         });

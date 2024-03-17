@@ -127,6 +127,9 @@ class SallaryController extends Controller
             ->selectRaw("DATE(created_at) as date, nominal, type, status")
             ->get();
 
+        $data['sallary_id'] = $sallary_id;
+        $data['sallary'] = $sallary;
+
         // return response()->json($data);
         return view('admin.sallaries.detail', $data);
     }
@@ -202,5 +205,46 @@ class SallaryController extends Controller
         $pdf = FacadePdf::loadView('admin.sallaries.download', $data);
         return $pdf->download("Slip Gaji {$sallary->user->name}.pdf");
         // return view('admin.sallaries.download', $data);
+    }
+
+    public function recount(Request $request)
+    {
+        try {
+            $sallaryId = Crypt::decryptString($request->sallary_id);
+            $sallary = WeeklySallary::findOrFail($sallaryId);
+            $user = $sallary->user;
+        } catch (ModelNotFoundException $th) {
+            return response()->json([
+                'message' => 'Data penggajian tidak ditemukan'
+            ], 404);
+        }
+
+        $pstart = $sallary->period_start;
+
+        $newSallary = WeeklySallary::currentWeekFrom($user, $pstart, false);
+
+        $sallary->fill([
+            'presence_status' => $newSallary->presence_status,
+            'total_sold' => $newSallary->total_sold,
+            'min_sold' => $newSallary->min_sold,
+            'uang_absen' => $newSallary->uang_absen ?? 0,
+            'insentive' => $newSallary->insentive ?? 0,
+            'main_sallary' => $newSallary->main_sallary,
+            'insurance' => $newSallary->insurance ?? 0,
+            'kasbon' => $newSallary->kasbon ?? 0,
+            'unpaid_keep' => $newSallary->unpaid_keep ?? 0,
+            'total_kasbon' => $newSallary->total_kasbon ?? 0,
+            'total' => $newSallary->total,
+            'status' => $newSallary->status ?? 'ungiven',
+        ]);
+
+        $sallary->save();
+
+        return response()->json([
+            'message' => 'Penghitungan ulang berhasil',
+            'data' => [
+                'sallary' => $newSallary,
+            ],
+        ]);
     }
 }

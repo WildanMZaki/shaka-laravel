@@ -14,12 +14,12 @@
                     <div class="row">
                         <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-lg-center">
                             <div class="iamleft">
-                                <h4 class="p-0 m-0">Detail Penggajian</h4>
+                                <h4 class="p-0 m-0">Detail Penggajian ({{ $sallary->user->name }})</h4>
                                 <p class="p-0 m-0">Periode : {{ $period }}</p>
                             </div>
                             <div class="iamright d-flex d-md-block justify-content-end">
-                                <button class="btn btn-primary btn-manual-add">
-                                    <i class="ti ti-plus"></i> Tambah Manual
+                                <button class="btn btn-primary" id="btn-count-repeat" data-sallary_id="{{ $sallary_id }}">
+                                    <i class="ti ti-repeat me-2"></i> Hitung Ulang
                                 </button>
                             </div>
                         </div>
@@ -154,4 +154,35 @@
     <script src="{{ asset('libs') }}/wizecode/applier.js"></script>
     <script src="{{ asset('libs') }}/wizecode/Wize.js"></script>
     <script src="{{ asset('libs') }}/wizecode/WizeTable.js"></script>
+
+    <script>
+        const wize = new Wize();
+
+        $(document).on('click', '#btn-count-repeat', function (e) {
+            const sallary_id = $(this).data('sallary_id');
+            Swal.fire({
+                text: "Hitung ulang penggajian",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Ya",
+                cancelButtonText: "Batal",
+                customClass: {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-outline-danger ms-1",
+                },
+                buttonsStyling: false,
+            }).then((result) => {
+                if (result.value) {
+                    wize.ajax({
+                        url: '{!! route("sallaries.recount") !!}',
+                        method: 'POST',
+                        data: {sallary_id},
+                        addon_success: (response) => {
+                            window.location.reload();
+                        } 
+                    });
+                }
+            });
+        });
+    </script>
 @endpush
