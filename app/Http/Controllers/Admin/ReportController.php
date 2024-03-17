@@ -132,51 +132,42 @@ class ReportController extends Controller
     private function salesTable($dates, $employees)
     {
         $excelHeadings = ['Karyawan'];
+        $superTotal = 0;
+        $totEachDates = [];
         foreach ($dates as $date) {
             $excelHeadings[] = date('d', strtotime($date));
+            $totEachDates[$date] = 0;
         }
+        $excelHeadings[] = 'Total';
+
         $rows = [];
         foreach ($employees as $employee) {
+            $total = 0;
             $cols = [];
             $cols['name'] = $employee->name;
             foreach ($dates as $date) {
-                $presence = $employee->presences->where('date', $date)->first();
-                $presenceSymbol = '';
-                $suffix = '';
-                if ($presence) {
-                    switch ($presence->flag) {
-                        case 'hadir':
-                            $presenceSymbol = '*';
-                            break;
-                        case 'sakit':
-                            $presenceSymbol = 's';
-                            break;
-                        case 'izin':
-                            $presenceSymbol = 'i';
-                            break;
-                    }
-
-                    switch ($presence->status) {
-                        case 'approved':
-                            $suffix = '';
-                            break;
-                        case 'pending':
-                            $suffix = ' (p)';
-                            break;
-                        case 'rejected':
-                            $suffix = ' (r)';
-                            break;
-                    }
-                }
-                $cols[date('d', strtotime($date))] = $presenceSymbol . $suffix;
+                $qty = $employee->selling()->whereDate('created_at', $date)->sum('qty');
+                $totEachDates[$date] += $qty;
+                $total += intval($qty);
+                $cols[date('d', strtotime($date))] = (!intval($qty)) ? '' : $qty;
             }
+            $cols['total'] = $total;
+            $superTotal += $total;
             $rows[] = $cols;
         }
+        $lastRowCols = [];
+        $lastRowCols['name'] = 'Total';
+        foreach ($dates as $date) {
+            $lastRowCols[date('d', strtotime($date))] = (!intval($totEachDates[$date])) ? '' : $totEachDates[$date];
+        }
+        $lastRowCols['total'] = $superTotal;
+        $rows[] = $lastRowCols;
+
         $m = date('m', strtotime($dates[0]));
         $y = date('Y', strtotime($dates[0]));
-        $excel = new WzExcel('Data Laporan Absensi', $excelHeadings, $rows);
+        $excel = new WzExcel('Data Laporan Penjualan', $excelHeadings, $rows);
         $monthId = Muwiza::$idLongMonths[intval($m) - 1];
-        return Excel::download($excel, "Laporan Absensi $monthId $y.xlsx");
+        return Excel::download($excel, "Laporan Penjualan $monthId $y.xlsx");
     }
 
     public function teams(Request $request)
