@@ -105,22 +105,29 @@ class ReportController extends Controller
     {
         $y = $request->input('year', date('Y'));
         $m = $request->input('month', date('m'));
+        $this->data['positionSelected'] = $request->input('position', '6,7');
         $month = str_pad($m, 2, '0', STR_PAD_LEFT);
         $last = date('t', strtotime("$y-$month-01"));
         $range = ["$y-$month-01", "$y-$month-$last"];
 
-        $this->data['users'] = User::withTrashed()
-            ->whereHas('selling', function ($query) use ($range) {
-                $query->whereBetween('created_at', $range);
-            })
-            ->whereIn('access_id', [6, 7])
-            ->where('active', true)
-            ->withCount(['selling as total_qty' => function ($query) use ($range) {
-                $query->select(DB::raw('sum(qty) as total_qty'))
-                    ->whereBetween('created_at', $range);
-            }])
-            ->orderBy('total_qty', 'desc')
-            ->get();
+        $positions = explode(',', $this->data['positionSelected']);
+        if ($this->data['positionSelected'] != '5') {
+            $this->data['users'] = User::withTrashed()
+                ->whereIn('access_id', $positions)
+                ->whereHas('selling', function ($query) use ($range) {
+                    $query->whereBetween('created_at', $range);
+                })
+                ->withCount(['selling as total_qty' => function ($query) use ($range) {
+                    $query->select(DB::raw('sum(qty) as total_qty'))
+                        ->whereBetween('created_at', $range);
+                }])
+                ->orderBy('total_qty', 'desc')
+                ->get();
+        } else {
+            $this->data['users'] = User::withTrashed()
+                ->where('access_id', '5')
+                ->get();
+        }
 
         $submit = $request->input('submit', 'fetch');
         $this->data['dates'] = Fun::generateDateList($y, $month);
@@ -129,6 +136,9 @@ class ReportController extends Controller
             return $this->salesTable($this->data['dates'], $this->data['users']);
         }
 
+        $rowsTable = $this->salesTable($this->data['dates'], $this->data['users'], true);
+        $this->data['rows'] = $rowsTable;
+        // return response()->json($rowsTable);
         $this->data['yearSelected'] = $y;
         $this->data['monthSelected'] = $m;
         $this->data['target_default'] = Settings::of('Target Jual Harian SPG Freelancer');
@@ -136,7 +146,7 @@ class ReportController extends Controller
         return view('admin.reports.sales', $this->data);
     }
 
-    private function salesTable($dates, $employees)
+    private function salesTable($dates, $employees, $needRaw = false)
     {
         $excelHeadings = ['Karyawan'];
         $superTotal = 0;
@@ -169,6 +179,10 @@ class ReportController extends Controller
         }
         $lastRowCols['total'] = $superTotal;
         $rows[] = $lastRowCols;
+
+        if ($needRaw) {
+            return $rows;
+        }
 
         $m = date('m', strtotime($dates[0]));
         $y = date('Y', strtotime($dates[0]));

@@ -59,7 +59,12 @@
                         <thead>
                             <tr>
                                 <th>Karyawan</th>
+                                {{-- @php
+                                    $supTot = 0;
+                                    $totEachDates = [];
+                                @endphp --}}
                                 @foreach ($dates as $date)
+                                    {{-- @php $totEachDates[$date] = 0; @endphp --}}
                                     <th class="px-0 text-center">{{ date('d', strtotime($date)) }}</th>
                                 @endforeach
                                 <th class="text-center px-1">Total</th>
@@ -76,7 +81,35 @@
                                     @endforeach
                                 </tr>
                             @endforeach
+                            {{-- @foreach ($users as $user)
+                            <tr>
+                                <td>{{ $user->name }}</td>
+                                @php $total = 0; @endphp
+                                @foreach ($dates as $date)
+                                    @php
+                                        $qty = $user->selling()->whereDate('created_at', $date)->sum('qty');
+                                        $totEachDates[$date] += $qty;
+                                        $total += intval($qty);
+                                        $showQty = (!intval($qty)) ? '' : $qty;
+                                        $col = 'info';
+                                        if ($user->access_id == 6) {
+                                            $col = ($qty >= $target_default) ? 'success' : 'danger';
+                                        }
+                                    @endphp
+                                    <td class="text-{{ $col }} px-0 text-center">{{ $showQty }}</td>
+                                @endforeach
+                                <td class="text-center px-1">{{ \App\Helpers\Muwiza::ribuan($total) }}</td>
+                            </tr>
+                            @php $supTot += $total; @endphp
+                            @endforeach --}}
                         </tbody>
+                        {{-- <tfoot>
+                            <th>Total</th>
+                            @foreach ($dates as $date)
+                                <td class="text-center px-1">{{ ($totEachDates[$date] != 0) ? \App\Helpers\Muwiza::ribuan($totEachDates[$date]) : '' }}</td>
+                            @endforeach
+                            <th class="text-center px-1">{{ \App\Helpers\Muwiza::ribuan($supTot) }}</th>
+                        </tfoot> --}}
                     </table>
                 </div>
             </div>
