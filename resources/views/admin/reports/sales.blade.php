@@ -72,7 +72,7 @@
                                         @php
                                             $isName = $key == 'name';
                                         @endphp
-                                        <td class="{{ !$isName ? ' px-0 text-center' : ''}}">{{ $isName || $val == '' ? $val : \App\Helpers\Muwiza::ribuan(intval($val)) }}</td>                                        
+                                        <td class="{{ !$isName ? 'px-0 text-center' : ''}}">{{ $isName || $val == '' ? $val : \App\Helpers\Muwiza::ribuan(intval($val)) }}</td>                                        
                                     @endforeach
                                 </tr>
                             @endforeach

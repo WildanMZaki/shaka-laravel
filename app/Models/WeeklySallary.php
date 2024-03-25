@@ -184,6 +184,7 @@ class WeeklySallary extends Model
             $sallary->unpaid_keep = $unpaid_keep;
             $total = $gapok - $kasbon;
             $total -= $unpaid_keep;
+            $total -= $insur;
 
             $sallary->total_kasbon = $kasbon + $unpaid_keep;
             $nextMonday = Muwiza::nextMondayFrom(Muwiza::onlyDate($currentMonday));
@@ -206,7 +207,7 @@ class WeeklySallary extends Model
                 $kasbonFromKeep->created_at = $nextMonday . date(' H:i:s');
                 $kasbonFromKeep->save();
             }
-            $sallary->total = $total + $uangAbsen + $insentiveMingguan - $insur;
+            $sallary->total = $total + $uangAbsen + $insentiveMingguan;
             if (!$storeImmed) {
                 return $sallary;
             }

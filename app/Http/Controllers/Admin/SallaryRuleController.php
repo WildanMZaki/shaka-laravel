@@ -7,5 +7,9 @@ use Illuminate\Http\Request;
 
 class SallaryRuleController extends Controller
 {
-    //
+    public function index()
+    {
+        $data = [];
+        return view('admin.sallary-rule.index', $data);
+    }
 }
