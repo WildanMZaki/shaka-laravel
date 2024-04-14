@@ -57,6 +57,13 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         $exitCode = Artisan::call('migrate');
         return 'Migration Completed.' . "($exitCode)";
     });
+    Route::get('/optimize', function () {
+        $exitCode = Artisan::call('optimize');
+        $exitCode2 = Artisan::call('config:cache');
+        $exitCode3 = Artisan::call('route:cache');
+        $exitCode4 = Artisan::call('view:cache');
+        return 'Optimization complete.' . "($exitCode)($exitCode2)($exitCode3)($exitCode4)";
+    });
     Route::get('/run-seeder', function () {
         $exitCode = Artisan::call('db:seed --class=ReportMenuSeeder');
         return 'Seeding executed.' . "($exitCode)";
@@ -161,6 +168,11 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
         Route::prefix('sallaries')->group(function () {
             Route::prefix('rules')->group(function () {
                 Route::get('/', [SallaryRuleController::class, 'index'])->name('sallaries.rules');
+                Route::prefix('insentives')->group(function () {
+                    Route::post('/', [SallaryRuleController::class, 'store_insentive'])->name('rules.insentives.store');
+                    Route::put('/', [SallaryRuleController::class, 'update_insentive'])->name('rules.insentives.update');
+                    Route::delete('{id}', [SallaryRuleController::class, 'delete_insentive'])->name('rules.insentives.delete');
+                });
             });
             Route::prefix('monthly')->group(function () {
                 Route::get('/', [MonthlyInsentiveController::class, 'index'])->name('sallaries.monthly');

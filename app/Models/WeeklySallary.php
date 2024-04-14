@@ -34,6 +34,11 @@ class WeeklySallary extends Model
         return $this->belongsTo(User::class)->withTrashed();
     }
 
+    public function position()
+    {
+        return $this->belongsTo(Access::class)->withTrashed();
+    }
+
     // Ini khusus untuk generate gaji di minggu ini, untuk periode custom, maka gunakan fungsi lain saja lah ya, tapi base core perhitungannya kita gunakan saja yang sama
     public static function currentWeekFrom($user, ?string $dateTime = null, $storeImmed = true)
     {
@@ -59,6 +64,7 @@ class WeeklySallary extends Model
 
         $sallary = new WeeklySallary();
         $sallary->user_id = $user->id;
+        $sallary->access_id = $user->access_id;
         $sallary->period_start = $period_start;
         $sallary->period_end = $period_end;
         $sallary->presence_status = $presence->perfect;

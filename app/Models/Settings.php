@@ -13,6 +13,7 @@ class Settings extends Model
 
     public static function of(string $rule)
     {
+        $rule = trim($rule);
         $defaultSettings = [
             'Default Harga Jual' => 10000,
             'Limit Kasbon' => 400000,

@@ -48,7 +48,7 @@
                     </tr>
                     <tr>
                         <td class="text-dark">Jabatan</td>
-                        <td class="text-dark">: {{ $sallary->user->access->name }}</td>
+                        <td class="text-dark">: {{ $sallary->access_id == null ? $sallary->user->access->name : $sallary->position->name }}</td>
                     </tr>
                 </table>
             </div>

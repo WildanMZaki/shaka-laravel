@@ -12,7 +12,7 @@ class Product extends Model
 
     public function restocks()
     {
-        return $this->hasMany(Restock::class);
+        return $this->hasMany(Restock::class)->withTrashed();
     }
 
     public function sales()

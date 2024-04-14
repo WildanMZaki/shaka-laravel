@@ -175,55 +175,6 @@ function addDaysToDate(inputDate, numberOfDays) {
 }
 
 class Wize {
-    // ajax = (options = {}) => {
-    //     const {
-    //         url = document.URL,
-    //         data = {},
-    //         method = "POST",
-    //         headers = {},
-    //         addon_success = null,
-    //         successDefault = true,
-    //         addon_error = null,
-    //         inputSelector = null,
-    //         modalSelector = null,
-    //     } = options;
-
-    //     if (!url) {
-    //         alert("URL diperlukan");
-    //         throw Error("URL ajax diperlukan");
-    //     }
-
-    //     headers["X-CSRF-TOKEN"] = $('meta[name="csrf-token"]').attr("content");
-    //     $.ajax({
-    //         url: url,
-    //         type: method,
-    //         headers: headers,
-    //         data: data,
-    //         beforeSend: () => {
-    //             this.clear_errors();
-    //             this.show_loading();
-    //         },
-    //         success: (data) => {
-    //             if (addon_success != null) {
-    //                 addon_success(data);
-    //                 if (!successDefault) {
-    //                     return;
-    //                 }
-    //             }
-    //             if (modalSelector) {
-    //                 $(modalSelector).modal("hide");
-    //             }
-    //             this.show_success(data);
-    //         },
-    //         error: (err) => {
-    //             if (addon_error != null) {
-    //                 addon_error(data);
-    //                 return;
-    //             }
-    //             this.error_occured(err, inputSelector);
-    //         },
-    //     });
-    // };
     ajax = (options = {}) => {
         const {
             url = document.URL,

@@ -11,6 +11,11 @@ class Insentif extends Model
 
     protected $fillable = ['access_id', 'sales_qty', 'intensive', 'type', 'period'];
 
+    public function access()
+    {
+        return $this->belongsTo(Access::class, 'access_id');
+    }
+
     // Hanya bisa untuk ambil data insentive periode daily dan weekly
     public static function detailFor($access_id, $salesData)
     {
