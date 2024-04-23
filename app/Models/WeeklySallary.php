@@ -36,7 +36,7 @@ class WeeklySallary extends Model
 
     public function position()
     {
-        return $this->belongsTo(Access::class);
+        return $this->belongsTo(Access::class, 'access_id');
     }
 
     // Ini khusus untuk generate gaji di minggu ini, untuk periode custom, maka gunakan fungsi lain saja lah ya, tapi base core perhitungannya kita gunakan saja yang sama
