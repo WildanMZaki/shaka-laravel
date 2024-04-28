@@ -95,7 +95,40 @@
     <script src="{{ asset('assets') }}/js/main.js"></script>
 
     <!-- Page JS -->
+    <script src="{{ asset('libs') }}/wizecode/Wize.js"></script>
+
     <script>
+      const wz = new Wize();
+
+      $(document).on('click', ".change-my-profile", function() {
+          wz.ajax({
+              method: "GET",
+              url: "{{ route('settings.get_profile') }}",
+              successDefault: false,
+              addon_success: function(res) {
+                  let data = res.data
+                  Swal.close()
+                  $("#modal-edit-my-profile").modal('show')
+                  $("#modal-edit-my-profile").find("input[name='name'].myprofile").val(data.name)
+                  $("#modal-edit-my-profile").find("input[name='phone'].myprofile").val(data.phone)
+              }
+          })
+      })
+
+      $("#update-profile").submit(function(e) {
+          e.preventDefault()
+          wz.ajax({
+              url: $(this).attr('action'),
+              serialData: $(this).serialize(),
+              inputSelector: '.myprofile[name="{key}"]',
+              modalSelector: '#modal-edit-my-profile',
+              addon_success: function(data) {
+                  $("#update-profile")[0].reset()
+                  $(".name-of-user").html(data.name);
+              }
+          })
+      })
+
       $(document).ready(function () {
         $('li.menu-item.has-sub-menu').hover(
           // Mouseover event

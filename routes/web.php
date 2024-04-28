@@ -195,6 +195,8 @@ Route::prefix('/')->middleware(['auth'])->group(function () {
 
         Route::prefix('settings')->group(function () {
             Route::put('/change', [SettingController::class, 'change'])->name('settings.change');
+            Route::get('/profile', [SettingController::class, 'get_profile'])->name('settings.get_profile');
+            Route::post('/profile', [SettingController::class, 'change_profile'])->name('settings.change_profile');
         });
     });
 });

@@ -175,12 +175,22 @@ function addDaysToDate(inputDate, numberOfDays) {
 }
 
 class Wize {
+    serializedToJson = (serialized) => {
+        const data = {};
+        serialized.split("&").forEach((el) => {
+            const [key, value] = el.split("=");
+            data[key] = decodeURIComponent(value);
+        });
+        return data;
+    };
+
     ajax = (options = {}) => {
         const {
             url = document.URL,
             data = {},
             method = "POST",
             headers = {},
+            serialData = null,
             addon_success = null,
             successDefault = true,
             showLoading = true,
@@ -195,13 +205,19 @@ class Wize {
         }
 
         const isFormData = data instanceof FormData;
+        let jsonData;
+        if (serialData) {
+            jsonData = this.serializedToJson(serialData);
+        } else {
+            jsonData = data;
+        }
 
         headers["X-CSRF-TOKEN"] = $('meta[name="csrf-token"]').attr("content");
         $.ajax({
             url: url,
             type: method,
             headers: headers,
-            data: isFormData ? data : JSON.stringify(data),
+            data: isFormData ? data : JSON.stringify(jsonData),
             contentType: isFormData ? false : "application/json",
             processData: isFormData ? false : true,
             beforeSend: () => {
